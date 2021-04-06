@@ -19,8 +19,10 @@ models.initDB(sequelize);
 // Levels
 require('./src/routes/level/findAllLevels')(app);
 require('./src/routes/level/findLevelByPk')(app);
+require('./src/routes/level/createLevel')(app);
 // Tests
 require('./src/routes/test/findAllTests')(app);
 require('./src/routes/test/findTestByPk')(app);
+
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

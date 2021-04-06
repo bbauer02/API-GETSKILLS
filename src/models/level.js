@@ -10,7 +10,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
             unique: {
-                msg: 'Ce niveau existe déjà.'
+                args : true,
+                msg: 'Level:Label already exist!'
+            },
+            validate : {
+                notEmpty:{msg: `Level:Label cannot be empty!`},
+                notNull: {msg: `Level:Label cannot be NULL!`}
             }
         },
         ref: {
