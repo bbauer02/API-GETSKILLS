@@ -3,10 +3,10 @@
 #### Model "Level" TABLE "levels"
 
 ###### Get all Levels : 
-URL :` /api/levels/` METHOD : `GET`
+URL :` YOUR_DOMAINE/api/levels/` METHOD : `GET`
 
 ###### Get one Level by his id : 
-URL :` /api/levels/:id` METHOD : `GET`
+URL :` YOUR_DOMAINE/api/levels/:id` METHOD : `GET`
 
 
 
