@@ -1,5 +1,4 @@
-﻿
-module.exports = (sequelize, DataTypes) => {
+﻿module.exports = (sequelize, DataTypes) => {
     const Level =  sequelize.define('Level', {
         id: {
             type: DataTypes.INTEGER,

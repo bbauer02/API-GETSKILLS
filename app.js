@@ -20,6 +20,8 @@ models.initDB(sequelize);
 require('./src/routes/level/findAllLevels')(app);
 require('./src/routes/level/findLevelByPk')(app);
 require('./src/routes/level/createLevel')(app);
+require('./src/routes/level/deleteLevel')(app);
+
 // Tests
 require('./src/routes/test/findAllTests')(app);
 require('./src/routes/test/findTestByPk')(app);
