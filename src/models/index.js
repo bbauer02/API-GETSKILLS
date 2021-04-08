@@ -5,8 +5,10 @@ const filebasename = path.basename(__filename);
 const models = {};
 
 // Jeux de données
+const countries_languages = require('../db/mock-countries-languages');
 const levels = require('../db/mock-level');
 const tests = require('../db/mock-test');
+
 
 const initDB = async (sequelize) => {
     fs
@@ -34,6 +36,19 @@ const initDB = async (sequelize) => {
         await sequelize.sync({force:true})
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
+        // TABLE 'country'
+        for(const country_language of countries_languages) {
+            const country = await models['Country'].create({
+                country:country_language.country
+            });
+            
+            for(const language of country_language.languages) {
+                await models['Language'].create({
+                    country_id: country.id,
+                    language: language
+                });
+            }
+        }
         // TABLE 'levels'
         for(const level of levels) {
             await models['Level'].create({

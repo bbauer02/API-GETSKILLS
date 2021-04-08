@@ -16,6 +16,12 @@ app
 models.initDB(sequelize);
 
 // Points de terminaison
+// Countries
+require('./src/routes/country/findAllCountries')(app);
+
+// Languages 
+require('./src/routes/language/findAllLanguages')(app);
+
 // Levels
 require('./src/routes/level/findAllLevels')(app);
 require('./src/routes/level/findLevelByPk')(app);
