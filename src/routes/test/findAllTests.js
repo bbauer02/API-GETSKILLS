@@ -1,6 +1,5 @@
 ﻿const {models} = require('../../models');
 
-
 module.exports =  (app) => {
     app.get('/api/tests', async (req,res) => {
        try {
@@ -30,7 +29,7 @@ module.exports =  (app) => {
             ]
             });
             const message = `${Tests.count} test(s) found`;
-            res.json({message, data: Tests.rows})
+            res.json({message, data: Tests.rows});
        }
        catch (error){
          const message = `Service not available. Please retry later.`;
