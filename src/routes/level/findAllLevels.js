@@ -5,23 +5,37 @@ module.exports =  (app) => {
   app.get('/api/levels', async (req,res) => {
     try {
       // calcul le nombre d'arguments dans la requête
-      const countArgs = Object.keys(req.query).length;
+      //const countArgs = Object.keys(req.query).length;
       const parameters = {};
-      // Parameter : LABEL
-      if(req.query.label) {
+      // Parameter : LABEL ET REF
+      if(req.query.label && req.query.ref) {
         parameters.where = {
-            label:{
-            [Op.like] : `%${req.query.label}%`
-        }}
+          [Op.or]: [
+            {label:{ 
+              [Op.like] : `%${req.query.label}%`
+            }},
+            {ref:{ 
+              [Op.like] : `%${req.query.ref}%`
+            }}] 
+        }
+      } 
+      // IF ONLY one of the 2 are passed
+      else {
+          // Parameter : LABEL
+          if(req.query.label) {
+            parameters.where = {
+                label:{
+                [Op.like] : `%${req.query.label}%`
+            }}
+          }
+          // Parameter : REF
+          if(req.query.ref) {
+            parameters.where = {
+                ref:{
+                [Op.like] : `%${req.query.ref}%`
+            }}
+          }
       }
-      // Parameter : REF
-      if(req.query.ref) {
-        parameters.where = {
-            ref:{
-            [Op.like] : `%${req.query.ref}%`
-        }}
-      }
-    
       // Parameter : LIMIT
       if(req.query.limit) {
         const limit = parseInt(req.query.limit);       
@@ -40,6 +54,8 @@ module.exports =  (app) => {
         }
         parameters.offset = parseInt(req.query.offset);
       }
+      // Parameter : ORDER
+      parameters.order = [['label', 'ASC']]
 
       const Levels = await models['Level'].findAndCountAll(parameters);
       const message = `${Levels.count} level(s) found`;
