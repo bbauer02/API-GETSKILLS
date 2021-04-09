@@ -1,11 +1,12 @@
 ﻿const {models} = require('../../models');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 module.exports =  (app) => {
     app.get('/api/countries', async (req,res) => {
         try {
             const parameters = {};
             if(req.query.search) {
+                const lower = Sequelize.fn('LOWER',Sequelize.col('country'));
                 parameters.where = {
                     country: {
                         [Op.like] : `%${req.query.search}%`

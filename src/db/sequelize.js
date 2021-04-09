@@ -7,9 +7,14 @@ const sequelize = new Sequelize(
         host: 'localhost',
         port: 3307,
         dialect: 'mariadb',
-        dialectOptions: {
-            timezone:'Etc/GMT-2'
-        },
+        define: {
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_general_ci',
+            dialectOptions: {
+                timezone:'Etc/GMT-2',  
+            }
+        }
+        ,
         logging:true
     }
 )

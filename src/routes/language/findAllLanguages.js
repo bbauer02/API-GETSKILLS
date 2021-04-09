@@ -11,8 +11,7 @@ module.exports =  (app) => {
                         [Op.like] : `%${req.query.search}%`
                     }
                 };
-            }
-            
+            } 
             parameters.include = [{
                 model: models['Country'],
                 attributes : [["country","label"]]              
