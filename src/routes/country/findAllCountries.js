@@ -6,7 +6,6 @@ module.exports =  (app) => {
         try {
             const parameters = {};
             if(req.query.search) {
-                const lower = Sequelize.fn('LOWER',Sequelize.col('country'));
                 parameters.where = {
                     country: {
                         [Op.like] : `%${req.query.search}%`
