@@ -1,21 +1,54 @@
 ﻿module.exports = (sequelize, DataTypes) => {
     const Country =  sequelize.define('Country', {
-        id: {
+        country_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true 
+            autoIncrement: true
         },
-        country: {
-            type: DataTypes.STRING
+        label: {
+            type:DataTypes.STRING,
+            allowNull: false,
+            validate : {
+                notEmpty:{msg: `Country:Label_fr cannot be empty !`},
+                notNull: {msg: `Country:Label_fr cannot be NULL!`}
+            }
+        },
+        inhabitant: {
+            type:DataTypes.STRING,
+            allowNull: false,
+            validate : {
+                notEmpty:{msg: `Country:Inhabitant cannot be empty !`},
+                notNull: {msg: `Country:Inhabitant cannot be NULL!`}
+            }
+        },
+        language: {
+            type:DataTypes.STRING,
+            allowNull: false,
+            validate : {
+                notEmpty:{msg: `Country:Language cannot be empty !`},
+                notNull: {msg: `Country:Language cannot be NULL!`}
+            }
+        },
+        code: {
+            type:DataTypes.STRING,
+            allowNull: false,
+            validate : {
+                notEmpty:{msg: `Country:Code cannot be empty !`},
+                notNull: {msg: `Country:Code cannot be NULL!`}
+            }
         }
     },
     {
         tableName: 'countries',
-        timestamps: false
+        timestamps: false,
     });
 
     Country.associate = models => {
-        Country.hasMany(models.Language,{foreignKey:'country_id', sourceKey: 'id'});
+        Country.hasOne(models.User,{foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
+        Country.hasOne(models.User,{foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
+        Country.hasOne(models.User,{foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
+        Country.hasOne(models.User,{foreignKey:'role_id',sourceKey: 'country_id', timestamps: false});
+
     }
-    return Country;
-} 
+     return Country;
+}

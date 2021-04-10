@@ -5,16 +5,19 @@ const filebasename = path.basename(__filename);
 const models = {};
 
 // Jeux de données
-const countries_languages = require('../db/mock-countries-languages');
+const countries = require('../db/mock-countries');
+const roles = require('../db/mock-roles');
+
 const levels = require('../db/mock-level');
 const tests = require('../db/mock-test');
+const users = require('../db/mock-user');
 
 
 const initDB = async (sequelize) => {
     fs
     .readdirSync(__dirname)
     .filter( (file) => {
-        const returnFile = (file.indexOf('.') !== 0)
+        const returnFile = (file.indexOf('.') !== 0) 
           && (file !== filebasename)
           && (file.slice(-3) === '.js');
           return returnFile;
@@ -36,19 +39,47 @@ const initDB = async (sequelize) => {
         await sequelize.sync({force:true})
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
-        // TABLE 'country'
-        for(const country_language of countries_languages) {
-            const country = await models['Country'].create({
-                country:country_language.country
+
+        // FILL TABLE 'countries' / 'languages' / 'nationality'
+        for(const country of countries) {
+            const Country = await models['Country'].create({
+                label:country.en_short_name,
+                inhabitant:country.nationality,
+                language:country.nationality,
+                code:country.alpha_2_code
             });
-            
-            for(const language of country_language.languages) {
-                await models['Language'].create({
-                    country_id: country.id,
-                    language: language
-                });
-            }
         }
+
+        // FILL TABLE 'ROLE'
+        for(const role of roles) {
+            const Role = await models['Role'].create({
+                label: role.label,
+                power: role.power
+            });
+        }
+
+
+        // TABLE 'users'
+       /* for (const user of users) {
+            await models['User'].create({
+                role_id: user.role_id,
+                login: user.login,
+                password:user.password,
+                email: user.email,
+                firstname: user.firstname,
+                lastname : user.lastname,
+                adress1:user.adress1,
+                address2: user.adress2,
+                zipcode: user.zipcode,
+                city: user.city,
+                country: user.country,
+                birthday: user.birthday,
+                nationnality: user.nationnality,
+                firstlanguage: user.firstlanguage
+            });
+        }
+*/
+
         // TABLE 'levels'
         for(const level of levels) {
             await models['Level'].create({

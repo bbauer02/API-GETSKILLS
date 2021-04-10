@@ -1,5 +1,5 @@
 ﻿const {models} = require('../../models');
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 
 module.exports =  (app) => {
     app.get('/api/countries', async (req,res) => {
