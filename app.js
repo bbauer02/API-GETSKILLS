@@ -19,6 +19,9 @@ models.initDB(sequelize);
 // Countries
 require('./src/routes/country/findAllCountries')(app);
 
+// Roles
+require('./src/routes/role/findAllRoles')(app);
+require('./src/routes/role/findRoleByPk')(app);
 
 
 // Levels
