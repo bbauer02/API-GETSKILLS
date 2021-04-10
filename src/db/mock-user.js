@@ -1,19 +1,22 @@
 ﻿const users = [
     {
-        role_id: 1,
+        role_id: 5,
         login: "bauer",
         password: "bb1212",
         email: "bbauer02@gmail.com",
+        phone: '+330323522248',
+        gender :"M",
+        civility : 1,
         firstname: "Baptiste",
         lastname: "Bauer",
         adress1: "30 rue Robert Leroux",
         adress2: "",
         zipcode: "02000",
         city: "LAON",
-        country: 70,
+        country_id: 76,
         birthday: new Date(1982, 7, 4)     ,
-        nationnality: 70,
-        firstlanguage:70
+        nationality_id: 3,
+        firstlanguage_id:5
     }
 ];
 module.exports = users;

@@ -24,6 +24,12 @@ require('./src/routes/country/findCountryByPk')(app);
 require('./src/routes/role/findAllRoles')(app);
 require('./src/routes/role/findRoleByPk')(app);
 
+// Users
+require('./src/routes/user/findUserByPk')(app);
+require('./src/routes/user/findAllUsers')(app);
+require('./src/routes/user/createUser')(app);
+require('./src/routes/user/updateUser')(app);
+require('./src/routes/user/deleteUser')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);

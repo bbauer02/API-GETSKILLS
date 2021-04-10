@@ -13,7 +13,7 @@
                 notNull: {msg: `Country:Label_fr cannot be NULL!`}
             }
         },
-        nationality: {
+        countryNationality: {
             type:DataTypes.STRING,
             allowNull: false,
             validate : {
@@ -21,7 +21,7 @@
                 notNull: {msg: `Country:Nationality cannot be NULL!`}
             }
         },
-        language: {
+        countryLanguage: {
             type:DataTypes.STRING,
             allowNull: false,
             validate : {
@@ -44,11 +44,9 @@
     });
 
     Country.associate = models => {
-        Country.hasOne(models.User,{foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
-        Country.hasOne(models.User,{foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
-        Country.hasOne(models.User,{foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
-        Country.hasOne(models.User,{foreignKey:'role_id',sourceKey: 'country_id', timestamps: false});
-
+        Country.hasMany(models.User,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
+        Country.hasMany(models.User,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
+        Country.hasMany(models.User,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
     }
      return Country;
 }

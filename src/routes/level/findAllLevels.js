@@ -43,7 +43,7 @@ module.exports =  (app) => {
           const message = `Limit parameter should be an integer.`;
           return res.status(400).json({message})
         }
-        parameters.limit = parseInt(req.query.limit);
+        parameters.limit = limit;
       }
       // Parameter : OFFSET
       if(req.query.offset) {

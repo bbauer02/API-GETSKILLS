@@ -49,7 +49,7 @@
                 notNull: {msg: `User:civility cannot be NULL!`}
             }
         },
-        genrer : {
+        gender : {
             type: DataTypes.STRING,
             allowNull:false,
             validate : {
@@ -140,12 +140,10 @@
         timestamps: false
     });
     User.associate = models => {
-        User.belongsTo(models.Country,{foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
-        User.belongsTo(models.Country,{foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
-        User.belongsTo(models.Country,{foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
-        User.belongsTo(models.Country,{foreignKey:'role_id',sourceKey: 'country_id', timestamps: false});
-
-
+        User.belongsTo(models.Role,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false});
+        User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
+        User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
+        User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
     }
     return User;
 }  

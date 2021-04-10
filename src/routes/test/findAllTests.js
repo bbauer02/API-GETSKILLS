@@ -8,25 +8,27 @@ module.exports =  (app) => {
                     parent_id: null
                 },
                 order:['label'], 
-                include: [{
-                    model: models['Level'],
-                    attributes : ["id", "label", "description", "ref"],
-                    through: {
-                        attributes: []
-                    },
-                },
-                {
-                    model:models['Test'],
-                    as: 'children',
-                    include:[{
+                include:
+                [
+                    {
                         model: models['Level'],
                         attributes : ["id", "label", "description", "ref"],
                         through: {
                             attributes: []
                         }
-                    }]
-                }
-            ]
+                    },
+                    {
+                        model:models['Test'],
+                        as: 'children',
+                        include:[{
+                            model: models['Level'],
+                            attributes : ["id", "label", "description", "ref"],
+                            through: {
+                                attributes: []
+                            }
+                        }]
+                    }
+                ]
             });
             const message = `${Tests.count} test(s) found`;
             res.json({message, data: Tests.rows});

@@ -28,7 +28,7 @@
     });
 
     Role.associate = models => {
-        Role.hasOne(models.User,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false});
-    }
+        Role.hasMany(models.User,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false});
+    } 
     return Role;
 }

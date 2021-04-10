@@ -5,7 +5,7 @@ module.exports =  (app) => {
     app.get('/api/roles', async (req,res) => {
         try {
             const parameters = {};
-            const Roles = await models['Role'].findAndCountAll(parameters);
+            const Roles = await models['Role'].findAndCountAll();
             const message = `${Roles.count} roles found`;
             res.json({message, data: Roles.rows});
         }

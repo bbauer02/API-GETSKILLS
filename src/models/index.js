@@ -44,8 +44,8 @@ const initDB = async (sequelize) => {
         for(const country of countries) {
             const Country = await models['Country'].create({
                 label:country.en_short_name,
-                nationality:country.nationality,
-                language:country.nationality,
+                countryNationality:country.nationality,
+                countryLanguage:country.nationality,
                 code:country.alpha_2_code
             });
         }
@@ -60,25 +60,28 @@ const initDB = async (sequelize) => {
 
 
         // TABLE 'users'
-       /* for (const user of users) {
+        for (const user of users) {
             await models['User'].create({
                 role_id: user.role_id,
                 login: user.login,
                 password:user.password,
                 email: user.email,
+                phone: user.phone,
+                gender:user.gender,
+                civility:user.civility,
                 firstname: user.firstname,
                 lastname : user.lastname,
                 adress1:user.adress1,
                 address2: user.adress2,
                 zipcode: user.zipcode,
                 city: user.city,
-                country: user.country,
+                country_id: user.country_id,
                 birthday: user.birthday,
-                nationnality: user.nationnality,
-                firstlanguage: user.firstlanguage
+                nationality_id: user.nationality_id,
+                firstlanguage_id: user.firstlanguage_id
             });
         }
-*/
+
 
         // TABLE 'levels'
         for(const level of levels) {
