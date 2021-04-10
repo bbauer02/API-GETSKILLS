@@ -5,10 +5,33 @@ module.exports =  (app) => {
     app.get('/api/countries', async (req,res) => {
         try {
             const parameters = {};
-            if(req.query.search) {
+
+
+            if(req.query.name) {
                 parameters.where = {
-                    country: {
-                        [Op.like] : `%${req.query.search}%`
+                    label: {
+                        [Op.like] : `%${req.query.name}%`
+                    }
+                }
+            }
+            if(req.query.lang) {
+                parameters.where = {
+                        language: {
+                            [Op.like] : `%${req.query.lang}%`
+                        }
+                }
+            }
+            if(req.query.code) {
+                parameters.where = {
+                    code: {
+                        [Op.like] : `%${req.query.code}%`
+                    }
+                }
+            }
+            if(req.query.nationality) {
+                parameters.where = {
+                    nationality: {
+                        [Op.like] : `%${req.query.nationality}%`
                     }
                 }
             }

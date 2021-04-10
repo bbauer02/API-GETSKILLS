@@ -44,7 +44,7 @@ const initDB = async (sequelize) => {
         for(const country of countries) {
             const Country = await models['Country'].create({
                 label:country.en_short_name,
-                inhabitant:country.nationality,
+                nationality:country.nationality,
                 language:country.nationality,
                 code:country.alpha_2_code
             });

@@ -13,12 +13,12 @@
                 notNull: {msg: `Country:Label_fr cannot be NULL!`}
             }
         },
-        inhabitant: {
+        nationality: {
             type:DataTypes.STRING,
             allowNull: false,
             validate : {
-                notEmpty:{msg: `Country:Inhabitant cannot be empty !`},
-                notNull: {msg: `Country:Inhabitant cannot be NULL!`}
+                notEmpty:{msg: `Country:Nationality cannot be empty !`},
+                notNull: {msg: `Country:Nationality cannot be NULL!`}
             }
         },
         language: {
