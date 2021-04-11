@@ -30,6 +30,7 @@ require('./src/routes/user/findAllUsers')(app);
 require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
+require('./src/routes/user/findInstitutUsers')(app);
 
 //Institutes
 require('./src/routes/institut/findAllInstituts')(app);
