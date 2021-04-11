@@ -19,6 +19,10 @@
             validate : {
                 notEmpty:{msg: `User:Login cannot be empty !`},
                 notNull: {msg: `User:Login cannot be NULL!`}
+            },
+            unique: {
+                args : true,
+                msg: 'User:Login already exist!'
             }
         },
         password: {
@@ -35,6 +39,10 @@
             validate : {
                 notEmpty:{msg: `User:Email cannot be empty !`},
                 notNull: {msg: `User:Email cannot be NULL!`}
+            },
+            unique: {
+                args : true,
+                msg: 'User:Email already exist!'
             }
         },
         phone: {

@@ -11,6 +11,10 @@
             validate : {
                 notEmpty:{msg: `Institut:label cannot be empty !`},
                 notNull: {msg: `Institut:label cannot be NULL!`}
+            },
+            unique: {
+                args : true,
+                msg: 'Institut:Label already exist!'
             }
         },
         adress1 : {
@@ -59,6 +63,10 @@
             validate : {
                 notEmpty:{msg: `Institut:Email cannot be empty !`},
                 notNull: {msg: `Institut:Email cannot be NULL!`}
+            },
+            unique: {
+                args : true,
+                msg: 'Institut:Email already exist!'
             }
         },
         siteweb: {
