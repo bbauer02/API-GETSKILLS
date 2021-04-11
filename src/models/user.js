@@ -147,6 +147,8 @@
         User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
         User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
         User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
+
+        User.belongsToMany(models.Institut, {through:models.institutHasUser,foreignKey:'user_id', otherKey:'institut_id',timestamps: false });
     }
     return User;
 }  

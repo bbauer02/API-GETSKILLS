@@ -7,10 +7,10 @@ const models = {};
 // Jeux de données
 const countries = require('../db/mock-countries');
 const roles = require('../db/mock-roles');
-
 const levels = require('../db/mock-level');
 const tests = require('../db/mock-test');
 const users = require('../db/mock-user');
+const instituts = require('../db/mock-institut');
 
 
 const initDB = async (sequelize) => {
@@ -33,8 +33,6 @@ const initDB = async (sequelize) => {
         }
     });
   
-    //db.sequelize = sequelize;
-    //db.Sequelize = Sequelize;
     try {
         await sequelize.sync({force:true})
         console.log("La base de données est synchronisée !")
@@ -81,6 +79,22 @@ const initDB = async (sequelize) => {
                 firstlanguage_id: user.firstlanguage_id
             });
         }
+
+        // TABLE 'instituts'
+        for(const institut of instituts) {
+            await models['Institut'].create({
+                label: institut.label,
+                adress1:institut.adress1,
+                adress2:institut.adress2,
+                zipcode:institut.zipcode,
+                city:institut.city,
+                country_id:institut.country_id,
+                email: institut.email,
+                siteweb:institut.siteweb,
+                phone: institut.phone,
+                socialNetwork : institut.socialNetwork
+            });
+        }   
 
 
         // TABLE 'levels'
