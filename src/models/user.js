@@ -50,7 +50,7 @@
             }
         },
         gender : {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull:false,
             validate : {
                 notEmpty:{msg: `User:Gender cannot be empty !`},
@@ -99,6 +99,9 @@
             validate : {
                 notEmpty:{msg: `User:City cannot be empty !`},
                 notNull: {msg: `User:City cannot be NULL!`}
+            },
+            set(value) {
+                this.setDataValue('city', value.toUpperCase());
             }
         },
         country_id: {

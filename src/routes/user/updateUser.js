@@ -12,7 +12,7 @@ module.exports = (app) => {
             User.update(req.body,{
                 where:{user_id:req.params.id}
             });
-            const message = `User id:${User.id} has been updated `;
+            const message = `User id:${User.user_id} has been updated `;
             res.json({message, data: User});
         }
         catch (error) {

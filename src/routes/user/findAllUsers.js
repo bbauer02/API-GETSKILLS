@@ -29,7 +29,7 @@ module.exports =  (app) => {
                   }
             }
             else {
-                // recherche par Nom
+                // recherche par Prénom
                 if(req.query.fname) {
                     parameters.where.firstname = {[Op.like] : `%${req.query.fname}%`}
                 }
