@@ -25,9 +25,13 @@ module.exports =  (app) => {
                 as:'firstlanguage',
                 attributes : [["countryLanguage",'label']]
             }];
-            const Users = await models['User'].findOne(parameters);
+            const User = await models['User'].findOne(parameters);
+            if(User === null) {
+                const message = `User doesn't exist.Retry with an other user id.`;
+                return res.status(404).json({message});
+            }
             const message = `Users found`;
-            res.json({message, data: Users});
+            res.json({message, data: User});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

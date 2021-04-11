@@ -7,10 +7,9 @@
         },
         role_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
             validate : {
-                notEmpty:{msg: `User:Role_id cannot be empty !`},
-                notNull: {msg: `User:Role_id cannot be NULL!`}
+                notEmpty:{msg: `User:Role_id cannot be empty !`}
             }
         },
         login: {
@@ -114,10 +113,9 @@
         },
         country_id: {
             type: DataTypes.INTEGER,
-            allowNull:false,
+            allowNull:true,
             validate : {
-                notEmpty:{msg: `User:Country_id cannot be empty !`},
-                notNull: {msg: `User:Country_id cannot be NULL!`}
+                notEmpty:{msg: `User:Country_id cannot be empty !`}
             }
             
         },
@@ -131,18 +129,16 @@
         },
         nationality_id: {
             type: DataTypes.INTEGER,
-            allowNull:false,
+            allowNull:true,
             validate : {
-                notEmpty:{msg: `User:Nationality_id cannot be empty !`},
-                notNull: {msg: `User:Nationality_id cannot be NULL!`}
+                notEmpty:{msg: `User:Nationality_id cannot be empty !`}
             }
         },
         firstlanguage_id: {
             type: DataTypes.INTEGER,
-            allowNull:false,
+            allowNull:true,
             validate : {
-                notEmpty:{msg: `User:Firstlanguage_id cannot be empty !`},
-                notNull: {msg: `User:Firstlanguage_id cannot be NULL!`}
+                notEmpty:{msg: `User:Firstlanguage_id cannot be empty !`}
             }
         }
     }, 
@@ -151,10 +147,10 @@
         timestamps: false
     });
     User.associate = models => {
-        User.belongsTo(models.Role,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false});
-        User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
-        User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
-        User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
+        User.belongsTo(models.Role,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false, onDelete:'SET NULL'});
+        User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
 
         User.belongsToMany(models.Institut, {through:models.institutHasUser,foreignKey:'user_id', otherKey:'institut_id',timestamps: false });
     }

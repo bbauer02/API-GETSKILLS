@@ -57,28 +57,7 @@ const initDB = async (sequelize) => {
         }
 
 
-        // TABLE 'users'
-        for (const user of users) {
-            await models['User'].create({
-                role_id: user.role_id,
-                login: user.login,
-                password:user.password,
-                email: user.email,
-                phone: user.phone,
-                gender:user.gender,
-                civility:user.civility,
-                firstname: user.firstname,
-                lastname : user.lastname,
-                adress1:user.adress1,
-                address2: user.adress2,
-                zipcode: user.zipcode,
-                city: user.city,
-                country_id: user.country_id,
-                birthday: user.birthday,
-                nationality_id: user.nationality_id,
-                firstlanguage_id: user.firstlanguage_id
-            });
-        }
+
 
         // TABLE 'instituts'
         for(const institut of instituts) {
@@ -95,6 +74,37 @@ const initDB = async (sequelize) => {
                 socialNetwork : institut.socialNetwork
             });
         }   
+                // TABLE 'users'
+                for (const user of users) {
+                    const RandomInstitut = Math.floor(Math.random() * 6) +1;
+                    const newUser = await models['User'].create({
+                        role_id: user.role_id,
+                        login: user.login,
+                        password:user.password,
+                        email: user.email,
+                        phone: user.phone,
+                        gender:user.gender,
+                        civility:user.civility,
+                        firstname: user.firstname,
+                        lastname : user.lastname,
+                        adress1:user.adress1,
+                        address2: user.adress2,
+                        zipcode: user.zipcode,
+                        city: user.city,
+                        country_id: user.country_id,
+                        birthday: user.birthday,
+                        nationality_id: user.nationality_id,
+                        firstlanguage_id: user.firstlanguage_id
+                    });
+                    //  TABLE 'institut_has_user'        
+                    await models['institutHasUser'].create({
+                        user_id: newUser.user_id,
+                        institut_id: RandomInstitut
+                   });
+
+                }
+     
+
 
 
         // TABLE 'levels'

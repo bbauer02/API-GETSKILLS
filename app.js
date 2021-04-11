@@ -31,6 +31,13 @@ require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
 
+//Institutes
+require('./src/routes/institut/findAllInstituts')(app);
+require('./src/routes/institut/findInstitutByPk')(app);
+require('./src/routes/institut/createInstitut')(app);
+require('./src/routes/institut/updateInstitut')(app);
+require('./src/routes/institut/deleteInstitut')(app);
+
 // Levels
 require('./src/routes/level/findAllLevels')(app);
 require('./src/routes/level/findLevelByPk')(app);
