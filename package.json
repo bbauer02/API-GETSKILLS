@@ -9,8 +9,10 @@
   "author": "Bauer Baptiste",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
     "sequelize": "^6.6.2"
   },

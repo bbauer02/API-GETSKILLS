@@ -16,6 +16,9 @@ app
 models.initDB(sequelize);
 
 // Points de terminaison
+// Login
+require('./src/routes/login')(app);
+
 // Countries
 require('./src/routes/country/findAllCountries')(app);
 require('./src/routes/country/findCountryByPk')(app);

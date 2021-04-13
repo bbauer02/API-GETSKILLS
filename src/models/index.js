@@ -1,6 +1,7 @@
 ﻿const fs = require('fs');
 const path = require('path');
 const DataTypes = require('sequelize');
+const bcrypt = require('bcrypt');
 const filebasename = path.basename(__filename);
 const models = {};
 
@@ -75,12 +76,13 @@ const initDB = async (sequelize) => {
             });
         }   
                 // TABLE 'users'
+                //await bcrypt.hash(user.password, 10),
                 for (const user of users) {
                     const RandomInstitut = Math.floor(Math.random() * 6) +1;
                     const newUser = await models['User'].create({
                         role_id: user.role_id,
                         login: user.login,
-                        password:user.password,
+                        password: await bcrypt.hash(user.password, 2),
                         email: user.email,
                         phone: user.phone,
                         gender:user.gender,
