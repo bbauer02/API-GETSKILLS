@@ -126,7 +126,7 @@ const initDB = async (sequelize) => {
             }); 
             if(test.levels && test.levels.length > 0) {
                // const lastTest = await db['Test'].findByPk(oneTest.id);
-               oneTest.setLevels(test.levels);
+              // oneTest.setLevels(test.levels);
             }   
         }
      }

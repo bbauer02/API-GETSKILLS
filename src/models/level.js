@@ -1,6 +1,6 @@
 ﻿module.exports = (sequelize, DataTypes) => {
     const Level =  sequelize.define('Level', {
-        id: {
+        level_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
@@ -32,7 +32,7 @@
     });
 
     Level.associate = models => {
-        Level.belongsToMany(models.Test, {through:models.testHasLevel,foreignKey:'level_id', otherKey:'test_id', timestamps: false });
+        Level.hasMany(models.testHasLevel,{foreignKey:'level_id', targetKey:'level_id'})
     }
   
     return Level;

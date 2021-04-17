@@ -151,8 +151,12 @@
         User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
-
         User.belongsToMany(models.Institut, {through:models.institutHasUser,foreignKey:'user_id', otherKey:'institut_id',timestamps: false });
+ 
+        User.hasMany(models.sessionHasUser,{foreignKey:'user_id', targetKey:'user_id'})
+ 
+
+
     }
     return User;
 }  
