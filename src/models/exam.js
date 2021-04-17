@@ -33,7 +33,7 @@
             type: DataTypes.INTEGER
         },
         duration: {
-            type: DataTypes.TIME
+            type: DataTypes.INTEGER
         }
     },
     {

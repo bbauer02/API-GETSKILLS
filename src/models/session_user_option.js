@@ -2,7 +2,8 @@
     const sessionUserOption =  sequelize.define('sessionUserOption', {
         
         user_price: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         addressExam: {
             type: DataTypes.TEXT
