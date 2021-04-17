@@ -18,7 +18,7 @@ module.exports =  (app) => {
                     return res.status(400).json({message})
                 }
                 parameters.where.country_id = country_id;
-            }
+            } 
             // Recherche par ville
             if(req.query.city) {
                 parameters.where.city = {[Op.like] : `%${req.query.city}%`}
@@ -54,7 +54,7 @@ module.exports =  (app) => {
 
             const Instituts = await models['Institut'].findAndCountAll(parameters);
            
-            const message = `${Instituts.count} users found`;
+            const message = `${Instituts.count} instituts found`;
            res.json({message, data: Instituts.rows});
         }
         catch(error) {
