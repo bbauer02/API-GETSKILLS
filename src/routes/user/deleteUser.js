@@ -9,7 +9,7 @@ module.exports = (app) => {
         return res.status(404).json({message});
       }
       const UserDeleted = User;
-      await User.destroy({where: { user_id: User.id}});
+      await User.destroy({where: { user_id: User.user_id}});
       const message = `User id:${UserDeleted.user_id} has been deleted`;
       res.json({message, data: UserDeleted});
     }

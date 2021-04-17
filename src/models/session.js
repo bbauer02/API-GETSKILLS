@@ -3,25 +3,56 @@
         session_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            allowNull:false
         },
         institut_id: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:institut_id cannot be empty!`},
+                notNull: {msg: `Session:institut_id cannot be NULL!`}
+            }
         },
         start: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:start cannot be empty!`},
+                notNull: {msg: `Session:start cannot be NULL!`}
+            }
         },
         end: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:end cannot be empty!`},
+                notNull: {msg: `Session:end cannot be NULL!`}
+            }
         },
         limitDateSubscribe: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:limitDateSubscribe cannot be empty!`},
+                notNull: {msg: `Session:limitDateSubscribe cannot be NULL!`}
+            }
         },
         placeAvailable: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:placeAvailable cannot be empty!`},
+                notNull: {msg: `Session:placeAvailable cannot be NULL!`}
+            }
         } ,
         testLevel_id:{
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:testLevel_id cannot be empty!`},
+                notNull: {msg: `Session:testLevel_id cannot be NULL!`}
+            }
         }
     },
     {
@@ -35,3 +66,4 @@
     };
     return Session;
 }
+ 
