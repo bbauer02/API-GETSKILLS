@@ -42,7 +42,7 @@ require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
 require('./src/routes/institut/addUserInstitut')(app);
-
+require('./src/routes/institut/deleteUserInstitut')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
