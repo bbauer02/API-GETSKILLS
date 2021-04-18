@@ -36,7 +36,26 @@
       birthday: new Date(1988, 9, 14),
       nationality_id: 112,
       firstlanguage_id:46
-  }
+  },
+  {
+    role_id: 1,
+    login: "cLefebre",
+    password: "lfvr1234*",
+    email: "cLefebre@gmail.com",
+    phone: '123456789',
+    gender :1,
+    civility : 1,
+    firstname: "Christophe",
+    lastname: "Lefebre",
+    adress1: "5 boulevard Voltaire",
+    adress2: "Apt 6",
+    zipcode: "13000",
+    city: "marseille",
+    country_id: 76,
+    birthday: new Date(1987, 10, 14),
+    nationality_id: 76,
+    firstlanguage_id:76
+}
 ];
 module.exports = users;
 /* JSON GENERATOR

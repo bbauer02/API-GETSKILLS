@@ -41,6 +41,8 @@ require('./src/routes/institut/findInstitutByPk')(app);
 require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
+require('./src/routes/institut/addUserInstitut')(app);
+
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
@@ -59,5 +61,6 @@ require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
+
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
