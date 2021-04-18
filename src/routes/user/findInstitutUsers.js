@@ -25,9 +25,10 @@ module.exports =  (app) => {
                 }
                 parameters.offset = parseInt(req.query.offset);
             }
-
+            parameters.attributes = {exclude:['password']};
             parameters.include = [{
                 model: models['User'],
+                attributes:{exclude:['password']},
                 include:[{
                     model: models['Country'],
                     as:'country',
@@ -44,7 +45,6 @@ module.exports =  (app) => {
                     attributes : [["countryLanguage",'label']]
                 }]
             }];
-
             const Users = await models['institutHasUser'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;
             res.json({message, data: Users.rows});

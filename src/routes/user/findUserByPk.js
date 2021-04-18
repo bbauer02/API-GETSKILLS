@@ -25,6 +25,7 @@ module.exports =  (app) => {
                 as:'firstlanguage',
                 attributes : [["countryLanguage",'label']]
             }];
+            parameters.attributes = {exclude:['password']};
             const User = await models['User'].findOne(parameters);
             if(User === null) {
                 const message = `User doesn't exist.Retry with an other user id.`;

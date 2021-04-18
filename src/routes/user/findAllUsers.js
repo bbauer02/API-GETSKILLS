@@ -87,6 +87,7 @@ module.exports =  (app) => {
 
 
             parameters.order = ['lastname'];
+            parameters.attributes = {exclude:['password']};
             parameters.include = [{
                 model: models['Role'],
                 attributes : ["label", "power"]
