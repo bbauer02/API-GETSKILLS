@@ -46,24 +46,29 @@
                 notNull: {msg: `Session:placeAvailable cannot be NULL!`}
             }
         } ,
-        testLevel_id:{
+        test_id:{
             type: DataTypes.INTEGER,
             allowNull:false,
             validate : {
                 notEmpty:{msg: `Session:testLevel_id cannot be empty!`},
                 notNull: {msg: `Session:testLevel_id cannot be NULL!`}
             }
-        }
+        },
+        level_id:{
+            type: DataTypes.INTEGER,
+            allowNull:true
+        } 
     },
     {
         tableName: 'sessions',
         timestamps: false
     });
     Session.associate = models => { 
-        Session.hasMany(models.sessionHasUser,{foreignKey:'session_id', targetKey:'session_id'})
+        Session.hasMany(models.sessionUser,{foreignKey:'session_id', targetKey:'session_id'})
         Session.belongsTo(models.Institut,{foreignKey:'institut_id',targetKey: 'institut_id'});
-        Session.belongsTo(models.testHasLevel, { foreignKey: 'testLevel_id' ,targetKey: 'testLevel_id'});
+        Session.belongsTo(models.Test,{foreignKey:'session_id'});
+        Session.belongsTo(models.Level,{foreignKey:'level_id'});
     };
     return Session;
 }
- 
+   

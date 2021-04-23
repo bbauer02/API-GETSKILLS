@@ -16,12 +16,12 @@
         } 
     },
     {
-        tableName: 'session_user_option',
+        tableName: 'session_user_option', 
         timestamps: false
     });
     sessionUserOption.associate = models => { 
-        sessionUserOption.belongsTo(models.sessionHasUser, { foreignKey: 'sessionUser_id', targetKey: 'sessionUser_id' });
-        sessionUserOption.belongsTo(models.Exam, { foreignKey: 'exam_id', targetKey: 'exam_id' });
+        sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', targetKey: 'sessionUser_id' });
+     //   sessionUserOption.belongsTo(models.Exam, { foreignKey: 'exam_id', targetKey: 'exam_id' });
     };
     
     return sessionUserOption;

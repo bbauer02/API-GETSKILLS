@@ -1,9 +1,15 @@
 ﻿module.exports = (sequelize, DataTypes) => {
-    const Exam =  sequelize.define('Exam', { 
+    const Exam =  sequelize.define('Exam', {
         exam_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
+        },
+        test_id:{
+            type: DataTypes.INTEGER
+        },
+        level_id:{
+            type: DataTypes.INTEGER
         },
         label: {
             type:DataTypes.STRING,
@@ -34,15 +40,19 @@
         },
         duration: {
             type: DataTypes.INTEGER
-        }
+        },
+        successScore: {
+            type: DataTypes.INTEGER
+        } 
     },
     {
-        tableName: 'exams',
+        tableName: 'exams', 
         timestamps: false
     });
-    Exam.associate = models => {
-        Exam.belongsToMany(models.Test,  {through:models.testHasExam,foreignKey:'exam_id', otherKey:'test_id',timestamps: false });
-        Exam.belongsToMany(models.sessionHasUser,  {through:models.sessionUserOption,foreignKey:'exam_id', otherKey:'sessionUser_id',timestamps: false });
-    }
-    return Exam;
-}
+    Exam.associate = models => { 
+        Exam.belongsTo(models.Test,{foreignKey:'test_id'});
+        Exam.belongsTo(models.Level,{foreignKey:'level_id'});
+    };
+ 
+    return Exam; 
+} 

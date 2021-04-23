@@ -1,5 +1,5 @@
 ﻿module.exports = (sequelize, DataTypes) => {
-    const sessionHasUser =  sequelize.define('sessionHasUser', {
+    const sessionUser =  sequelize.define('sessionUser', {
         sessionUser_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -23,7 +23,7 @@
 
     },
     {
-        tableName: 'session_has_user',
+        tableName: 'sessionUsers',
         timestamps: false,
         uniqueKeys: {
             compositeKey: {
@@ -31,11 +31,11 @@
             }
         }
     });
-    sessionHasUser.associate = models => { 
-        sessionHasUser.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'user_id',onDelete:'CASCADE' });
-        sessionHasUser.belongsTo(models.Session, { foreignKey: 'session_id', targetKey: 'session_id' });
-        sessionHasUser.belongsToMany(models.Exam,  {through:models.sessionUserOption,foreignKey:'sessionUser_id', otherKey:'exam_id',timestamps: false });
+    sessionUser.associate = models => { 
+        sessionUser.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'user_id',onDelete:'CASCADE' });
+        sessionUser.belongsTo(models.Session, { foreignKey: 'session_id', targetKey: 'session_id' });
+       // sessionHasUser.belongsToMany(models.Exam,  {through:models.sessionUserOption,foreignKey:'sessionUser_id', otherKey:'exam_id',timestamps: false });
     };
     
-    return sessionHasUser;
+    return sessionUser;
 }

@@ -101,29 +101,29 @@ const initDB = async (sequelize) => {
                     { 'user_id' : 1, 'institut_id':2},
                     { 'user_id' : 2, 'institut_id':1}
                 ]);
+
+           /*     // TABLE 'tests'
+                for(const test of tests) {
+                    await models['Test'].create({
+                        label:       test.label,
+                        isInternal:  test.isInternal,
+                        parent_id:   test.parent_id
+                    });  
+                }
+
                 // TABLE 'levels'
                 for(const level of levels) {
                     await models['Level'].create({
                         label:level.label,
                         ref: level.ref,
-                        description: level.description
+                        description: level.description,
+                        test_id:level.test_id
                     });
                 }
-                // TABLE 'tests'
-                for(const test of tests) {
-                    const newTest = await models['Test'].create({
-                        label:       test.label,
-                        isInternal:  test.isInternal,
-                        parent_id:   test.parent_id
-                    });  
 
-                    for(const level of test.levels) {
-                        await models['testHasLevel'].create({
-                            test_id:newTest.test_id,
-                            level_id: level
-                        })
-                    }
-                }
+*/
+
+                /*
                 // TABLE 'sessions'
                 for(const session of sessions) {
                     await models['Session'].create({
@@ -132,7 +132,7 @@ const initDB = async (sequelize) => {
                         end: session.end,
                         limitDateSubscribe: session.limitDateSubscribe,
                         placeAvailable : session.placeAvailable,
-                        testLevel_id : session.testLevel_id 
+                        exam_id : session.exam_id 
                     });
                 }
 
@@ -145,9 +145,9 @@ const initDB = async (sequelize) => {
                         hasPaid: sessionUser.hasPaid,
                         informations: sessionUser.informations
                     });
-                }
+                }*/
 
-                // TABLE 'exam'
+            /*    // TABLE 'exam'
                 for(const exam of exams) {
                     await models['Exam'].create({
                         label: exam.label,
@@ -166,9 +166,9 @@ const initDB = async (sequelize) => {
                     { 'test_id' : 3, 'exam_id':3},
                     { 'test_id' : 3, 'exam_id':4},
                     { 'test_id' : 3, 'exam_id':5}
-                ]);
+                ]);*/
 
-                // TABLE 'sessionUserOption'
+              /*  // TABLE 'sessionUserOption'
                 await models['sessionUserOption'].bulkCreate([
                     { 'exam_id' : 1, 'user_price':50, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
                     { 'exam_id' : 2, 'user_price':null, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
@@ -176,7 +176,7 @@ const initDB = async (sequelize) => {
                     { 'exam_id' : 4, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
                     { 'exam_id' : 5, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 2}
 
-                ]);
+                ]);*/
      }
      catch(error) {
          throw error;
