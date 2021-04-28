@@ -86,7 +86,7 @@ module.exports =  (app) => {
             if(req.query.users==="true")
             {
                 const addUsers = {
-                    model: models['sessionHasUser'],
+                    model: models['sessionUser'],
                     include:[{
                         model: models['User'],
                         attributes: {exclude:['password']},
@@ -116,17 +116,23 @@ module.exports =  (app) => {
             if(req.query.tests==="true")
             {
                 const addTests = {
-                    model: models['testHasLevel'],
-                    attributes: ['testLevel_id'],
+                    model: models['Test'],
+                    attributes: ['test_id','label','isInternal','parent_id'],
                     include:[{
-                        model: models['Test']
-                    },
-                    {
-                        model: models['Level']
+                        as:"parent",
+                        model: models['Test'],
+                        attributes: ['test_id','label','isInternal','parent_id'],
                     }]
                 };
                 parameters.include.push(addTests);
+                
+                const addLevels = {
+                    model: models['Level'],
+                    attributes:['level_id','label','ref','description']
+                };
+                parameters.include.push(addLevels);
             }
+
 
 
             const Sessions = await models['Session'].findAndCountAll(parameters);

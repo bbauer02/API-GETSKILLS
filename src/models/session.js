@@ -66,7 +66,7 @@
     Session.associate = models => { 
         Session.hasMany(models.sessionUser,{foreignKey:'session_id', targetKey:'session_id'})
         Session.belongsTo(models.Institut,{foreignKey:'institut_id',targetKey: 'institut_id'});
-        Session.belongsTo(models.Test,{foreignKey:'session_id'});
+        Session.belongsTo(models.Test,{foreignKey:'test_id'});
         Session.belongsTo(models.Level,{foreignKey:'level_id'});
     };
     return Session;

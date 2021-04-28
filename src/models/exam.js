@@ -50,8 +50,8 @@
         timestamps: false
     });
     Exam.associate = models => { 
-        Exam.belongsTo(models.Test,{foreignKey:'test_id'});
-        Exam.belongsTo(models.Level,{foreignKey:'level_id'});
+/*Exam.belongsTo(models.Test,{foreignKey:'test_id'});
+        Exam.belongsTo(models.Level,{foreignKey:'level_id'});*/
     };
  
     return Exam; 

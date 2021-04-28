@@ -170,17 +170,6 @@ const initDB = async (sequelize) => {
                         duration: exam.duration
                     });
                 }
-                /*
-                // TABLE 'testHasExam'
-                await models['testHasExam'].bulkCreate([
-                    { 'test_id' : 1, 'exam_id':1},
-                    { 'test_id' : 1, 'exam_id':2},
-                    { 'test_id' : 3, 'exam_id':3},
-                    { 'test_id' : 3, 'exam_id':4},
-                    { 'test_id' : 3, 'exam_id':5}
-                ]);*/
-
-
      }
      catch(error) {
          throw error;

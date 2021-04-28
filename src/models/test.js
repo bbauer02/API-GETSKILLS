@@ -35,11 +35,11 @@
 
     Test.associate = models => {
         Test.hasOne(models.Test, { foreignKey:'parent_id',targetKey: 'test_id'});
-        Test.belongsTo(models.Test, {foreignKey:'parent_id'});
+        Test.belongsTo(models.Test, {as:"parent",foreignKey:'parent_id'});
 
         Test.hasOne(models.Session, {foreignKey:'test_id',targetKey: 'test_id'});
         Test.hasMany(models.Level,{foreignKey:'test_id',targetKey: 'test_id'});
         Test.hasMany(models.Exam,{foreignKey:'test_id',targetKey: 'test_id'})
     }
-        return Test; 
+        return Test;  
 } 

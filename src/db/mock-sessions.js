@@ -6,8 +6,8 @@
         end: new Date(2021, 9, 5, 17,00),
         limitDateSubscribe : new Date(2021, 7, 31, 23,59),
         placeAvailable: 100,
-        test_id:1,
-        level_id:1
+        test_id:2,
+        level_id:2
     },
     {
         session_id:2,
@@ -17,7 +17,7 @@
         limitDateSubscribe : new Date(2021, 4, 31, 23,59),
         placeAvailable: 3,
         test_id:3,
-        level_id:6
+        level_id:8
     }
 ];
 
