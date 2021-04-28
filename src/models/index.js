@@ -102,7 +102,7 @@ const initDB = async (sequelize) => {
                     { 'user_id' : 2, 'institut_id':1}
                 ]);
 
-           /*     // TABLE 'tests'
+               // TABLE 'tests'
                 for(const test of tests) {
                     await models['Test'].create({
                         label:       test.label,
@@ -120,10 +120,7 @@ const initDB = async (sequelize) => {
                         test_id:level.test_id
                     });
                 }
-
-*/
-
-                /*
+                
                 // TABLE 'sessions'
                 for(const session of sessions) {
                     await models['Session'].create({
@@ -132,24 +129,38 @@ const initDB = async (sequelize) => {
                         end: session.end,
                         limitDateSubscribe: session.limitDateSubscribe,
                         placeAvailable : session.placeAvailable,
-                        exam_id : session.exam_id 
+                        test_id : session.test_id,
+                        level_id: session.level_id
                     });
                 }
 
-                // TABLE 'session_has_user'
+                // TABLE 'sessionUsers'
                 for(const sessionUser of sessionUsers) {
-                    await models['sessionHasUser'].create({
+                    await models['sessionUser'].create({
                         session_id: sessionUser.session_id,
                         user_id: sessionUser.user_id,
                         paymentMode: sessionUser.paymentMode,
                         hasPaid: sessionUser.hasPaid,
                         informations: sessionUser.informations
                     });
-                }*/
+                }
+              // TABLE 'sessionUserOption'
+                await models['sessionUserOption'].bulkCreate([
+                    { 'exam_id' : 1, 'user_price':50, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
+                    { 'exam_id' : 2, 'user_price':null, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
+                    { 'exam_id' : 3, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 1, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
+                    { 'exam_id' : 4, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
+                    { 'exam_id' : 5, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 2}
 
-            /*    // TABLE 'exam'
+                ]);
+
+
+
+              // TABLE 'exam'
                 for(const exam of exams) {
                     await models['Exam'].create({
+                        test_id:exam.test_id,
+                        level_id:exam.level_id,
                         label: exam.label,
                         isWritten: exam.isWritten,
                         isOption: exam.isOption,
@@ -159,6 +170,7 @@ const initDB = async (sequelize) => {
                         duration: exam.duration
                     });
                 }
+                /*
                 // TABLE 'testHasExam'
                 await models['testHasExam'].bulkCreate([
                     { 'test_id' : 1, 'exam_id':1},
@@ -168,15 +180,7 @@ const initDB = async (sequelize) => {
                     { 'test_id' : 3, 'exam_id':5}
                 ]);*/
 
-              /*  // TABLE 'sessionUserOption'
-                await models['sessionUserOption'].bulkCreate([
-                    { 'exam_id' : 1, 'user_price':50, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
-                    { 'exam_id' : 2, 'user_price':null, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
-                    { 'exam_id' : 3, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 1, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
-                    { 'exam_id' : 4, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
-                    { 'exam_id' : 5, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 2}
 
-                ]);*/
      }
      catch(error) {
          throw error;

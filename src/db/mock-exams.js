@@ -3,6 +3,7 @@ const exams = [
     {
         exam_id: 1,
         test_id: 1,
+        level_id: 1,
         label: "Epreuve écrite",
         isWritten: true,
         isOption: false,
@@ -14,6 +15,8 @@ const exams = [
     },
     {
         exam_id: 2,
+        test_id: 1,
+        level_id: 1,
         label: "Epreuve Orale",
         isWritten: false,
         isOption: false,
@@ -25,6 +28,8 @@ const exams = [
     },
     {
         exam_id: 3,
+        test_id: 3,
+        level_id: 6,
         label: "Vocabulaire",
         isWritten: true,
         isOption: false,
@@ -36,6 +41,8 @@ const exams = [
     },
     {
         exam_id: 4,
+        test_id: 3,
+        level_id: 6,
         label: "Lecture",
         isWritten: true,
         isOption: false,
@@ -47,6 +54,8 @@ const exams = [
     },
     {
         exam_id: 5,
+        test_id: 3,
+        level_id: 6,
         label: "Ecoute",
         isWritten: true,
         isOption: false,

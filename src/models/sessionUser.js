@@ -34,7 +34,7 @@
     sessionUser.associate = models => { 
         sessionUser.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'user_id',onDelete:'CASCADE' });
         sessionUser.belongsTo(models.Session, { foreignKey: 'session_id', targetKey: 'session_id' });
-       // sessionHasUser.belongsToMany(models.Exam,  {through:models.sessionUserOption,foreignKey:'sessionUser_id', otherKey:'exam_id',timestamps: false });
+        sessionUser.hasMany(models.sessionUserOption,{foreignKey:'sessionUser_id',targetKey: 'sessionUser_id'})
     };
     
     return sessionUser;
