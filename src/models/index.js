@@ -167,7 +167,8 @@ const initDB = async (sequelize) => {
                         price:exam.price,
                         coeff:exam.coeff,
                         nbrQuestions:exam.nbrQuestions,
-                        duration: exam.duration
+                        duration: exam.duration,
+                        successScore: exam.successScore
                     });
                 }
      }

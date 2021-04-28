@@ -62,5 +62,11 @@ require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 
+// Exams
+require('./src/routes/exam/findAllExams')(app);
+require('./src/routes/exam/createExam')(app);
+require('./src/routes/exam/deleteExam')(app);
+require('./src/routes/exam/updateExam')(app);
+
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
