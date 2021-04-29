@@ -54,6 +54,9 @@ require('./src/routes/level/updateLevel')(app);
 // Tests
 require('./src/routes/test/findAllTests')(app);
 require('./src/routes/test/findTestByPk')(app);
+require('./src/routes/test/createTest')(app);
+require('./src/routes/test/updateTest')(app);
+require('./src/routes/test/deleteTest')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);

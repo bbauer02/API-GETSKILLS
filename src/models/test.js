@@ -39,7 +39,8 @@
 
         Test.hasOne(models.Session, {foreignKey:'test_id',targetKey: 'test_id'});
         Test.hasMany(models.Level,{foreignKey:'test_id',targetKey: 'test_id'});
+
         Test.hasMany(models.Exam,{foreignKey:'test_id',targetKey: 'test_id'})
     }
         return Test;  
-} 
+}  

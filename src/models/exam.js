@@ -50,10 +50,10 @@
         timestamps: false
     });
     Exam.associate = models => { 
-        Exam.belongsTo(models.Test,{foreignKey:'test_id'});
+        Exam.belongsTo(models.Test,{foreignKey:'test_id',onDelete:'SET NULL'});
         Exam.belongsTo(models.Level,{foreignKey:'level_id'});
         Exam.hasOne(models.sessionUserOption, {foreignKey:'exam_id',targetKey: 'exam_id'});
     };
   
     return Exam; 
-} 
+}  
