@@ -144,7 +144,17 @@
     }, 
     {
         tableName: 'users',
-        timestamps: false
+        timestamps: false,
+        hooks: {
+            afterCreate: (user) => {
+                delete user.dataValues.password;
+            },
+            afterUpdate: (user) => {
+                delete user.dataValues.password;
+            },
+        }
+
+
     });
     User.associate = models => {
         User.belongsTo(models.Role,{foreignKey:'role_id',sourceKey: 'role_id', timestamps: false, onDelete:'SET NULL'});

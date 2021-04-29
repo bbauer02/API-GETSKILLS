@@ -6,7 +6,12 @@ const privateKey = require('../auth/private_key');
 module.exports = (app) => {
     app.post('/api/login',async (req, res) => {
         try {
-            const user = await models['User'].findOne({where: {login:req.body.login}});
+            const user = await models['User'].findOne({
+                where:
+                {
+                    login:req.body.login
+                }
+            });
             if(user === null) {
                 const message = `Login doesn't exist`;
                 return res.status(404).json({message});
@@ -27,6 +32,7 @@ module.exports = (app) => {
 
 
             const message = `User has been connected`;
+            delete user.dataValues.password;
                 return res.json({message, data:user, token})
         }
         catch(error) {
