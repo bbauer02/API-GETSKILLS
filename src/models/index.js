@@ -144,15 +144,7 @@ const initDB = async (sequelize) => {
                         informations: sessionUser.informations
                     });
                 }
-              // TABLE 'sessionUserOption'
-                await models['sessionUserOption'].bulkCreate([
-                    { 'exam_id' : 1, 'user_price':50, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
-                    { 'exam_id' : 2, 'user_price':null, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
-                    { 'exam_id' : 3, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 1, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
-                    { 'exam_id' : 4, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
-                    { 'exam_id' : 5, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 2}
 
-                ]);
 
 
 
@@ -171,6 +163,16 @@ const initDB = async (sequelize) => {
                         successScore: exam.successScore
                     });
                 }
+
+                // TABLE 'sessionUserOption'
+                await models['sessionUserOption'].bulkCreate([
+                { 'exam_id' : 1, 'user_price':50, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
+                { 'exam_id' : 2, 'user_price':null, 'addressExam' : "Centre d'examen de LAON - Boulodrome 02000 LAON","DateTime" : new Date(2021, 5, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 1},
+                { 'exam_id' : 3, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 1, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
+                { 'exam_id' : 4, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 2, 9,00), "isCandidate" : true, "sessionUser_id" : 2},
+                { 'exam_id' : 5, 'user_price':null, 'addressExam' : "INALCO 2 Rue de Lille, 75007 Paris","DateTime" : new Date(2021, 6, 3, 9,00), "isCandidate" : true, "sessionUser_id" : 2}
+
+            ]);
      }
      catch(error) {
          throw error;

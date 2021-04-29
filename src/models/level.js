@@ -8,10 +8,6 @@
         label: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: {
-                args : true,
-                msg: 'Level:Label already exist!'
-            },
             validate : {
                 notEmpty:{msg: `Level:Label cannot be empty!`},
                 notNull: {msg: `Level:Label cannot be NULL!`}

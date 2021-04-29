@@ -68,6 +68,13 @@
         ref: "JLPT-N1",
         description :"",
         test_id: 3
+    },
+    {
+        id:11,
+        label: "A1",
+        ref: "A1",
+        description :"Utilisateur élémentaire (niveau introductif ou de découverte)",
+        test_id: 5
     }
     
 ]

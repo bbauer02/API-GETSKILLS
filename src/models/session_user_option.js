@@ -21,6 +21,10 @@
         sessionUser_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
+        },
+        exam_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
         }
     },
     {
@@ -29,6 +33,7 @@
     });
     sessionUserOption.associate = models => { 
         sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', targetKey: 'sessionUser_id' });
+        sessionUserOption.belongsTo(models.Exam,{foreignKey:'exam_id'});
     };
     
     return sessionUserOption;

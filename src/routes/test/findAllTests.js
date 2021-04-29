@@ -5,28 +5,20 @@ module.exports =  (app) => {
        try {
             const Tests = await models['Test'].findAndCountAll({
                 where: {
-                    parent_id: null
+                 parent_id:null
                 },
                 order:['label'], 
                 include:
                 [
                     {
-                        model: models['Level'],
-                        attributes : ["id", "label", "description", "ref"],
-                        through: {
-                            attributes: []
-                        }
+                        model: models['Test'],
+                        as:'child',
+                        include:[{
+                            model: models['Level']
+                        }]
                     },
                     {
-                        model:models['Test'],
-                        as: 'children',
-                        include:[{
-                            model: models['Level'],
-                            attributes : ["id", "label", "description", "ref"],
-                            through: {
-                                attributes: []
-                            }
-                        }]
+                        model: models['Level']
                     }
                 ]
             });

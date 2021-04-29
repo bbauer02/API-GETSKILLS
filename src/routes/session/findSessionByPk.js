@@ -5,45 +5,66 @@ module.exports =  (app) => {
         try {
             const parameters = {}; 
             parameters.where = {session_id:req.params.id};
-            parameters.include = [{
-                model: models['Institut'],
-                attributes : ["label"]
-            }];
-            const addUsers = {
-                model: models['sessionHasUser'],
-                include:[{
-                    model: models['User'],
-                    attributes: {exclude:['password']},
-                    include: [{
-                        model: models['Country'],
-                        as:"country",
-                        attributes : ["label"]
-                    },
-                    {
-                        model: models['Country'],
-                        as:"nationality",
-                        attributes : ["countryNationality"]
-                    },
-                    {
-                        model: models['Country'],
-                        as:"firstlanguage", 
-                        attributes : ["countryLanguage"]
-                    }] 
-                }]
-            };
-            parameters.include.push(addUsers);
-
-            const addTests = {
-                model: models['testHasLevel'],
-                attributes: ['testLevel_id'],
-                include:[{
+        
+            parameters.include = [
+                {
+                    model: models['Institut'],
+                    attributes : ["label"]
+                },
+                {
                     model: models['Test']
                 },
                 {
                     model: models['Level']
-                }]
+                },
+                {
+                    model: models['sessionUser'],
+                    include:[{
+                        model: models['User'],
+                        attributes: {exclude:['password']},
+                        include: [
+                        {
+                            model: models['sessionUser'],
+                            include:[{ 
+                                model: models['sessionUserOption'],
+                                include:[{ 
+                                    model: models['Exam']
+                                }]
+                            }]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"country",
+                            attributes : ["label"]
+                        }, 
+                        {
+                            model: models['Country'],
+                            as:"nationality",
+                            attributes : ["countryNationality"]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"firstlanguage", 
+                            attributes : ["countryLanguage"]
+                        }] 
+                    }]
+                }
+        ];
+
+
+       
+/*
+            const addLevel = {
+                model: models['Level']
             };
-            parameters.include.push(addTests);
+            parameters.include.push(addLevel);
+
+            
+            const addTest = {
+                model: models['Test']
+            };
+            parameters.include.push(addTest);
+*/
             
             const Session = await models['Session'].findOne(parameters);
             if(Session === null) {
@@ -55,7 +76,7 @@ module.exports =  (app) => {
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
-            res.status(500).json({message, data: error});
+            res.status(500).json({message, data: error.toString()});
         }
     });
 }

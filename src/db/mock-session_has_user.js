@@ -14,6 +14,14 @@
         paymentMode: 1,
         hasPaid: true,
         informations : "Information sur Baptiste Bauer."
+    },
+    {
+        sessionUser_id: 3,
+        session_id: 2,
+        user_id: 3,
+        paymentMode: 1,
+        hasPaid: false,
+        informations : "Information sur Christophe Lefebre."
     }
 ];
 

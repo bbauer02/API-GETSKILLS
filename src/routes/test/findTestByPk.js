@@ -5,26 +5,25 @@ module.exports =  (app) => {
        try {
             const Test = await models['Test'].findAll({
                 where: {
-                    id: req.params.id
+                    test_id: req.params.id
                 },
                 order:['label'], 
                 include: [{
                     model: models['Level'],
-                    attributes : ["id", "label", "description", "ref"],
-                    through: {
-                        attributes: []
-                    }
                 },
                 {
                     model:models['Test'],
-                    as: 'children',
+                    as: 'child',
                     include:[{
                         model: models['Level'],
-                        attributes : ["id", "label", "description", "ref"],
-                        through: {
-                            attributes: []
-                        }
-                    }]
+                     }]
+                },
+                {
+                    model:models['Test'],
+                    as: 'parent',
+                    include:[{
+                        model: models['Level'],
+                     }]
                 }]
             });
             if(Test === null) {
@@ -36,7 +35,7 @@ module.exports =  (app) => {
        }
        catch (error){
          const message = `Service not available. Please retry later.`;
-         res.status(500).json({message, data: error})
+         res.status(500).json({message, data: error.toString()})
        }
 
 
