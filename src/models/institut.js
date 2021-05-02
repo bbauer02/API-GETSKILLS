@@ -94,7 +94,7 @@
     });
     Institut.associate = models => {
         Institut.belongsTo(models.Country,{as: 'institutCountry',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
-        Institut.belongsToMany(models.User,  {through:models.institutHasUser,foreignKey:'user_id', otherKey:'institut_id',timestamps: false });
+        Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', targetKey:'institut_id'})
         Institut.hasMany(models.Session,{foreignKey:'institut_id'});
     }
     return Institut;

@@ -1,8 +1,6 @@
 ﻿const {models} = require('../models');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const privateKey = require('../auth/private_key');
-
+const jwtUtils = require('../auth/jwt.utils');
 module.exports = (app) => {
     app.post('/api/login',async (req, res) => {
         try {
@@ -10,7 +8,10 @@ module.exports = (app) => {
                 where:
                 {
                     login:req.body.login
-                }
+                },
+                include : [{
+                    model:models['Role']
+                }]
             });
             if(user === null) {
                 const message = `Login doesn't exist`;
@@ -22,22 +23,20 @@ module.exports = (app) => {
                 return res.status(401).json({message})
             } 
 
-            // JWT
-            const token = jwt.sign(
-                {userId: user.user_id },
-                privateKey,
-                {expiresIn: '24h'}
-            )
-
 
 
             const message = `User has been connected`;
             delete user.dataValues.password;
-                return res.json({message, data:user, token})
+                return res.json(
+                    {
+                        message, 
+                        data:user,
+                        token: jwtUtils.generateTokenForUser(user)
+                    });
         }
         catch(error) {
             const message = `User cannot be authentified. Please retry later.`;
-            res.status(500).json({message, data: error});
+            res.status(500).json({message, data: error.toString()});
         }
     });
 }

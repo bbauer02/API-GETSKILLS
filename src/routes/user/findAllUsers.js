@@ -1,9 +1,12 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
+const {isAuthenticated,isAuthorized} = require('../../auth/jwt.utils');
+const auth = require('../../auth/auth');
 
 module.exports =  (app) => {
     app.get('/api/users', async (req,res) => {
         try {
+           
             const parameters = {}; 
             parameters.where = {};
             // Recherche par identifiant du rôle.

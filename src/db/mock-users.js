@@ -1,6 +1,5 @@
 ﻿const users = [
     {
-        role_id: 5,
         login: "bauer",
         password: "bb1212",
         email: "bbauer02@gmail.com",
@@ -19,7 +18,6 @@
         firstlanguage_id:76
     },
     {
-      role_id: 1,
       login: "umebosi1014",
       password: "ume1014",
       email: "umebosi1014@yahoo.co.jp",
@@ -38,7 +36,6 @@
       firstlanguage_id:46
   },
   {
-    role_id: 1,
     login: "cLefebre",
     password: "lfvr1234*",
     email: "cLefebre@gmail.com",
