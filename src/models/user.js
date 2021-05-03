@@ -133,6 +133,10 @@
             validate : {
                 notEmpty:{msg: `User:Firstlanguage_id cannot be empty !`}
             }
+        },
+        role_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
         }
     }, 
     {
@@ -154,6 +158,7 @@
         User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        User.belongsTo(models.Role,{foreignKey:'role_id',sourceKey: 'role_id'});
 
         User.hasMany(models.institutHasUser,{as:'instituts',foreignKey:'user_id', targetKey:'user_id'})
         User.hasMany(models.sessionUser,{foreignKey:'user_id', targetKey:'user_id'})

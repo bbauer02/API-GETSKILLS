@@ -28,9 +28,9 @@
     });
 
     Level.associate = models => {
-        Level.hasOne(models.Session, {foreignKey:'level_id',targetKey: 'level_id'});
+        Level.hasMany(models.Session, {foreignKey:'level_id',targetKey: 'level_id'});
         Level.belongsTo(models.Test,{foreignKey:'test_id',targetKey: 'test_id'})
-        Level.hasOne(models.Exam, {foreignKey:'level_id',targetKey: 'level_id'});
+        Level.hasMany(models.Exam, {foreignKey:'level_id',targetKey: 'level_id'});
     }
   
     return Level;
