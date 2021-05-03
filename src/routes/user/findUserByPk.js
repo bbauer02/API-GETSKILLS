@@ -6,10 +6,7 @@ module.exports =  (app) => {
             const parameters = {}; 
             parameters.where = {user_id:req.params.id};
             parameters.order = ['lastname'];
-            parameters.include = [{
-                model: models['Role'],
-                attributes : ["label", "power"]
-            },
+            parameters.include = [
             {
                 model: models['Country'],
                 as:'country',
@@ -24,6 +21,19 @@ module.exports =  (app) => {
                 model: models['Country'],
                 as:'firstlanguage',
                 attributes : [["countryLanguage",'label']]
+            },
+            {
+                model: models['institutHasUser'],
+                attributes:['institut_id'],
+                as:'instituts',
+                include:[{
+                    model:models['Institut'],
+                    attributes:['label']
+                },
+                {
+                    model:models['Role'],
+                    attributes:['role_id','label','power']
+                }]
             }];
             parameters.attributes = {exclude:['password']};
             const User = await models['User'].findOne(parameters);
