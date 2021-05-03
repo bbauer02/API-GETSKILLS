@@ -1,15 +1,13 @@
 ﻿const jwt = require('jsonwebtoken');
-
-const JWT_SIGN_SECRET = '3778214125442A472D4B6150645267556B58703273357638792F423F4528482B4D6251655468566D597133743677397A24432646294A404E635266556A586E5A';
+const ENV = require('dotenv').config().parsed;
+let JWT_SIGN_SECRET = ENV.JWT_SIGN_SECRET;
 
 module.exports = {
     // Generer un Token
     generateTokenForUser: (userData) => {
         return jwt.sign({
             user_id: userData.user_id,
-            role_id: userData.role_id,
-            role: userData.Role.label,
-            power: userData.Role.power
+           instituts : userData.instituts
         },
         JWT_SIGN_SECRET, 
         {

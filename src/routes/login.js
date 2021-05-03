@@ -8,10 +8,37 @@ module.exports = (app) => {
                 where:
                 {
                     login:req.body.login
-                },
-                include : [{
-                    model:models['Role']
-                }]
+                }, 
+                include: 
+                        [{
+                            model: models['Country'],
+                            as:'country',
+                            attributes : ["label"]
+                        },
+                        {
+                            model: models['Country'],
+                            as:'nationality',
+                            attributes : [["countryNationality",'label']]
+                        },
+                        {
+                            model: models['Country'],
+                            as:'firstlanguage',
+                            attributes : [["countryLanguage",'label']]
+                        },
+                        {
+                            model: models['institutHasUser'],
+                            attributes:['institut_id'],
+                            as:'instituts',
+                            include:[{
+                                model:models['Institut'],
+                                attributes:['label']
+                            },
+                            {
+                                model:models['Role'],
+                                attributes:['role_id','label','power']
+                            }]
+                        }
+                    ]
             });
             if(user === null) {
                 const message = `Login doesn't exist`;
