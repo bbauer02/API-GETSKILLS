@@ -43,6 +43,22 @@ module.exports =  (app) => {
                     model: models['Country'],
                     as:'firstlanguage',
                     attributes : [["countryLanguage",'label']]
+                },
+                {
+                    model: models['institutHasUser'],
+                    where: {
+                        institut_id: req.params.id
+                    },
+                    attributes:['institut_id'],
+                    as:'instituts',
+                    include:[{
+                        model:models['Institut'],
+                        attributes:['label']
+                    },
+                    {
+                        model:models['Role'],
+                        attributes:['role_id','label','power']
+                    }]
                 }]
             }];
             const Users = await models['institutHasUser'].findAndCountAll(parameters);
