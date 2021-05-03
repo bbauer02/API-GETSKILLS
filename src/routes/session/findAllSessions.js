@@ -87,7 +87,8 @@ module.exports =  (app) => {
             {
                 const addUsers = {
                     model: models['sessionUser'],
-                    include:[{
+                    include:[
+                        {
                         model: models['User'],
                         attributes: {exclude:['password']},
                         include: [{
