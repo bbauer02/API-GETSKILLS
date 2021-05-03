@@ -33,7 +33,7 @@ require('./src/routes/user/findAllUsers')(app);
 require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
-require('./src/routes/user/findInstitutUsers')(app);
+
 
 //Institutes
 require('./src/routes/institut/findAllInstituts')(app);
@@ -43,6 +43,7 @@ require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
 require('./src/routes/institut/addUserInstitut')(app);
 require('./src/routes/institut/deleteUserInstitut')(app);
+require('./src/routes/institut/findUsers')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);

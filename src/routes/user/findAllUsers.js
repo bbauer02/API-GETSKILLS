@@ -101,7 +101,7 @@ module.exports =  (app) => {
                 },
                 {
                     model:models['Role'],
-                    attributes:['label','power']
+                    attributes:['role_id','label','power']
                 }]
             },
             {
