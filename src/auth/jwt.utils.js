@@ -3,6 +3,17 @@ const ENV = require('dotenv').config().parsed;
 let JWT_SIGN_SECRET = ENV.JWT_SIGN_SECRET;
 
 module.exports = {
+    // Niveau de droit par "modules"
+    modulePower : {
+        PUT : {
+            instituts : ENV.INSTITUTS_UPDATE,
+            sessions : ENV.SESSIONS_UPDATE
+        },
+        DELETE : {
+            instituts : ENV.INSTITUTS_DELETE,
+            sessions : ENV.SESSIONS_DELETE
+        }
+    },
     // Generer un Token
     generateTokenForUser: (userData) => {
         return jwt.sign({
@@ -46,47 +57,48 @@ module.exports = {
             res.status(401).json({"message" : error.message});
         }
     },
+    hasPowerEnough : (systemRole, powerNeeded) => {
+        if(systemRole && systemRole.power >= powerNeeded ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    },
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
-    isAuthorized:  powerNeeded => {
-        return  async (req, res, next) => {
+    isAuthorized:  async (req, res, next) => {
             try {
-            
                 const decodedToken = await module.exports.getHeaderToken(req);
-                if(req.params.institut_id ) {
-                    const userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === req.params.institut_id );
-                    if(userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
+                const moduleName = req.url.split('/')[2];
+                const httpMethod = req.method;
+                const powerNeeded = module.exports.modulePower[httpMethod][moduleName];
+                if(moduleName === 'instituts' && req.params.id) {
+                    const userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(req.params.id) );
+                    if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
                         next();
                     }
+                    else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
+                        next();
+                    }
+                    else {
+                       throw new Error('Not granted any authorities'); 
+                    }
                 }
-                next();/*
-                console.log(decodedToken.systemRole && decodedToken.systemRole.power >= powerNeeded)
-                if(decodedToken.systemRole && decodedToken.systemRole.power >= powerNeeded  ) {
-                    next();
+                else if (moduleName === 'Sessions' && req.body.institut_id) {
+                    const userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(req.body.institut_id) );
+                    if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
+                        next();
+                    }
+                    else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
+                        next();
+                    }
+                    else {
+                       throw new Error('Not granted any authorities'); 
+                    }
                 }
-
-                    throw new Error('Not granted any authorities');   */ 
             }
             catch(error) {
                 res.status(401).json({"error" :error.message });
             }
-        }
     }
-    /*// Fonction qui vérifie si s'il y a une entéte "Autorisation" dans la requete
-    parseAuthorization: (authorization) => {
-        return (authorization != null) ? authorization.replace('Bearer ', '') :null;
-    },
-    getUserId:  (authorization) => {
-        let userId = -1;
-        const token = module.exports.parseAuthorization(authorization);
-        if(token!=null) {
-            try {
-                const jwtToken = jwt.verify(token, JWT_SIGN_SECRET);
-                if(jwtToken != null)
-                userId = jwtToken.user_id;
-            } catch(error) {
-
-            }
-        }
-        return userId;
-    }*/
 }

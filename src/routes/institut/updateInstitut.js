@@ -1,16 +1,17 @@
 ﻿const {models} = require('../../models');
 const { ValidationError,UniqueConstraintError } = require('sequelize');
-const {  isAuthorized} = require('../../auth/jwt.utils');
+const {  isAuthorized } = require('../../auth/jwt.utils');
+
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id',isAuthorized(1),async (req, res) => {
+    app.put('/api/instituts/:id',isAuthorized,async (req, res) => {
         try {
-            const Institut = await models['Institut'].findByPk(req.params.institut_id);
+            const Institut = await models['Institut'].findByPk(req.params.id);
             if(Institut === null) {
                 const message = `Institut doesn't exist.Retry with an other institut id.`;
                 return res.status(404).json({message});
             }
             Institut.update(req.body,{
-                where:{institut_id:req.params.institut_id}
+                where:{institut_id:req.params.id}
             });
             const message = `Institut id:${Institut.institut_id} has been updated `;
             res.json({message, data: Institut});

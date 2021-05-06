@@ -1,6 +1,6 @@
 ﻿const {models} = require('../../models');
 const { ValidationError,UniqueConstraintError } = require('sequelize');
-
+const {  isAuthorized} = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.put('/api/sessions/:id', async (req, res) => {
         try {
@@ -10,7 +10,7 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             }
             Session.update(req.body,{
-                where:{session_id:req.params.id}
+                where:{session_id:req.params.id} 
             });
             const message = `Session id:${Session.session_id} has been updated `;
             res.json({message, data: Session});

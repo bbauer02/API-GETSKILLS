@@ -1,23 +1,23 @@
 ﻿const roles = [
     {
         label:"User",
-        power: 0
-    },
-    {
-        label:"Teacher",
         power: 1
     },
     {
-        label:"Director",
-        power: 6
+        label:"Teacher of the institut",
+        power: 2
     },
     {
-        label:"Management",
-        power: 5
+        label:"Manageor of the institut",
+        power: 3
     },
     {
-        label:"SuperAdmin",
-        power: 9
+        label:"Administrator of the institut",
+        power: 4
+    },
+    {
+        label:"System Administrator",
+        power: 10
     }
 ]
 module.exports = roles;
