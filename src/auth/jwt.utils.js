@@ -72,29 +72,20 @@ module.exports = {
                 const moduleName = req.url.split('/')[2];
                 const httpMethod = req.method;
                 const powerNeeded = module.exports.modulePower[httpMethod][moduleName];
-                if(moduleName === 'instituts' && req.params.id) {
-                    const userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(req.params.id) );
-                    if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
-                        next();
-                    }
-                    else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
-                        next();
-                    }
-                    else {
-                       throw new Error('Not granted any authorities'); 
-                    }
+                let userMemberOfInstitut = null;
+
+                if( (moduleName === 'instituts' && req.params.id) || (moduleName === 'Sessions' && req.body.institut_id)) {
+                    const reqInstitut_id = req.params.id || req.body.institut_id;
+                    userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
                 }
-                else if (moduleName === 'Sessions' && req.body.institut_id) {
-                    const userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(req.body.institut_id) );
-                    if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
-                        next();
-                    }
-                    else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
-                        next();
-                    }
-                    else {
-                       throw new Error('Not granted any authorities'); 
-                    }
+                if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
+                    next();
+                }
+                else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
+                    next();
+                }
+                else {
+                   throw new Error('Not granted any authorities'); 
                 }
             }
             catch(error) {
