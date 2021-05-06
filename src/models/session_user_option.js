@@ -32,7 +32,7 @@
         timestamps: false
     });
     sessionUserOption.associate = models => { 
-        sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', targetKey: 'sessionUser_id' });
+        sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', sourceKey: 'sessionUser_id' });
         sessionUserOption.belongsTo(models.Exam,{foreignKey:'exam_id'});
     };
     

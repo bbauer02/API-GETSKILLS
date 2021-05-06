@@ -34,13 +34,13 @@
     });
 
     Test.associate = models => {
-        Test.hasMany(models.Test, { as: "child",foreignKey:'parent_id',targetKey: 'test_id'});
+        Test.hasMany(models.Test, { as: "child",foreignKey:'parent_id',sourceKey: 'test_id'});
         Test.belongsTo(models.Test, {as:"parent",foreignKey:'parent_id'});
 
-        Test.hasOne(models.Session, {foreignKey:'test_id',targetKey: 'test_id'});
-        Test.hasMany(models.Level,{foreignKey:'test_id',targetKey: 'test_id'});
+        Test.hasOne(models.Session, {foreignKey:'test_id',sourceKey: 'test_id'});
+        Test.hasMany(models.Level,{foreignKey:'test_id',sourceKey: 'test_id'});
 
-        Test.hasMany(models.Exam,{foreignKey:'test_id',targetKey: 'test_id'})
+        Test.hasMany(models.Exam,{foreignKey:'test_id',sourceKey: 'test_id'})
     }
         return Test;  
 }  

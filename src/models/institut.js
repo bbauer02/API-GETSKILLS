@@ -95,8 +95,8 @@ module.exports = (sequelize, DataTypes) => {
     });
     Institut.associate = models => {
         Institut.belongsTo(models.Country,{as: 'institutCountry',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
-        Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', targetKey:'institut_id'})
-        Institut.hasMany(models.Session,{foreignKey:'institut_id', targetKey:'institut_id'})
+        Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', sourceKey:'institut_id'})
+        Institut.hasMany(models.Session,{foreignKey:'institut_id', sourceKey:'institut_id'})
     }
     return Institut;
 }

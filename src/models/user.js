@@ -161,8 +161,8 @@ module.exports = (sequelize, DataTypes) => {
         User.belongsTo(models.Role,{as:'systemRole',foreignKey:'systemRole_id',sourceKey: 'role_id'});
 
 
-        User.hasMany(models.institutHasUser,{as:'instituts',foreignKey:'user_id', targetKey:'user_id'})
-        User.hasMany(models.sessionUser,{foreignKey:'user_id', targetKey:'user_id'})
+        User.hasMany(models.institutHasUser,{as:'instituts',foreignKey:'user_id', sourceKey:'user_id'})
+        User.hasMany(models.sessionUser,{foreignKey:'user_id', sourceKey:'user_id'})
  
 
 
