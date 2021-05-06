@@ -26,41 +26,35 @@ module.exports =  (app) => {
                 parameters.offset = parseInt(req.query.offset);
             }
             parameters.attributes = {exclude:['password']};
-            parameters.include = [{
-                model: models['User'],
-                attributes:{exclude:['password']},
-                include:[{
-                    model: models['Country'],
-                    as:'country',
-                    attributes : ["label"]
+            parameters.include = [
+                {
+                    model: models['Role']
                 },
                 {
-                    model: models['Country'],
-                    as:'nationality',
-                    attributes : [["countryNationality",'label']]
-                },
-                {
-                    model: models['Country'],
-                    as:'firstlanguage',
-                    attributes : [["countryLanguage",'label']]
-                },
-                {
-                    model: models['institutHasUser'],
-                    where: {
-                        institut_id: req.params.id
-                    },
-                    attributes:['institut_id'],
-                    as:'instituts',
+                    
+                    model: models['User'],
+                    attributes:{exclude:['password']},
                     include:[{
-                        model:models['Institut'],
-                        attributes:['label']
+                        model: models['Country'],
+                        as:'country',
+                        attributes : ["label"]
                     },
                     {
-                        model:models['Role'],
-                        attributes:['role_id','label','power']
+                        model: models['Country'],
+                        as:'nationality',
+                        attributes : [["countryNationality",'label']]
+                    },
+                    {
+                        model: models['Country'],
+                        as:'firstlanguage',
+                        attributes : [["countryLanguage",'label']]
+                    },
+                    {
+                        model: models['Role'],
+                        as:'systemRole'
                     }]
-                }]
-            }];
+                }
+            ];
             const Users = await models['institutHasUser'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;
             res.json({message, data: Users.rows});

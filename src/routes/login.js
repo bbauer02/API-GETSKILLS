@@ -37,6 +37,10 @@ module.exports = (app) => {
                                 model:models['Role'],
                                 attributes:['role_id','label','power']
                             }]
+                        },
+                        {
+                            model: models['Role'],
+                            as : 'systemRole'
                         }
                     ]
             });

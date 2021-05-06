@@ -1,4 +1,5 @@
-﻿module.exports = (sequelize, DataTypes) => {
+  
+module.exports = (sequelize, DataTypes) => {
     const Institut =  sequelize.define('Institut', { 
         institut_id: {
             type: DataTypes.INTEGER,
@@ -95,7 +96,7 @@
     Institut.associate = models => {
         Institut.belongsTo(models.Country,{as: 'institutCountry',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
         Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', targetKey:'institut_id'})
-        Institut.hasMany(models.Session,{foreignKey:'institut_id'});
+        Institut.hasMany(models.Session,{foreignKey:'institut_id', targetKey:'institut_id'})
     }
     return Institut;
 }

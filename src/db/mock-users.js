@@ -15,7 +15,8 @@
         country_id: 76,
         birthday: new Date(1982, 7, 4)     ,
         nationality_id: 76,
-        firstlanguage_id:76
+        firstlanguage_id:76,
+        systemRole_id : 5
     },
     {
       login: "umebosi1014",
@@ -33,7 +34,8 @@
       country_id: 76,
       birthday: new Date(1988, 9, 14),
       nationality_id: 112,
-      firstlanguage_id:46
+      firstlanguage_id:46,
+      systemRole_id:null
   },
   {
     login: "cLefebre",
@@ -51,7 +53,8 @@
     country_id: 76,
     birthday: new Date(1987, 10, 14),
     nationality_id: 76,
-    firstlanguage_id:76
+    firstlanguage_id:76,
+    systemRole_id:null
 }
 ];
 module.exports = users;

@@ -77,7 +77,6 @@ const initDB = async (sequelize) => {
                 //await bcrypt.hash(user.password, 10),
                 for (const user of users) {
                     const newUser = await models['User'].create({
-                        role_id: user.role_id,
                         login: user.login,
                         password: await bcrypt.hash(user.password, 2),
                         email: user.email,
@@ -93,13 +92,14 @@ const initDB = async (sequelize) => {
                         country_id: user.country_id,
                         birthday: user.birthday,
                         nationality_id: user.nationality_id,
-                        firstlanguage_id: user.firstlanguage_id
-                    });
+                        firstlanguage_id: user.firstlanguage_id,
+                        systemRole_id:user.systemRole_id
+                    }); 
                 }
                 // TABLE 'institutHasUser'
                 await models['institutHasUser'].bulkCreate([
                     { 'user_id' : 1, 'institut_id':2,'role_id': 1},
-                    { 'user_id' : 1, 'institut_id':1,'role_id': 5},
+                    { 'user_id' : 1, 'institut_id':1,'role_id': 1},
                     { 'user_id' : 2, 'institut_id':1,'role_id': 1}
                 ]);
 

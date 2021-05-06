@@ -1,7 +1,5 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
-const {isAuthenticated,isAuthorized} = require('../../auth/jwt.utils');
-const auth = require('../../auth/auth');
 
 module.exports =  (app) => {
     app.get('/api/users', async (req,res) => {
@@ -118,6 +116,10 @@ module.exports =  (app) => {
                 model: models['Country'],
                 as:'firstlanguage',
                 attributes : [["countryLanguage",'label']]
+            },
+            {
+                model: models['Role'],
+                as:'systemRole'
             }];
             const Users = await models['User'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;

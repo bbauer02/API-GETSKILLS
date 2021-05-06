@@ -1,10 +1,9 @@
 ﻿const {models} = require('../../models');
-
 module.exports =  (app) => {
-    app.get('/api/users/:id', async (req,res) => {
+    app.get('/api/users/:user_id',async (req,res) => {
         try {
             const parameters = {}; 
-            parameters.where = {user_id:req.params.id};
+            parameters.where = {user_id:req.params.user_id};
             parameters.order = ['lastname'];
             parameters.include = [
             {
@@ -34,6 +33,11 @@ module.exports =  (app) => {
                     model:models['Role'],
                     attributes:['role_id','label','power']
                 }]
+            },
+            {
+                model:models['Role'], 
+                as:'systemRole',
+                attributes:['role_id','label','power']
             }];
             parameters.attributes = {exclude:['password']};
             const User = await models['User'].findOne(parameters);

@@ -2,6 +2,7 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 
+
 module.exports =  (app) => {
     app.get('/api/sessions', async (req,res) => {
         try {

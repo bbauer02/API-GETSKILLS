@@ -2,17 +2,17 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 
 module.exports = (app) => {
-    app.put('/api/levels/:id', async (req, res) => {
+    app.put('/api/levels/:level_id', async (req, res) => {
         try {
-            const Level = await models['Level'].findByPk(req.params.id);
+            const Level = await models['Level'].findByPk(req.params.level_id);
             if(Level === null) {
                 const message = `Level doesn't exist.Retry with an other level id.`;
                 return res.status(404).json({message});
             }
             Level.update(req.body,{
-                where:{id:req.params.id}
+                where:{id:req.params.level_id}
             });
-            const message = `Level id:${Level.id} has been updated `;
+            const message = `Level id:${Level.level_id} has been updated `;
             res.json({message, data: Level});
         }
         catch (error) {

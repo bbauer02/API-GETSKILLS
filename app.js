@@ -3,7 +3,7 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const port = 3000;
-
+ 
 
 /*DEV MOD*/
 const morgan = require('morgan');
@@ -17,6 +17,7 @@ models.initDB(sequelize);
 
 // Points de terminaison
 // Login
+
 require('./src/routes/login')(app);
 
 // Countries
@@ -73,5 +74,5 @@ require('./src/routes/exam/deleteExam')(app);
 require('./src/routes/exam/updateExam')(app);
 require('./src/routes/exam/findExamByPk')(app);
 
-
+ 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

@@ -2,10 +2,10 @@
 const {models} = require('../../models');
 
 module.exports = (app) => {
-    app.delete('/api/instituts/:id/unsubscribe/:userid',async (req,res) => {
+    app.delete('/api/instituts/:institut_id/unsubscribe/:unsubscribeUser_id',async (req,res) => {
         try {
-            const Institut = await models['Institut'].findByPk(req.params.id);
-            const User = await models['User'].findByPk(req.params.userid);
+            const Institut = await models['Institut'].findByPk(req.params.institut_id);
+            const User = await models['User'].findByPk(req.params.unsubscribeUser_id);
             if(Institut === null) {
               const message = `Institut doesn't exist.Retry with an other institut id.`;
               return res.status(404).json({message});
