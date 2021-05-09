@@ -2,18 +2,20 @@
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
-const port = 3000;
+
+const port = process.env.PORT || 3000;
  
 
-/*DEV MOD*/
-const morgan = require('morgan');
+
 app
-    .use(morgan('dev'))
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
 
 // Initialisation de la BDD
 models.initDB(sequelize);
+app.get('/', (req, res) => {
+    res.json('Hello, Heroku ! ');
+});
 
 // Points de terminaison
 // Login
