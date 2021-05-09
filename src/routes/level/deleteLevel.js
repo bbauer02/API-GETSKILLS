@@ -1,9 +1,9 @@
 ﻿const {models} = require('../../models');
   
 module.exports = (app) => {
-  app.delete('/api/levels/:level_id', async (req, res) => {
+  app.delete('/api/levels/:id', async (req, res) => {
     try {
-      const Level = await models['Level'].findByPk(req.params.level_id);
+      const Level = await models['Level'].findByPk(req.params.id);
       if(Level === null) {
         const message = `Level doesn't exist.Retry with an other level id.`;
         return res.status(404).json({message});

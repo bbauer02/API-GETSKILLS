@@ -1,10 +1,10 @@
 ﻿﻿const {models} = require('../../models');
 
 module.exports =  (app) => {
-    app.get('/api/instituts/:institut_id', async (req,res) => {
+    app.get('/api/instituts/:id', async (req,res) => {
         try {
             const parameters = {}; 
-            parameters.where = {institut_id:req.params.institut_id};
+            parameters.where = {institut_id:req.params.id};
             parameters.include = [{
                 model: models['Country'],
                 as:"institutCountry",

@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 
 module.exports =  (app) => {
 
-    app.get('/api/instituts/users/:id', async (req,res) => {
+    app.get('/api/instituts/:id/users', async (req,res) => {
         try {
             const parameters = {}; 
             parameters.where = {institut_id:req.params.id};

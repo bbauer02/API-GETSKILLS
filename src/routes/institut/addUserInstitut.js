@@ -2,7 +2,7 @@
 const {models} = require('../../models');
 
 module.exports = (app) => {
-    app.post('/api/instituts/adduser',async (req,res) => {
+    app.post('/api/instituts/users',async (req,res) => {
         try{
             const institutHasUser = await models['institutHasUser'].create(req.body);
             const message = `User id: ${institutHasUser.user_id} has been add in the institut id : ${institutHasUser.institut_id}.`;

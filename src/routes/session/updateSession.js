@@ -2,9 +2,14 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const {  isAuthorized} = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.put('/api/sessions/:id', async (req, res) => {
+    app.put('/api/sessions/:id',isAuthorized, async (req, res) => {
         try {
-            const Session = await models['Session'].findByPk(req.params.id);
+            const Session = await models['Session'].findOne({
+                where: {
+                    session_id: req.params.id,
+                    institut_id: req.body.institut_id
+                }
+            });
             if(Session === null) {
                 const message = `Session doesn't exist.Retry with an other session id.`;
                 return res.status(404).json({message});
