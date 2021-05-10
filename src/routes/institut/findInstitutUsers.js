@@ -1,9 +1,9 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
-
+const {  isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
 
-    app.get('/api/instituts/:id/users', async (req,res) => {
+    app.get('/api/instituts/:id/users',isAuthorized, async (req,res) => {
         try {
             const parameters = {}; 
             parameters.where = {institut_id:req.params.id};

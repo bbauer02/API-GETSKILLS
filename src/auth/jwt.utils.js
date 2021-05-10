@@ -67,10 +67,11 @@ module.exports = {
     },
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized:  async (req, res, next) => {
-        next();
-           /* try {
+    
+            try {
                 const decodedToken = await module.exports.getHeaderToken(req);
-                const moduleName = req.url.split('/')[2];
+                next();
+           /*     const moduleName = req.url.split('/')[2];
                 const httpMethod = req.method;
                 const powerNeeded = module.exports.modulePower[httpMethod][moduleName];
                 let userMemberOfInstitut = null;
@@ -88,10 +89,10 @@ module.exports = {
                 }
                 else {
                    throw new Error('Not granted any authorities'); 
-                }
+                }*/
             }
             catch(error) {
                 res.status(401).json({"error" :error.message });
-            }*/
+            }
     }
 }

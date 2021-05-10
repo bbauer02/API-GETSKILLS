@@ -1,6 +1,6 @@
 ﻿const {models} = require('../../models');
 const { ValidationError,UniqueConstraintError } = require('sequelize');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const {  isAuthorized } = require('../../auth/jwt.utils'); 
 
 module.exports = (app) => {
     app.put('/api/instituts/:id',isAuthorized,async (req, res) => {
