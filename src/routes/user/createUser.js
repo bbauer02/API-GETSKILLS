@@ -1,8 +1,8 @@
 ﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
-
+const {  isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.post('/api/users/',async (req,res) => {
+    app.post('/api/users/', isAuthorized, async (req,res) => {
         try{
             const User = await models['User'].create(req.body);
             const message = `User : ${User.lastname} ${User.firstname} has been created.`;

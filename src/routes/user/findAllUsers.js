@@ -1,20 +1,20 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
-
+const {  isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
-    app.get('/api/users', async (req,res) => {
+    app.get('/api/users',isAuthorized, async (req,res) => {
         try {
            
             const parameters = {}; 
             parameters.where = {};
-            // Recherche par identifiant du rôle.
-            if(req.query.role) {
-                const role = parseInt(req.query.role);
-                if(isNaN(role) ) {
-                    const message = `Role parameter should be an integer.`;
+            // Recherche par identifiant du rôle system.
+            if(req.query.systemRole) {
+                const systemRole = parseInt(req.query.systemRole);
+                if(isNaN(systemRole) ) {
+                    const message = `systemRole parameter should be an integer.`;
                 return res.status(400).json({message})
                 } 
-                parameters.where.role_id = role;
+                parameters.where.systemRole = systemRole;
              }
             // Recherche par Nom ET Prénom
             if(req.query.fname && req.query.lname)

@@ -1,8 +1,9 @@
 ﻿const {models} = require('../../models');
 const { ValidationError,UniqueConstraintError } = require('sequelize');
+const {  isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/users/:user_id', async (req, res) => {
+    app.put('/api/users/:user_id',isAuthorized, async (req, res) => {
         try {
             const User = await models['User'].findByPk(req.params.user_id);
             if(User === null) {
