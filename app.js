@@ -69,6 +69,7 @@ require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
+require('./src/routes/session/addUserSession')(app);
 
 // Exams
 require('./src/routes/exam/findAllExams')(app);
