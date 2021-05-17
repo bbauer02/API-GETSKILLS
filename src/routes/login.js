@@ -46,12 +46,12 @@ module.exports = (app) => {
             });
             if(user === null) {
                 const message = `Login doesn't exist`;
-                return res.status(404).json({message});
+                return res.status(401).json({message: message});
             }
            isPasswordValid = await bcrypt.compare(req.body.password, user.password);
             if(!isPasswordValid) {
                 const message = `invalid password`;
-                return res.status(401).json({message})
+                return res.status(401).json({message: message})
             } 
 
 
