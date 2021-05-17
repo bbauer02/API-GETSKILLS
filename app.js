@@ -2,7 +2,7 @@
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
-
+const cors = require('cors');
 const port = process.env.PORT || 3000;
  
 
@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 app
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
+    use(cors)
 
 // Initialisation de la BDD
 models.initDB(sequelize);
