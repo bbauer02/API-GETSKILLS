@@ -4,20 +4,18 @@ const moment = require('moment');
 const {  isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/sessions',isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:id/sessions',isAuthorized, async (req,res) => {
         try {
             const parameters = {};
             parameters.where = {};
-            // Conditions
-            // Session d'un institut
-            if(req.query.institut) {
-                const institut_id = parseInt(req.query.institut);
+
+                const institut_id = parseInt(req.params.id);
                 if(isNaN(institut_id) ) {
                     const message = `Institut parameter should be an integer.`;
                     return res.status(400).json({message})
                 }
-                parameters.where.institut_id = institut_id;
-            }   
+                parameters.where.institut_id = institut_id;  
+
             // Sessions après une date
             if(req.query.after) {
                 const after = moment(req.query.after,"DD/MM/YYYY").format('YYYY-MM-DD');

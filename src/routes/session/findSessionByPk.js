@@ -1,7 +1,8 @@
 ﻿const {models} = require('../../models');
+const {  isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/sessions/:id', async (req,res) => {
+    app.get('/api/sessions/:id',isAuthorized, async (req,res) => {
         try {
             const parameters = {}; 
             parameters.where = {session_id:req.params.id};
@@ -50,21 +51,6 @@ module.exports =  (app) => {
                     }]
                 }
         ];
-
-
-       
-/*
-            const addLevel = {
-                model: models['Level']
-            };
-            parameters.include.push(addLevel);
-
-            
-            const addTest = {
-                model: models['Test']
-            };
-            parameters.include.push(addTest);
-*/
             
             const Session = await models['Session'].findOne(parameters);
             if(Session === null) {

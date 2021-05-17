@@ -1,13 +1,13 @@
 ﻿const {models} = require('../../models');
-const {  isAuthorized} = require('../../auth/jwt.utils');
+const {  isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-  app.delete('/api/sessions/:id',isAuthorized, async (req, res) => {
+  app.delete('/api/instituts/:institut_id/sessions/:session_id',isAuthorized, async (req, res) => {
     try {
       const Session = await models['Session'].findOne({
         where: {
-            session_id: req.params.id,
-            institut_id: req.body.institut_id
+            session_id: req.params.session_id,
+            institut_id: req.params.institut_id
           }
       });
       if(Session === null) {
