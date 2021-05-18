@@ -1,13 +1,28 @@
 ﻿const {models} = require('../models');
 const bcrypt = require('bcrypt');
 const jwtUtils = require('../auth/jwt.utils');
+const { token: config } = require('../config');
+
 module.exports = (app) => {
     app.post('/api/login',async (req, res) => {
         try {
+            // 1. On récupère le nom d'utilisateur et le mot de passe dans la requête.
+            const { login, password } = req.body;
+            // 2. On envoie une erreur au client si le paramètre 'login' est manquant.
+            if(!login) {
+                const message = `Login/Username is missing !`;
+                return res.status(400).json({ message });
+            }
+            // 3. On envoie une erreur au client si le paramètre password est manquant.
+            if(!password) {
+                const message = `password is missing !`;
+                return res.status(400).json({ message });
+            }
+            // 4. On vérifie si le nom d'utilisateur existe.
             const user = await models['User'].findOne({
                 where:
                 {
-                    login:req.body.login
+                    login:login
                 }, 
                 include: 
                         [{
@@ -45,29 +60,52 @@ module.exports = (app) => {
                     ]
             });
             if(user === null) {
-                const message = `Login doesn't exist`;
+                const message = `Username or password is incorrect`;
                 return res.status(401).json({ message});
             }
-           isPasswordValid = await bcrypt.compare(req.body.password, user.password);
+
+            // 5. On envoie une erreur au client si les informations de connexion sont erronnées
+           isPasswordValid = await bcrypt.compare(password, user.password);
             if(!isPasswordValid) {
-                const message = `invalid password`;
+                const message = `Username or password is incorrect`;
                 return res.status(401).json({ message})
             } 
 
-
-
-            const message = `User has been connected`;
+            // 6. On supprime le champ "password" dans l'objet à retourner au client.
             delete user.dataValues.password;
-            const token = jwtUtils.generateTokenForUser(user);
-            
-            res.cookie('token', token, { httpOnly: true });
-            
-                return res.json(
-                    {
-                        message, 
-                        data:user,
-                        token: token
-                    });
+
+            // 7. On créer le JWT et Token et on le stocke en BDD
+            const {accessToken, refreshToken, xsrfToken}  = await jwtUtils.generateTokenForUser(user);
+
+            // 9. On envoie au client le JWT et le refresh token       
+            const message = `User has been connected`;
+
+            // 10. On créer le cookie contenant le JWT 
+            res.cookie('access_token',accessToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: config.accessToken.expiresIn
+            })
+
+            // 11. On créer le cookie contenant le refresh token 
+            res.cookie('refresh_token', refreshToken, {
+                httpOnly: true,
+                secure: true,
+                maxAge: config.refreshToken.expiresIn,
+                path: '/token'
+            });
+
+            return res.json(
+                {
+                    accessToken,
+                    tokenType: config.accessToken.type,
+                    accessTokenExpiresIn: config.accessToken.expiresIn,
+                    refreshToken,
+                    refreshTokenExpiresIn: config.refreshToken.expiresIn,
+                    xsrfToken,
+                    message, 
+                    data:user
+                });
         }
         catch(error) {
             const message = `User cannot be authentified. Please retry later.`;

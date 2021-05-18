@@ -1,6 +1,9 @@
 ﻿const jwt = require('jsonwebtoken');
 const ENV = require('dotenv').config().parsed;
-let JWT_SIGN_SECRET = ENV.JWT_SIGN_SECRET;
+const {models} = require('../models');
+const { token: config } = require('../config');
+const crypto = require('crypto');
+
 
 module.exports = {
     // Niveau de droit par "modules"
@@ -15,29 +18,64 @@ module.exports = {
         }
     },
     // Generer un Token
-    generateTokenForUser: (userData) => {
-        return jwt.sign({
-            user_id: userData.user_id,
+    generateTokenForUser: async (userData) => {
+        /* On créer le token CSRF */
+        const xsrfToken = crypto.randomBytes(64).toString('hex');
+
+        const accessToken =  jwt.sign({
+           user_id: userData.user_id,
            instituts : userData.instituts,
            systemRole: userData.systemRole,
-
+           xsrfToken
         },
-        JWT_SIGN_SECRET, 
+        config.accessToken.secret,
         {
-            expiresIn: '1h'
+            algorithm: config.accessToken.algorithm,
+            audience: config.accessToken.audience,
+            expiresIn: config.accessToken.expiresIn / 1000,
+            issuer: config.accessToken.issuer,
+            subject: userData.user_id.toString()
+        });
+        const refreshToken = crypto.randomBytes(128).toString('base64');
+
+        await models['RefreshToken'].create({
+            userId: userData.user_id,
+            token: refreshToken,
+            expiresAt: Date.now() + config.refreshToken.expiresIn
         });
 
+
+
+        return { accessToken, refreshToken, xsrfToken };
     },
     getHeaderToken : (req) => {
         return new Promise(async (resolve,reject) => {
 
             try {
-                const authorizationHeader = req.headers.authorization;
-                if(!authorizationHeader) { 
-                    reject(new Error('Give an authentification Token before asking for the ressource'));
-                } 
-                const token = authorizationHeader.split(' ')[1];
-                const decodedToken = await jwt.verify(token, JWT_SIGN_SECRET);
+                const {cookies, headers} = req;
+                console.log(req)
+                 /* On vérifie que le JWT est présent dans les cookies de la requête */
+                if (!cookies || !cookies.access_token) {
+                    reject(new Error('Missing token in cookie'));
+                }
+                const accessToken = cookies.access_token;
+
+                /* On vérifie que le token CSRF est présent dans les en-têtes de la requête */
+                if (!headers || !headers['x-xsrf-token']) {
+                    reject(new Error('Missing XSRF token in headers'));
+                }
+                const xsrfToken = headers['x-xsrf-token'];
+
+                // On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer
+                const decodedToken = await jwt.verify(accessToken, config.accessToken.secret, {
+                    algorithms: config.accessToken.algorithm
+                });
+
+                /* On vérifie que le token CSRF correspond à celui présent dans le JWT  */
+                if (xsrfToken !== decodedToken.xsrfToken) {
+                    reject(new Error('Bad xsrf token'));
+                }
+  
                 resolve(decodedToken);
             }
             catch(error) {
@@ -50,8 +88,7 @@ module.exports = {
     // Fonction qui vérifie si l'utilisateur est identifié, 
     isAuthenticated : async (req, res, next) => {
         try {
-            await module.exports.getHeaderToken(req);
-            next();
+
         }
         catch(error) {
             res.status(401).json({"message" : error.message});
@@ -70,7 +107,15 @@ module.exports = {
     
             try {
                 const decodedToken = await module.exports.getHeaderToken(req);
-                next();
+                // 4. On vérifie que l'utilisateur existe bien dans notre base de données.
+                const userId = decodedToken.sub;
+                const user = await models['User'].findOne({ where: { user_id: userId}});
+                if(!user) {
+                    throw new Error(`User ${userId} not exists.`); 
+                }
+                // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
+                req.user = user;
+                return next();
            /*     const moduleName = req.url.split('/')[2];
                 const httpMethod = req.method;
                 const powerNeeded = module.exports.modulePower[httpMethod][moduleName];

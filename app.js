@@ -4,6 +4,7 @@ const models = require('./src/models');
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3000;
+const cookieParser = require('cookie-parser');
  
 
 
@@ -11,6 +12,7 @@ app
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
     .use(cors())
+    .use(cookieParser())
 
 // Initialisation de la BDD
 models.initDB(sequelize);
