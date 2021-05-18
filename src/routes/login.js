@@ -58,11 +58,15 @@ module.exports = (app) => {
 
             const message = `User has been connected`;
             delete user.dataValues.password;
+            const token = jwtUtils.generateTokenForUser(user);
+            
+            res.cookie('token', token, { httpOnly: true });
+            
                 return res.json(
                     {
                         message, 
                         data:user,
-                        token: jwtUtils.generateTokenForUser(user)
+                        token: token
                     });
         }
         catch(error) {
