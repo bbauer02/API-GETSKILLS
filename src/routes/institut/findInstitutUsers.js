@@ -4,10 +4,10 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
 
-    app.get('/api/instituts/:id/users',isAuthenticated, isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:institut_id/users',isAuthenticated, isAuthorized, async (req,res) => {
         try {
             const parameters = {}; 
-            parameters.where = {institut_id:req.params.id};
+            parameters.where = {institut_id:req.params.institut_id};
             // Parameter : LIMIT
             if(req.query.limit) {
                 const limit = parseInt(req.query.limit);       

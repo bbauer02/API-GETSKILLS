@@ -5,18 +5,8 @@ const { token: config, power} = require('../config');
 const crypto = require('crypto');
 
 
+
 module.exports = {
-    // Niveau de droit par "modules"
-    modulePower : {
-        PUT : {
-            instituts : ENV.INSTITUTS_UPDATE,
-            sessions : ENV.SESSIONS_UPDATE
-        },
-        DELETE : {
-            instituts : ENV.INSTITUTS_DELETE,
-            sessions : ENV.SESSIONS_DELETE
-        }
-    },
     // Generer un Token
     generateTokenForUser: async (userData) => {
         /* On créer le token CSRF */
@@ -97,6 +87,7 @@ module.exports = {
             }
             // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
             req.user = user;
+            req.accessToken = decodedToken;
             return next();
         }
         catch(error) {
@@ -105,35 +96,48 @@ module.exports = {
     },
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized:  async (req, res, next) => {
+        try {
+            const decodedToken  =req.accessToken;
+            // points d'entrées : sans les id
+            const entriesPoints = req.url.split('/').filter(e => e !== 'api' && !parseInt(e)  && e !== '' );
+            const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e)  && e !== '' );
 
-
-
-
-
-
-
-        return next();
-           
-           /*     const moduleName = req.url.split('/')[2];
-                const httpMethod = req.method;
-                const powerNeeded = module.exports.modulePower[httpMethod][moduleName];
-                let userMemberOfInstitut = null;
-
-                if( (moduleName === 'instituts' && req.params.id) || (moduleName === 'Sessions' && req.body.institut_id)) {
-                    const reqInstitut_id = req.params.id || req.body.institut_id;
-                    userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
-                }
-
-                if( userMemberOfInstitut && userMemberOfInstitut.Role.power >= powerNeeded) {
-                    next();
-                }
-                else if (module.exports.hasPowerEnough(decodedToken.systemRole, powerNeeded)) {
-                    next();
+            // Lecture du fichier de configuration des pouvoirs dynamiquement.
+            const httpMethod = req.method.toUpperCase();
+            let powerNeed = power[httpMethod];
+            for(const entry of entriesPoints) {
+                // Il y a toujours un point d'entrée au minimum. Donc si il n'y a que un seul point d'entrée, on se branche sur le "default"
+                if(entriesPoints.length ===1) {
+                    powerNeed =powerNeed[entry.split('?')[0]]["default"];
                 }
                 else {
-                   throw new Error('Not granted any authorities'); 
-                }*/
-           
+                    powerNeed =powerNeed[entry.split('?')[0]];
+                }  
+            }   
+
+            // On vérifie les droits de l'utilisateur
+            let userMemberOfInstitut = null;
+            const moduleName = entriesPoints[0];
+            let userPower = 0;
+            if( moduleName === 'instituts' ) {
+                const reqInstitut_id = req.params.institut_id || req.body.institut_id;
+                userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
+                userPower = userMemberOfInstitut.Role.power;
+            }
+
+            if(userPower >= powerNeed) {
+                return next();
+            }
+            else if (decodedToken.systemRole.power >= 10 ) {
+                return next();
+            }
+            throw new Error(`You have no power here !`);
+        }
+        catch(error) {
+            res.status(401).json({"error" :error.message });
+        }
+  
+          
     },
     hasPowerEnough : (systemRole, powerNeeded) => {
         if(systemRole && systemRole.power >= powerNeeded ) {

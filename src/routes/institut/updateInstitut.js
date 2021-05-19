@@ -3,9 +3,9 @@ const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/instituts/:id',isAuthenticated, isAuthorized,async (req, res) => {
+    app.put('/api/instituts/:institut_id',isAuthenticated, isAuthorized,async (req, res) => {
         try {
-            const Institut = await models['Institut'].findByPk(req.params.id);
+            const Institut = await models['Institut'].findByPk(req.params.institut_id);
             if(Institut === null) {
                 const message = `Institut doesn't exist.Retry with an other institut id.`;
                 return res.status(404).json({message});

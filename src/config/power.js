@@ -1,6 +1,9 @@
 module.exports = (env) => ({
     GET : {
-        instituts : env.INSTITUTS_GET,
+        instituts : {
+           default: env.INSTITUTS_GET,
+           users : env.INSTITUTS_USERS_GET
+        },
         exams     : env.EXAMS_GET,
         countries : env.COUNTRIES_GET,
         levels    : env.LEVELS_GET,
@@ -10,7 +13,10 @@ module.exports = (env) => ({
         users     : env.USERS_GET,
     },
     POST : {
-        instituts : env.INSTITUTS_POST,
+        instituts : {
+            default : env.INSTITUTS_POST,
+            users : env.INSTITUTS_USERS_POST
+        },
         exams     : env.EXAMS_POST,
         countries : env.COUNTRIES_POST,
         levels    : env.LEVELS_POST,

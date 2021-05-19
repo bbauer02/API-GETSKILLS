@@ -2,10 +2,10 @@
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/instituts/:id', isAuthenticated, isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:institut_id', isAuthenticated, isAuthorized, async (req,res) => {
         try {
             const parameters = {}; 
-            parameters.where = {institut_id:req.params.id};
+            parameters.where = {institut_id:req.params.institut_id};
             parameters.include = [{
                 model: models['Country'],
                 as:"institutCountry",
