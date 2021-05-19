@@ -1,10 +1,10 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
 const moment = require('moment');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/sessions',isAuthorized, async (req,res) => {
+    app.get('/api/sessions', isAuthenticated,isAuthorized, async (req,res) => {
         try {
             const parameters = {};
             parameters.where = {};

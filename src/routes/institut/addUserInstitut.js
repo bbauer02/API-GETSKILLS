@@ -1,9 +1,9 @@
 ﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/users', isAuthorized, async (req,res) => {
+    app.post('/api/instituts/users', isAuthenticated, isAuthorized, async (req,res) => {
         try{
             const institutHasUser = await models['institutHasUser'].create(req.body);
             const message = `User id: ${institutHasUser.user_id} has been add in the institut id : ${institutHasUser.institut_id}.`;

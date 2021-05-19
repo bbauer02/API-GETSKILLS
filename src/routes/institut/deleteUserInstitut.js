@@ -1,8 +1,9 @@
 ﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.delete('/api/instituts/:institut_id/users/:user_id',async (req,res) => {
+    app.delete('/api/instituts/:institut_id/users/:user_id',isAuthenticated, isAuthorized,async (req,res) => {
         try {
             const Institut = await models['Institut'].findByPk(req.params.institut_id);
             const User = await models['User'].findByPk(req.params.user_id);

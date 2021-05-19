@@ -1,7 +1,7 @@
 ﻿const {models} = require('../../models');
-
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
-    app.get('/api/tests', async (req,res) => {
+    app.get('/api/tests', isAuthenticated, isAuthorized,async (req,res) => {
        try {
             const Tests = await models['Test'].findAndCountAll({
                 where: {

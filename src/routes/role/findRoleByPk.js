@@ -1,7 +1,7 @@
 ﻿const {models} = require('../../models');
-
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
-    app.get('/api/roles/:id', async (req,res) => {
+    app.get('/api/roles/:id', isAuthenticated, isAuthorized,async (req,res) => {
         try {
             const Role = await models['Role'].findByPk(req.params.id);
             if(Role === null) {

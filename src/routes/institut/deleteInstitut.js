@@ -1,8 +1,8 @@
 ﻿const {models} = require('../../models');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-  app.delete('/api/instituts/:id',isAuthorized, async (req, res) => {
+  app.delete('/api/instituts/:id',isAuthorized, isAuthenticated, isAuthorized,async (req, res) => {
     try {
       const Institut = await models['Institut'].findByPk(req.params.id);
       if(Institut === null) {

@@ -1,8 +1,8 @@
 ﻿﻿const {models} = require('../../models');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/instituts/:id', isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:id', isAuthenticated, isAuthorized, async (req,res) => {
         try {
             const parameters = {}; 
             parameters.where = {institut_id:req.params.id};

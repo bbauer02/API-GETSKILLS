@@ -1,9 +1,9 @@
 ﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
-const {  isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/sessions/',isAuthorized, async (req,res) => {
+    app.post('/api/sessions/', isAuthenticated,isAuthorized, async (req,res) => {
         try{
             const Session = await models['Session'].create(req.body);
             const message = `Session id : ${Session.session_id} has been created.`;

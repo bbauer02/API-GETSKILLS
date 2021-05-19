@@ -1,8 +1,9 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/roles', async (req,res) => {
+    app.get('/api/roles', isAuthenticated, isAuthorized,async (req,res) => {
         try {
             const parameters = {};
             const Roles = await models['Role'].findAndCountAll();

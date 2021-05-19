@@ -1,8 +1,9 @@
 ﻿const {models} = require('../../models');
 const { ValidationError,UniqueConstraintError } = require('sequelize');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/levels/:level_id', async (req, res) => {
+    app.put('/api/levels/:level_id', isAuthenticated, isAuthorized,async (req, res) => {
         try {
             const Level = await models['Level'].findByPk(req.params.level_id);
             if(Level === null) {

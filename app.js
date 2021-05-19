@@ -4,17 +4,15 @@ const models = require('./src/models');
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3000;
-var cookieParser = require('cookie-parser');
-var jwt = require('express-jwt');
-const ENV = require('dotenv').config().parsed;
-let JWT_SIGN_SECRET = ENV.JWT_SIGN_SECRET;
+const cookieParser = require('cookie-parser');
+ 
+
 
 app
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
     .use(cors())
     .use(cookieParser())
-    .use(jwt({ secret: JWT_SIGN_SECRET, algorithms: ['HS256'] , getToken: req => req.cookies.token}))
 
 // Initialisation de la BDD
 models.initDB(sequelize);

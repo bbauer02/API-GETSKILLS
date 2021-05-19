@@ -1,9 +1,9 @@
 ﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
-
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  app => {
-    app.post('/api/levels', async (req, res) => {
+    app.post('/api/levels', isAuthenticated, isAuthorized,async (req, res) => {
         try {
             const level = await models['Level'].create(req.body);
             const message = `The level '${req.body.label}' has been created.`;

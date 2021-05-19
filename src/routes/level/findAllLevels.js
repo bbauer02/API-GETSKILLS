@@ -1,8 +1,9 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-  app.get('/api/levels', async (req,res) => {
+  app.get('/api/levels', isAuthenticated, isAuthorized,async (req,res) => {
     try {
       // calcul le nombre d'arguments dans la requête
       //const countArgs = Object.keys(req.query).length;
