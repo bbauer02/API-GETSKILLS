@@ -53,7 +53,7 @@ module.exports = {
 
             try {
                 const {cookies, headers} = req;
-                console.log(req)
+
                  /* On vérifie que le JWT est présent dans les cookies de la requête */
                 if (!cookies || !cookies.access_token) {
                     reject(new Error('Missing token in cookie'));
@@ -105,6 +105,13 @@ module.exports = {
     },
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized:  async (req, res, next) => {
+
+
+
+
+
+
+
         return next();
            
            /*     const moduleName = req.url.split('/')[2];
