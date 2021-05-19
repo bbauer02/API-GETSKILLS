@@ -1,7 +1,7 @@
 ﻿const jwt = require('jsonwebtoken');
 const ENV = require('dotenv').config().parsed;
 const {models} = require('../models');
-const { token: config } = require('../config');
+const { token: config, power} = require('../config');
 const crypto = require('crypto');
 
 
