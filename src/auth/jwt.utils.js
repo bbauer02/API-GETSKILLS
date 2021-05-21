@@ -97,8 +97,7 @@ module.exports = {
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized:  async (req, res, next) => {
         try {
-            return next();
-         /*   const decodedToken  =req.accessToken;
+          const decodedToken  =req.accessToken;
             // points d'entrées : sans les id
             const entriesPoints = req.url.split('/').filter(e => e !== 'api' && !parseInt(e)  && e !== '' );
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e)  && e !== '' );
@@ -134,7 +133,7 @@ module.exports = {
             else if (decodedToken.systemRole.power >= 10 ) {
                 return next();
             }
-            throw new Error(`You have no power here !`);*/
+            throw new Error(`You have no power here !`);
         }
         catch(error) {
             res.status(401).json({"error" :error.message });
