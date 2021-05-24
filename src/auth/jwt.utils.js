@@ -86,7 +86,6 @@ module.exports = {
                 throw new Error(`User ${userId} not exists.`); 
             }
             // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
-            req.user = user;
             req.accessToken = decodedToken;
             return next();
         }
