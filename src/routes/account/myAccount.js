@@ -47,7 +47,7 @@ module.exports =  (app) => {
                 return res.status(404).json({message});
             }
             const message = `Users found`;
-            res.json({message, data: User});
+            res.json({message, User});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
