@@ -41,13 +41,13 @@ module.exports =  (app) => {
                 attributes:['role_id','label','power']
             }];
             parameters.attributes = {exclude:['password']};
-            const User = await models['User'].findOne(parameters);
-            if(User === null) {
+            const user = await models['User'].findOne(parameters);
+            if(user === null) {
                 const message = `User doesn't exist.Retry with an other user id.`;
                 return res.status(404).json({message});
             }
             const message = `Users found`;
-            res.json({message, User});
+            res.json({message, user});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

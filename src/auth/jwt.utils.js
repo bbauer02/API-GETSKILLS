@@ -86,6 +86,7 @@ module.exports = {
                 throw new Error(`User ${userId} not exists.`); 
             }
             // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
+            console.log(decodedToken)
             req.accessToken = decodedToken;
             return next();
         }
@@ -105,6 +106,7 @@ module.exports = {
             const httpMethod = req.method.toUpperCase();
             let powerNeed = power[httpMethod];
             for(const entry of entriesPoints) {
+                
                 // Il y a toujours un point d'entrée au minimum. Donc si il n'y a que un seul point d'entrée, on se branche sur le "default"
                 if(entriesPoints.length ===1) {
                     powerNeed =powerNeed[entry.split('?')[0]]["default"];
@@ -113,19 +115,20 @@ module.exports = {
                     powerNeed =powerNeed[entry.split('?')[0]];
                 }  
             }   
-
             // On vérifie les droits de l'utilisateur
             let userMemberOfInstitut = null;
             const moduleName = entriesPoints[0];
             let userPower = 0;
+
             if( moduleName === 'instituts' ) {
                 const reqInstitut_id = req.params.institut_id || req.body.institut_id || null;
+                
                 if(reqInstitut_id) {
                     userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
+
                     userPower = userMemberOfInstitut.Role.power;
                 } 
             }
-            
             if(userPower >= powerNeed) {
                 return next();
             }

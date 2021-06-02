@@ -104,7 +104,7 @@ module.exports = (app) => {
                     refreshTokenExpiresIn: config.refreshToken.expiresIn,
                     xsrfToken,
                     message, 
-                    data:user
+                    user
                 });
         }
         catch(error) {

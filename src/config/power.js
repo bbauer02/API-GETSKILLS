@@ -36,7 +36,9 @@ module.exports = (env) => ({
         users     : env.USERS_PUT,
     },
     DELETE : {
-        instituts : env.INSTITUTS_DELETE,
+        instituts :{
+            default: env.INSTITUTS_DELETE
+        },
         exams     : env.EXAMS_DELETE,
         countries : env.COUNTRIES_DELETE,
         levels    : env.LEVELS_DELETE,
