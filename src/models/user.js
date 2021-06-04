@@ -141,7 +141,7 @@ module.exports = (sequelize, DataTypes) => {
     }, 
     {
         tableName: 'users',
-        timestamps: false,
+        timestamps: true,
         hooks: {
             afterCreate: (user) => {
                 delete user.dataValues.password;

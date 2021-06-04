@@ -84,4 +84,7 @@ require('./src/routes/exam/findExamByPk')(app);
 // Account
 require('./src/routes/account/myAccount')(app);
  
+// Stats
+require('./src/routes/stats/statsUsers')(app);
+
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

@@ -56,6 +56,18 @@ module.exports = (app) => {
                         {
                             model: models['Role'],
                             as : 'systemRole'
+                        },
+                        {
+                            model: models['sessionUser'],
+                            include: [{
+                                model: models['Session'],
+                                include: [{
+                                    model: models['Level']
+                                },
+                                {
+                                    model: models['Test']
+                                }]
+                            }]
                         }
                     ]
             });
