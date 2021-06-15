@@ -1,8 +1,7 @@
 ﻿const {models} = require('../../models');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/countries/:id',  isAuthenticated, isAuthorized,async (req,res) => {
+    app.get('/api/countries/:id',async (req,res) => {
         try {
             const Country = await models['Country'].findByPk(req.params.id);
             if(Country === null) {
