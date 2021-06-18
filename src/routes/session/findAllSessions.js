@@ -1,10 +1,9 @@
 ﻿const {models} = require('../../models');
 const { Op } = require('sequelize');
 const moment = require('moment');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/sessions', isAuthenticated,isAuthorized, async (req,res) => {
+    app.get('/api/sessions', async (req,res) => {
         try {
             const parameters = {};
             parameters.where = {};
@@ -79,9 +78,18 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label"]
+                attributes : ["label", "country_id"],
+                where: {}
             }];
-
+            
+            if(req.query.country) {
+                const country_id = parseInt(req.query.country);
+                if(isNaN(country_id) ) {
+                    const message = `Counstry parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.include[0].where.country_id = country_id;
+            }   
             // Options 
             // Add Users
             if(req.query.users==="true")
@@ -112,11 +120,6 @@ module.exports =  (app) => {
                 parameters.include.push(addUsers);
             }
 
-            // Options 
-            // Add Test
-
-            if(req.query.tests==="true")
-            {
                 const addTests = {
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
@@ -133,7 +136,7 @@ module.exports =  (app) => {
                     attributes:['level_id','label','ref','description']
                 };
                 parameters.include.push(addLevels);
-            }
+
 
 
 
