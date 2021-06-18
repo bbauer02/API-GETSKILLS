@@ -8,6 +8,24 @@ module.exports =  (app) => {
             const parameters = {};
             parameters.where = {};
             // Conditions
+            // filtre par level id
+            if(req.query.level) {
+                const level_id = parseInt(req.query.level);
+                if(isNaN(level_id) ) {
+                    const message = `Level parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.where.level_id = level_id;
+            }  
+            // filtre par test id
+            if(req.query.test) {
+                const test_id = parseInt(req.query.test);
+                if(isNaN(test_id) ) {
+                    const message = `Level parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.where.test_id = test_id;
+            }  
             // Session d'un institut
             if(req.query.institut) {
                 const institut_id = parseInt(req.query.institut);
@@ -78,18 +96,24 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label", "country_id"],
+                attributes : ["label", "country_id", "city"],
                 where: {}
             }];
-            
+            // Filtre par Pays
             if(req.query.country) {
                 const country_id = parseInt(req.query.country);
                 if(isNaN(country_id) ) {
-                    const message = `Counstry parameter should be an integer.`;
+                    const message = `Country parameter should be an integer.`;
                     return res.status(400).json({message})
                 }
                 parameters.include[0].where.country_id = country_id;
             }   
+            // Filtre par City
+            if(req.query.city) {
+                const city = req.query.city;
+                parameters.include[0].where.city = city;
+            }  
+
             // Options 
             // Add Users
             if(req.query.users==="true")
