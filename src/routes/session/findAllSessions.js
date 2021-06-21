@@ -1,5 +1,5 @@
 ﻿const {models} = require('../../models');
-const { Op } = require('sequelize');
+const { Op,Sequelize } = require('sequelize');
 const moment = require('moment');
 
 module.exports =  (app) => {
@@ -113,9 +113,14 @@ module.exports =  (app) => {
                 const city = req.query.city;
                 parameters.include[0].where.city = city;
             }  
+            
 
             // Options 
-            // Add Users
+            const addUsers = {
+                model: models['sessionUser'],
+                attributes: [[Sequelize.fn('COUNT', Sequelize.col('sessionusers.sessionUser_id')), 'subscribedCount']]              
+            };
+           /* // Add Users
             if(req.query.users==="true")
             {
                 const addUsers = {
@@ -141,9 +146,9 @@ module.exports =  (app) => {
                         }] 
                     }]
                 };
-                parameters.include.push(addUsers);
-            }
-
+               
+            }*/
+            parameters.include.push(addUsers);
                 const addTests = {
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
@@ -161,12 +166,12 @@ module.exports =  (app) => {
                 };
                 parameters.include.push(addLevels);
 
+                parameters.distinct= true;
 
-
-
-            const Sessions = await models['Session'].findAndCountAll(parameters);
-            const message = `${Sessions.count} sessions found`;
-            res.json({message, data: Sessions.rows});
+            parameters.group = ['session.session_id']
+            const Sessions = await models['Session'].findAll(parameters);
+            const message = `${Sessions.length} sessions found`;
+            res.json({message, data: Sessions});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
