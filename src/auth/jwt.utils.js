@@ -125,7 +125,7 @@ module.exports = {
                 
                 if(reqInstitut_id) {
                     userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
-                    userPower = userMemberOfInstitut === null ? userMemberOfInstitut.Role.power : -1;
+                    userPower = (userMemberOfInstitut === null ||  userMemberOfInstitut === undefined) ? userMemberOfInstitut.Role.power : -1;
                 } 
             }
             if(userPower >= powerNeed) {

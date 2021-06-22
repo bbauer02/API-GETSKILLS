@@ -3,10 +3,28 @@ const { Op } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/exams', isAuthenticated, isAuthorized,async (req,res) => {
+    app.get('/api/exams',async (req,res) => {
         try {
             const parameters = {}; 
             parameters.where = {};
+            // Parameter : TEST
+            if(req.query.test) {
+                const test = parseInt(req.query.test);
+                if(isNaN(test) ) {
+                    const message = `Test parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }   
+                parameters.where.test_id = test;
+            }
+            // Parameter : LEVEL
+            if(req.query.level) {
+                const level = parseInt(req.query.level);
+                if(isNaN(level) ) {
+                    const message = `Level parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }   
+                parameters.where.level_id = level;
+            }
              // Parameter : LIMIT
              if(req.query.limit) {
                 const limit = parseInt(req.query.limit);       
