@@ -1,14 +1,31 @@
 ﻿const {models} = require('../../models');
-const { Op } = require('sequelize');
+const { Op,Sequelize } = require('sequelize');
 const moment = require('moment');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/sessions', isAuthenticated,isAuthorized, async (req,res) => {
+    app.get('/api/sessions', async (req,res) => {
         try {
             const parameters = {};
             parameters.where = {};
             // Conditions
+            // filtre par level id
+            if(req.query.level) {
+                const level_id = parseInt(req.query.level);
+                if(isNaN(level_id) ) {
+                    const message = `Level parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.where.level_id = level_id;
+            }  
+            // filtre par test id
+            if(req.query.test) {
+                const test_id = parseInt(req.query.test);
+                if(isNaN(test_id) ) {
+                    const message = `Level parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.where.test_id = test_id;
+            }  
             // Session d'un institut
             if(req.query.institut) {
                 const institut_id = parseInt(req.query.institut);
@@ -79,11 +96,31 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label"]
+                attributes : ["label", "country_id", "city"],
+                where: {}
             }];
+            // Filtre par Pays
+            if(req.query.country) {
+                const country_id = parseInt(req.query.country);
+                if(isNaN(country_id) ) {
+                    const message = `Country parameter should be an integer.`;
+                    return res.status(400).json({message})
+                }
+                parameters.include[0].where.country_id = country_id;
+            }   
+            // Filtre par City
+            if(req.query.city) {
+                const city = req.query.city;
+                parameters.include[0].where.city = city;
+            }  
+            
 
             // Options 
-            // Add Users
+            const addUsers = {
+                model: models['sessionUser'],
+                attributes: [[Sequelize.fn('COUNT', Sequelize.col('sessionusers.sessionUser_id')), 'subscribedCount']]              
+            };
+           /* // Add Users
             if(req.query.users==="true")
             {
                 const addUsers = {
@@ -109,14 +146,9 @@ module.exports =  (app) => {
                         }] 
                     }]
                 };
-                parameters.include.push(addUsers);
-            }
-
-            // Options 
-            // Add Test
-
-            if(req.query.tests==="true")
-            {
+               
+            }*/
+            parameters.include.push(addUsers);
                 const addTests = {
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
@@ -133,13 +165,13 @@ module.exports =  (app) => {
                     attributes:['level_id','label','ref','description']
                 };
                 parameters.include.push(addLevels);
-            }
 
+                parameters.distinct= true;
 
-
-            const Sessions = await models['Session'].findAndCountAll(parameters);
-            const message = `${Sessions.count} sessions found`;
-            res.json({message, data: Sessions.rows});
+            parameters.group = ['session.session_id']
+            const Sessions = await models['Session'].findAll(parameters);
+            const message = `${Sessions.length} sessions found`;
+            res.json({message, data: Sessions});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

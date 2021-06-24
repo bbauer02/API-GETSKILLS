@@ -27,7 +27,7 @@ module.exports = {
             subject: userData.user_id.toString()
         });
         const refreshToken = crypto.randomBytes(128).toString('base64');
-
+ 
         await models['RefreshToken'].create({
             userId: userData.user_id,
             token: refreshToken,
