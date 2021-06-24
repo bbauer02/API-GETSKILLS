@@ -43,7 +43,6 @@ module.exports = {
 
             try {
                 const {cookies, headers} = req;
-
                  /* On vérifie que le JWT est présent dans les cookies de la requête */
                 if (!cookies || !cookies.access_token) {
                     reject(new Error('Missing token in cookie'));
@@ -86,7 +85,6 @@ module.exports = {
                 throw new Error(`User ${userId} not exists.`); 
             }
             // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
-            console.log(decodedToken)
             req.accessToken = decodedToken;
             return next();
         }
@@ -113,7 +111,7 @@ module.exports = {
                 }
                 else {
                     powerNeed =powerNeed[entry.split('?')[0]];
-                }  
+                }
             }   
             // On vérifie les droits de l'utilisateur
             let userMemberOfInstitut = null;
@@ -125,9 +123,8 @@ module.exports = {
                 
                 if(reqInstitut_id) {
                     userMemberOfInstitut = decodedToken.instituts.find(({institut_id}) => institut_id === parseInt(reqInstitut_id) );
-
-                    userPower = userMemberOfInstitut.Role.power;
-                } 
+                    userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
+                }
             }
             if(userPower >= powerNeed) {
                 return next();
