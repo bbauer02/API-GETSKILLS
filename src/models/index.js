@@ -148,7 +148,6 @@ const initDB = async (sequelize) => {
 
 
 
-
               // TABLE 'exam'
                 for(const exam of exams) {
                     await models['Exam'].create({

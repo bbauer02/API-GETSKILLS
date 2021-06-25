@@ -17,10 +17,6 @@
             validate : {
                 notEmpty:{msg: `Exam:label cannot be empty !`},
                 notNull: {msg: `Exam:label cannot be NULL!`}
-            },
-            unique: {
-                args : true,
-                msg: 'Exam:Label already exist!'
             }
         },
         isWritten : {
