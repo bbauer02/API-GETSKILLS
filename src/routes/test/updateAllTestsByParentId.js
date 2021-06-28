@@ -5,15 +5,7 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.put('/api/tests/parent/:parent_id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
-            let Tests = await models['Test']
-                .findAndCountAll({ where: { parent_id: req.params.parent_id } });
-
-            if(Tests.count === 0) {
-                const message = `Tests doesn't exist. Retry with an other parent id.`;
-                return res.status(404).json({message});
-            }
-
-            Tests = await models['Test'].update(req.body,{where:{parent_id:req.params.parent_id}})
+            let Tests = await models['Test'].update(req.body,{where:{parent_id:req.params.parent_id}})
 
             Tests = await models['Test']
                 .findAll({ where: { parent_id: req.params.parent_id } });

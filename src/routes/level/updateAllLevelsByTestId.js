@@ -5,15 +5,7 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.put('/api/levels/test/:test_id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
-            let Levels = await models['Level']
-                .findAndCountAll({ where: { test_id: req.params.test_id } });
-
-            if(Levels.count === 0) {
-                const message = `Levels doesn't exist. Retry with an other test id.`;
-                return res.status(404).json({message});
-            }
-
-            Levels = await models['Level'].update(req.body,{where:{test_id:req.params.test_id}})
+            let Levels = await models['Level'].update(req.body,{where:{test_id:req.params.test_id}})
 
             Levels = await models['Level']
                 .findAll({ where: { test_id: req.params.test_id } });

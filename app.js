@@ -3,7 +3,7 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3002;
 const cookieParser = require('cookie-parser');
  
 
