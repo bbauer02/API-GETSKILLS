@@ -11,6 +11,8 @@ module.exports = (app) => {
 
             await models['Test'].update(req.body, {where: {parent_id: req.params.id}});
 
+            await models['Level'].update(req.body, {where: {test_id: req.params.id}});
+
             let Tests = await models['Level'].findAll( {
                 include: [
                     {
