@@ -22,8 +22,8 @@
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
-    "sequelize": "^6.6.2",
-    "win-node-env": "^0.4.0"
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
