@@ -16,7 +16,7 @@ module.exports = (app) => {
             Tests = await models['Test'].update(req.body,{where:{parent_id:req.params.parent_id}})
 
             Tests = await models['Test']
-                .findAndCountAll({ where: { parent_id: req.params.parent_id } });
+                .findAll({ where: { parent_id: req.params.parent_id } });
 
             const message = `${Tests.count} Tests with parent_id:${req.params.parent_id} have been updated `;
             res.json({message, data: Tests});

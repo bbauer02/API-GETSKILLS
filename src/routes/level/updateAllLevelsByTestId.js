@@ -16,7 +16,7 @@ module.exports = (app) => {
             Levels = await models['Level'].update(req.body,{where:{test_id:req.params.test_id}})
 
             Levels = await models['Level']
-                .findAndCountAll({ where: { test_id: req.params.test_id } });
+                .findAll({ where: { test_id: req.params.test_id } });
 
             const message = `${Levels.count} Levels with test_id:${req.params.test_id} have been updated `;
             res.json({message, data: Levels});
