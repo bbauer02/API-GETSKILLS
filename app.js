@@ -57,6 +57,8 @@ require('./src/routes/level/findLevelByPk')(app);
 require('./src/routes/level/createLevel')(app);
 require('./src/routes/level/deleteLevel')(app);
 require('./src/routes/level/updateLevel')(app);
+require('./src/routes/level/updateAllLevelsByTestId')(app);
+
 
 // Tests
 require('./src/routes/test/findAllTests')(app);
