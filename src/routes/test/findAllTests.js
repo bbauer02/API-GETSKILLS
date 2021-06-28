@@ -4,9 +4,6 @@ module.exports =  (app) => {
     app.get('/api/tests', async (req,res) => {
        try {
             const Tests = await models['Test'].findAndCountAll({
-                where: {
-                 parent_id:null
-                },
                 order:['label'], 
                 include:
                 [
