@@ -39,7 +39,14 @@
         label: "TEST (ARCHIVE)",
         isInternal: false,
         parent_id: null,
-        isArchive: true,
+        isArchive: false,
+    },
+    {
+        id:7,
+        label: "TEST (ARCHIVE) ENFANT",
+        isInternal: false,
+        parent_id: 6,
+        isArchive: false,
     },
 ]
 

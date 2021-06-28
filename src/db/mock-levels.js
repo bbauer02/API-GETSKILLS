@@ -86,6 +86,38 @@
         description :"Utilisateur élémentaire (niveau introductif ou de découverte)",
         test_id: 5,
         isArchive: false,
+    },
+    {
+        id:12,
+        label: "A2",
+        ref: "A2",
+        description :"",
+        test_id: 5,
+        isArchive: false,
+    },
+    {
+        id:13,
+        label: "A1",
+        ref: "A1",
+        description :"",
+        test_id: 2,
+        isArchive: false,
+    },
+    {
+        id:14,
+        label: "A2",
+        ref: "A2",
+        description :"",
+        test_id: 2,
+        isArchive: false,
+    },
+    {
+        id:15,
+        label: "A1",
+        ref: "A1",
+        description :"",
+        test_id: 7,
+        isArchive: false,
     }
     
 ]
