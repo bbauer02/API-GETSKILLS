@@ -33,21 +33,7 @@
         isInternal: false,
         parent_id: 1,
         isArchive: false,
-    },
-    {
-        id:6,
-        label: "TEST (ARCHIVE)",
-        isInternal: false,
-        parent_id: null,
-        isArchive: false,
-    },
-    {
-        id:7,
-        label: "TEST (ARCHIVE) ENFANT",
-        isInternal: false,
-        parent_id: 6,
-        isArchive: false,
-    },
+    }
 ]
 
 

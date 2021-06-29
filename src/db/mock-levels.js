@@ -110,16 +110,7 @@
         description :"",
         test_id: 2,
         isArchive: false,
-    },
-    {
-        id:15,
-        label: "A1",
-        ref: "A1",
-        description :"",
-        test_id: 7,
-        isArchive: false,
     }
-    
 ]
 
 
