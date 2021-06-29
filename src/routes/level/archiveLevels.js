@@ -4,9 +4,9 @@ const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/level/archive/:id', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/levels/archive/:id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
-            const Level = await models['Level'].findByPk(req.params.level_id);
+            const Level = await models['Level'].findByPk(req.params.id);
             if(Level === null) {
                 const message = `Level doesn't exist.Retry with an other level id.`;
                 return res.status(404).json({message});

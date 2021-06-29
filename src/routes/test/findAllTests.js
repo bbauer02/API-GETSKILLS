@@ -1,4 +1,5 @@
-﻿const {models} = require('../../models');
+﻿const {Op} = require("sequelize");
+const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
     app.get('/api/tests', async (req,res) => {
