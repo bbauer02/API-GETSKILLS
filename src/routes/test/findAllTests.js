@@ -35,6 +35,8 @@ module.exports =  (app) => {
             // Parameter : ARCHIVE (?archive=true)
            if(req.query.archive) {
                parameters.where = {isArchive: JSON.parse(req.query.archive)}
+           } else {
+               parameters.where = {isArchive: false}
            }
             const message = `${Tests.count} test(s) found`;
             res.json({message, data: Tests.rows});
