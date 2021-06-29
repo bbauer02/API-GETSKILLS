@@ -6,13 +6,22 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.put('/api/tests/archive/:id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
+            const Test = await models['Test'].findByPk(req.params.id);
+            if(Test === null) {
+                const message = `Test doesn't exist.Retry with an other Test id.`;
+                return res.status(404).json({message});
+            }
 
-            await models['Test'].update(req.body, {where: {test_id: req.params.id}});
+            // archivage du test
+            Test.update({isArchive: true}, {where: {test_id: req.params.id}});
 
-            await models['Test'].update(req.body, {where: {parent_id: req.params.id}});
+            // archivage de ses variants
+            const Variants = await models['Test'].update({isArchive: true}, {where: {parent_id: req.params.id}});
 
-            await models['Level'].update(req.body, {where: {test_id: req.params.id}});
+            // archivage de ses levels
+            const Levels = await models['Level'].update({isArchive: true}, {where: {test_id: req.params.id}});
 
+            // archivage des levels de ses variants
             let Tests = await models['Level'].findAll( {
                 include: [
                     {
@@ -31,12 +40,11 @@ module.exports = (app) => {
             });
 
             Tests.forEach((test) => {
-                test.update(req.body, {where: {isArchive: true}})
+                test.update({isArchive: true}, {where: {isArchive: true}})
             })
 
-
-            const message = `${Tests.count} Tests with parent_id:${req.params.parent_id} have been updated `;
-            res.json({message, data: Tests});
+            const message = `Archivage : test id:${Test.test_id} - ${Variants.count} variants - ${Levels.count} levels: - levels from variants:${Tests.count}`;
+            res.json({message, data: {Test}});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {
