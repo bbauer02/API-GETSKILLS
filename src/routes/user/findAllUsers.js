@@ -14,7 +14,7 @@ module.exports =  (app) => {
                     const message = `systemRole parameter should be an integer.`;
                 return res.status(400).json({message})
                 } 
-                parameters.where.systemRole = systemRole;
+                parameters.where.systemRole_id = systemRole;
              }
             // Recherche par Nom ET Prénom
             if(req.query.fname && req.query.lname)
@@ -38,6 +38,10 @@ module.exports =  (app) => {
                 if(req.query.lname) {
                     parameters.where.lastname = {[Op.like] : `%${req.query.lname}%`}
                 }
+            }
+            // recherche par Email
+            if(req.query.email) {
+                parameters.where.email = {[Op.like] : `%${req.query.email}%`}
             }
             // recherche par pays
             if(req.query.country) {
