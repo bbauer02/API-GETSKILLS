@@ -18,7 +18,7 @@ module.exports = (app) => {
             
             await models['institutHasUser'].destroy({where: {institut_id: Institut.institut_id, user_id: User.user_id  }});
             const message = `User id:${User.user_id} has been deleted from the institut`;
-            res.json({message});
+            res.json({message, data: User});
           }
           catch(error) {
             const message = `Service not available. Please retry later.`;
