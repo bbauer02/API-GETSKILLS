@@ -43,6 +43,10 @@ module.exports =  (app) => {
             if(req.query.email) {
                 parameters.where.email = {[Op.like] : `%${req.query.email}%`}
             }
+            // recherche par Email stricte
+            if(req.query.emailstrict) {
+                parameters.where.email = {[Op.eq] : `${req.query.emailstrict}`}
+            }
             // recherche par pays
             if(req.query.country) {
                 const country = parseInt(req.query.country);
