@@ -37,22 +37,22 @@ module.exports =  (app) => {
             }   
             // Sessions après une date
             if(req.query.after) {
-                const after = moment(req.query.after,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const after = moment(req.query.after,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.gte]: after
                 }
             }
             // Sessions avant une date
             if(req.query.before) {
-                const before = moment(req.query.before,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const before = moment(req.query.before,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.lte]: before
                 }
             }
             // Sessions dans entre 2 dates
             if(req.query.start && req.query.end) {
-                const start = moment(req.query.start,"DD/MM/YYYY").format('YYYY-MM-DD');
-                const end = moment(req.query.end,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const start = moment(req.query.start,"YYYY-MM-DD");
+                const end = moment(req.query.end,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.between]: [start,end]
                 }
