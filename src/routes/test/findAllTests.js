@@ -17,6 +17,8 @@ module.exports =  (app) => {
            // Parameter : ORDER
            parameters.order = [['label', 'ASC']]
 
+           parameters.where = {parent_id: {[Op.is]: null}}
+
            // Parameter : INCLUDE
            parameters.include = [
                {
@@ -33,12 +35,6 @@ module.exports =  (app) => {
 
             const Tests = await models['Test'].findAndCountAll(parameters);
 
-            // Parameter : ARCHIVE (?archive=true)
-           if(req.query.archive) {
-               parameters.where = {isArchive: JSON.parse(req.query.archive)}
-           } else {
-               parameters.where = {isArchive: false}
-           }
             const message = `${Tests.count} test(s) found`;
             res.json({message, data: Tests.rows});
        }

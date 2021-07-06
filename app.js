@@ -59,7 +59,6 @@ require('./src/routes/level/deleteLevel')(app);
 require('./src/routes/level/updateLevel')(app);
 require('./src/routes/level/archiveLevels')(app);
 
-
 // Tests
 require('./src/routes/test/findAllTests')(app);
 require('./src/routes/test/findTestByPk')(app);
@@ -68,6 +67,7 @@ require('./src/routes/test/updateTest')(app);
 require('./src/routes/test/deleteTest')(app);
 require('./src/routes/test/archiveChildTests')(app);
 require('./src/routes/test/archiveTests')(app);
+require('./src/routes/test/findAllVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
@@ -77,6 +77,12 @@ require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
+
+// Skills
+require('./src/routes/skill/findAllSkills')(app);
+require('./src/routes/skill/createSkill')(app);
+require('./src/routes/skill/updateSkill')(app);
+require('./src/routes/skill/deleteSkill')(app);
 
 // Exams
 require('./src/routes/exam/findAllExams')(app);

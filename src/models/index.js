@@ -15,6 +15,7 @@ const instituts = require('../db/mock-instituts');
 const sessions = require('../db/mock-sessions');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
+const skills = require("../db/mock-skills");
 
 const initDB = async (sequelize) => {
     fs
@@ -146,6 +147,14 @@ const initDB = async (sequelize) => {
                     });
                 }
 
+                // TABLE 'skill'
+                for(const skill of skills) {
+                    await models['Skill'].create({
+                        skill_id:skill.skill_id,
+                        label:skill.label,
+                        parent_id:skill.parent_id,
+                    })
+                }
 
 
               // TABLE 'exam'
