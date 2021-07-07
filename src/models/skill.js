@@ -34,7 +34,7 @@
     });
 
     Skill.associate = models => {
-        Skill.hasMany(models.Skill, { as: "child",foreignKey:'parent_id',sourceKey: 'skill_id'});
+        Skill.hasMany(models.Skill, { as: "child",foreignKey:'parent_id',sourceKey: 'skill_id',onDelete: 'CASCADE', hooks: true});
         Skill.belongsTo(models.Skill, {as:"parent",foreignKey:'parent_id'});
     }
         return Skill;
