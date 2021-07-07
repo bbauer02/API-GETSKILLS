@@ -64,12 +64,14 @@ require('./src/routes/test/findTestByPk')(app);
 require('./src/routes/test/createTest')(app);
 require('./src/routes/test/updateTest')(app);
 require('./src/routes/test/deleteTest')(app);
+require('./src/routes/test/findAllTestsAndVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
 require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
+require('./src/routes/session/deleteUserSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
