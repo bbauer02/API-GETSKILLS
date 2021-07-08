@@ -75,6 +75,7 @@ require('./src/routes/session/deleteUserSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
+require('./src/routes/session/findAllSessionsByInstituts')(app);
 
 // Exams
 require('./src/routes/exam/findAllExams')(app);
