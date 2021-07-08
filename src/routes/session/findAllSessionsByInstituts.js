@@ -113,27 +113,24 @@ module.exports =  (app) => {
             // Options 
             // Add Test
 
-            if(req.query.tests==="true")
-            {
-                const addTests = {
+
+            const addTests = {
+                model: models['Test'],
+                attributes: ['test_id','label','isInternal','parent_id'],
+                include:[{
+                    as:"parent",
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
-                    include:[{
-                        as:"parent",
-                        model: models['Test'],
-                        attributes: ['test_id','label','isInternal','parent_id'],
-                    }]
-                };
-                parameters.include.push(addTests);
-                
-                const addLevels = {
-                    model: models['Level'],
-                    attributes:['level_id','label','ref','description']
-                };
-                parameters.include.push(addLevels);
-            }
-
-
+                }]
+            };
+            parameters.include.push(addTests);
+            
+            const addLevels = {
+                model: models['Level'],
+                attributes:['level_id','label','ref','description']
+            };
+            parameters.include.push(addLevels);
+            
 
             const Sessions = await models['Session'].findAndCountAll(parameters);
             const message = `${Sessions.count} sessions found`;
