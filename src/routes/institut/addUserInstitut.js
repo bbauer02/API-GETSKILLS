@@ -6,7 +6,7 @@ module.exports = (app) => {
     app.post('/api/instituts/users', isAuthenticated, isAuthorized, async (req,res) => {
         try{
             const institutHasUser = await models['institutHasUser'].create(req.body);
-            const message = `User id: ${institutHasUser.user_id} has been add in the institut id : ${institutHasUser.institut_id}.`;
+            const message = `User id: ${institutHasUser.user_id} has been added in the institut id : ${institutHasUser.institut_id}.`;
             res.json({message, data:institutHasUser})
         }catch(error) {
             if(error instanceof ValidationError) {

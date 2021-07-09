@@ -26,6 +26,15 @@
             type:DataTypes.INTEGER,
             defaultValue:null,
             allowNull:true
+        },
+        isArchive : {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Test:isArchive cannot be empty!`},
+                notNull: {msg: `Test:isArchive cannot be NULL!`}
+            }
         }
     },
     {
