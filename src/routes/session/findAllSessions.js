@@ -96,7 +96,7 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label", "country_id", "city"],
+                attributes : ["label"],
                 where: {}
             }];
             // Filtre par Pays
@@ -116,11 +116,12 @@ module.exports =  (app) => {
             
 
             // Options 
+            
             const addUsers = {
                 model: models['sessionUser'],
-                attributes: [[Sequelize.fn('COUNT', Sequelize.col('sessionusers.sessionUser_id')), 'subscribedCount']]              
             };
-           /* // Add Users
+            
+            // Add Users
             if(req.query.users==="true")
             {
                 const addUsers = {
@@ -147,8 +148,9 @@ module.exports =  (app) => {
                     }]
                 };
                
-            }*/
+            }
             parameters.include.push(addUsers);
+            
                 const addTests = {
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
@@ -165,6 +167,12 @@ module.exports =  (app) => {
                     attributes:['level_id','label','ref','description']
                 };
                 parameters.include.push(addLevels);
+                
+                const addInstitut = {
+                    model: models['Institut'],
+                    attributes:['label']
+                };
+                parameters.include.push(addInstitut);
 
                 parameters.distinct= true;
 

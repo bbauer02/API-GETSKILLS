@@ -85,7 +85,7 @@ module.exports =  (app) => {
             }
             // Parameter : OFFSET
             if(req.query.offset) {
-                const offset = parseInt(req.query.offset);       
+                const offset = parseInt(req.query.offset);      
                 if(isNaN(offset) ) {
                 const message = `Offset parameter should be an integer.`;
                 return res.status(400).json({message})
