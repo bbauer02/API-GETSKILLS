@@ -23,6 +23,7 @@
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
     "sequelize": "^6.6.2",
+    "stripe": "^8.160.0",
     "win-node-env": "^0.4.0"
   },
   "devDependencies": {

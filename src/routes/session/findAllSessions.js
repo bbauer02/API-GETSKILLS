@@ -78,7 +78,7 @@ module.exports =  (app) => {
 
             // Parameter : LIMIT
             if(req.query.limit) {
-                const limit = parseInt(req.query.limit);       
+                const limit = parseInt(req.query.limit);    
                 if(isNaN(limit) ) {
                     const message = `Limit parameter should be an integer.`;
                     return res.status(400).json({message})
@@ -96,7 +96,7 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label", "country_id", "city"],
+                attributes : ["label", "country_id", "city", "adress1", "adress2", "zipcode", "email", "phone"],
                 where: {}
             }];
             // Filtre par Pays
@@ -117,37 +117,8 @@ module.exports =  (app) => {
 
             // Options 
             const addUsers = {
-                model: models['sessionUser'],
-                attributes: [[Sequelize.fn('COUNT', Sequelize.col('sessionusers.sessionUser_id')), 'subscribedCount']]              
+                model: models['sessionUser']          
             };
-           /* // Add Users
-            if(req.query.users==="true")
-            {
-                const addUsers = {
-                    model: models['sessionUser'],
-                    include:[
-                        {
-                        model: models['User'],
-                        attributes: {exclude:['password']},
-                        include: [{
-                            model: models['Country'],
-                            as:"country",
-                            attributes : ["label"]
-                        },
-                        {
-                            model: models['Country'],
-                            as:"nationality",
-                            attributes : ["countryNationality"]
-                        },
-                        {
-                            model: models['Country'],
-                            as:"firstlanguage",
-                            attributes : ["countryLanguage"]
-                        }] 
-                    }]
-                };
-               
-            }*/
             parameters.include.push(addUsers);
                 const addTests = {
                     model: models['Test'],
@@ -168,7 +139,7 @@ module.exports =  (app) => {
 
                 parameters.distinct= true;
 
-            parameters.group = ['session.session_id']
+            parameters.group = ['session.session_id'];
             const Sessions = await models['Session'].findAll(parameters);
             const message = `${Sessions.length} sessions found`;
             res.json({message, data: Sessions});

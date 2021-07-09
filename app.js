@@ -17,7 +17,7 @@ app
 // Initialisation de la BDD
 models.initDB(sequelize);
 app.get('/', (req, res) => {
-    res.json('Hello, Heroku ! ');
+    res.json('Hello, API ! ');
 });
 
 // Points de terminaison
@@ -86,5 +86,9 @@ require('./src/routes/account/myAccount')(app);
  
 // Stats
 require('./src/routes/stats/statsUsers')(app);
+
+
+// Payment
+require('./src/routes/payment/createCheckoutSession')(app);
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
