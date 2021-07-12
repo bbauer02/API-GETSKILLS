@@ -1,5 +1,1 @@
 ﻿node_modules
-/.idea/
-.env.local
-package.json
-package-lock.json
