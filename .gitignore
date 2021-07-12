@@ -3,4 +3,3 @@
 .env.local
 package.json
 package-lock.json
-app.js
