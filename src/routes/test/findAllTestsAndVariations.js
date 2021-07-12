@@ -4,7 +4,20 @@ module.exports =  (app) => {
     app.get('/api/testsAll', async (req,res) => {
        try {
             const Tests = await models['Test'].findAndCountAll({
-                order:['label']
+                order:['label'],
+                include:
+                [
+                    {
+                        model: models['Test'],
+                        as:'child',
+                        include:[{
+                            model: models['Level']
+                        }]
+                    },
+                    {
+                        model: models['Level']
+                    }
+                ]
             });
             const message = `${Tests.count} test(s) found`;
             res.json({message, data: Tests.rows});
@@ -13,7 +26,5 @@ module.exports =  (app) => {
          const message = `Service not available. Please retry later.`;
          res.status(500).json({message, data: error})
        }
-
-
     });
 }
