@@ -1,27 +1,40 @@
-﻿const {models} = require('../../models');
+﻿const {Op} = require("sequelize");
+const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
     app.get('/api/tests', async (req,res) => {
        try {
-            const Tests = await models['Test'].findAndCountAll({
-                where: {
-                 parent_id:null
-                },
-                order:['label'], 
-                include:
-                [
-                    {
-                        model: models['Test'],
-                        as:'child',
-                        include:[{
-                            model: models['Level']
-                        }]
-                    },
-                    {
-                        model: models['Level']
-                    }
-                ]
-            });
+
+           const parameters = {};
+
+           // Parameter : ARCHIVE (?archive=true)
+           if(req.query.archive) {
+               parameters.where = {isArchive: JSON.parse(req.query.archive)}
+           } else {
+               parameters.where = {isArchive: false}
+           }
+
+           // Parameter : ORDER
+           parameters.order = [['label', 'ASC']]
+
+           parameters.where = {parent_id: {[Op.is]: null}}
+
+           // Parameter : INCLUDE
+           parameters.include = [
+               {
+                   model: models['Test'],
+                   as:'child',
+                   include:[{
+                       model: models['Level']
+                   }]
+               },
+               {
+                   model: models['Level']
+               }
+           ]
+
+            const Tests = await models['Test'].findAndCountAll(parameters);
+
             const message = `${Tests.count} test(s) found`;
             res.json({message, data: Tests.rows});
        }

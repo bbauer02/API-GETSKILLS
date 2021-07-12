@@ -78,7 +78,7 @@ module.exports =  (app) => {
 
             // Parameter : LIMIT
             if(req.query.limit) {
-                const limit = parseInt(req.query.limit);       
+                const limit = parseInt(req.query.limit);    
                 if(isNaN(limit) ) {
                     const message = `Limit parameter should be an integer.`;
                     return res.status(400).json({message})
@@ -96,7 +96,7 @@ module.exports =  (app) => {
             }
             parameters.include = [{
                 model: models['Institut'],
-                attributes : ["label"],
+                attributes : ["label", "country_id", "city", "adress1", "adress2", "zipcode", "email", "phone"],
                 where: {}
             }];
             // Filtre par Pays
@@ -176,7 +176,7 @@ module.exports =  (app) => {
 
                 parameters.distinct= true;
 
-            parameters.group = ['session.session_id']
+            parameters.group = ['session.session_id'];
             const Sessions = await models['Session'].findAll(parameters);
             const message = `${Sessions.length} sessions found`;
             res.json({message, data: Sessions});
