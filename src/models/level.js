@@ -20,6 +20,15 @@
         description :{
             type:DataTypes.TEXT,
             allowNull:true
+        },
+        isArchive : {
+            type:DataTypes.BOOLEAN,
+            defaultValue:false,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Level:isArchive cannot be empty!`},
+                notNull: {msg: `Level:isArchive cannot be NULL!`}
+            }
         }
     },
     {

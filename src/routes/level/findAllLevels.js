@@ -9,6 +9,7 @@ module.exports =  (app) => {
       //const countArgs = Object.keys(req.query).length;
       const parameters = {};
       // Parameter : LABEL ET REF
+      console.log(req.query.archive)
       if(req.query.label && req.query.ref) {
         parameters.where = {
           [Op.or]: [
@@ -37,6 +38,13 @@ module.exports =  (app) => {
             }}
           }
       }
+      // Parameter : ARCHIVE (?archive=true)
+      if(req.query.archive) {
+        parameters.where = {isArchive: JSON.parse(req.query.archive)}
+      } else {
+        parameters.where = {isArchive: false}
+      }
+
       // Parameter : LIMIT
       if(req.query.limit) {
         const limit = parseInt(req.query.limit);       
