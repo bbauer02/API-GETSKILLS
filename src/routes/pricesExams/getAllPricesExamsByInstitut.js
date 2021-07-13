@@ -12,21 +12,21 @@ module.exports = (app) => {
         // récupérer tous les tests
 
         try {
-            const ExamsPrice = await models['ExamsPrice'].findAndCountAll({
-                attributes: ['price'],
+            const ExamsPrice = await models['Institut'].findAndCountAll({
+                attributes: ['label'],
+                where: {institut_id: institutId},
+                required: true,
                 include: [{
-                    model: models['Institut'],
-                    where: {institut_id: institutId},
-                    attributes: ['label']
-                }, {
-                    model: models['Exam'],
                     attributes: ['label'],
+                    model: models['Exam'],
+                    required: true,
                     include: [{
                         model: models['Test'],
-                        attributes: ['label']
+                        attributes: ['label'],
                     }]
                 }]
             });
+
             const message = `${ExamsPrice.count} price(s) found`;
             res.json({message, data: ExamsPrice.rows})
         } catch (error) {

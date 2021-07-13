@@ -98,7 +98,6 @@ module.exports = (sequelize, DataTypes) => {
         Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', sourceKey:'institut_id', onDelete:'CASCADE'})
         Institut.hasMany(models.Session,{foreignKey:'institut_id', sourceKey:'institut_id', onDelete:'CASCADE'})
         Institut.belongsToMany(models.Exam, {through: models.ExamsPrice, foreignKey: 'institut_id'});
-
     }
     return Institut;
 }
