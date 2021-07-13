@@ -97,6 +97,8 @@ require('./src/routes/account/myAccount')(app);
 // Stats
 require('./src/routes/stats/statsUsers')(app);
 
+// Exams Prices
+require('./src/routes/pricesExams/getAllPricesExamsByInstitut')(app)
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
