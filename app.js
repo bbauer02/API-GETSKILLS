@@ -66,6 +66,7 @@ require('./src/routes/test/deleteTest')(app);
 require('./src/routes/test/archiveChildTests')(app);
 require('./src/routes/test/archiveTests')(app);
 require('./src/routes/test/findAllVariations')(app);
+require('./src/routes/test/findAllTestsAndVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
