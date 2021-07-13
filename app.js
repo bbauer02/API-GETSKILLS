@@ -101,6 +101,7 @@ require('./src/routes/stats/statsUsers')(app);
 require('./src/routes/pricesExams/getAllPricesExamsByInstitut')(app);
 require('./src/routes/pricesExams/createExamsPrices')(app);
 require('./src/routes/pricesExams/updateExamsPrices')(app);
+require('./src/routes/pricesExams/deleteExamsPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);

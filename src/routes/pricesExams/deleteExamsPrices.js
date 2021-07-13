@@ -3,13 +3,12 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/exams_prices/update', async (req, res) => {
+    app.delete('/api/exams_prices/delete', async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = req.body.institut_id;
         const examId = req.body.exam_id;
-        const price = req.body.price;
 
         // récupérer tous les tests
         try {
@@ -21,14 +20,11 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             }
 
-           await ExamPrice.update({
-                exam_id: examId,
-                price: price,
-            }, {
+            await ExamPrice.destroy( {
                 where: {[Op.and]: [{institut_id: institutId},{exam_id: examId}]}
             })
 
-            const message = `Price for exam id = ${ExamPrice.exam_id} has been updated.`;
+            const message = `Price for exam id = ${ExamPrice.exam_id} has been destroyed.`;
             res.json({message, data: ExamPrice})
 
         } catch (error) {
