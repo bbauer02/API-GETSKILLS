@@ -9,16 +9,12 @@ module.exports = (sequelize, DataTypes) => {
         },
         price: {
             type: DataTypes.FLOAT,
+            defaultValue: 0.
         },
     }, {
         tableName: 'prices_exams',
         timestamps: false,
     });
-
-    ExamsPrice.associate = models => {
-        ExamsPrice.hasMany(models.Institut, {foreignKey:'institut_id', sourceKey: 'institut_id', timestamps: false});
-        ExamsPrice.hasMany(models.Exam, {foreignKey:'exam_id', sourceKey: 'exam_id', timestamps: false});
-    }
 
     return ExamsPrice;
 }   
