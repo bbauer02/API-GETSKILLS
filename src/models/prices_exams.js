@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
         exam_id: {
             type: DataTypes.INTEGER,
         },
-
         price: {
             type: DataTypes.FLOAT,
         },
@@ -15,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'prices_exams',
         timestamps: false,
     });
+
+    ExamsPrice.associate = models => {
+        ExamsPrice.hasMany(models.Institut, {foreignKey:'institut_id', sourceKey: 'institut_id', timestamps: false});
+        ExamsPrice.hasMany(models.Exam, {foreignKey:'exam_id', sourceKey: 'exam_id', timestamps: false});
+    }
 
     return ExamsPrice;
 }   
