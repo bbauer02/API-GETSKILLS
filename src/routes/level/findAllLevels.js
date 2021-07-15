@@ -20,7 +20,7 @@ module.exports =  (app) => {
               [Op.like] : `%${req.query.ref}%`
             }}] 
         }
-      } 
+      }
       // IF ONLY one of the 2 are passed
       else {
           // Parameter : LABEL
