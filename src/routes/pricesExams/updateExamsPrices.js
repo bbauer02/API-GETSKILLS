@@ -3,7 +3,7 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/exams_prices/update', async (req, res) => {
+    app.put('/api/exams_prices/edit', async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
@@ -12,47 +12,63 @@ module.exports = (app) => {
         const price = req.body.price;
 
 
-        try {
-            // vérifier l'institut
-            const institut = await models['Institut'].findOne({
-                where: {institut_id: institutId}
-            })
-            if(institut  === null) {
+        // vérifier l'institut
+        await models['Institut'].findOne({
+            where: {institut_id: institutId}
+        }).then(function (institutFound) {
+            if (institutFound === null) {
                 const message = `institut doesn't exist. Retry with an other institut id.`;
                 return res.status(404).json({message});
             }
+        }).catch(function (error) {
+            const message = `Service not available. Please retry later.`;
+            return res.status(500).json({message, data: error.message})
+        });
 
-            // vérifier l'exam
-            const exam = await models['Exam'].findOne({
-                where: {exam_id: institutId}
-            })
-            if(exam  === null) {
+
+        // vérifier l'exam
+        await models['Exam'].findOne({
+            where: {exam_id: institutId}
+        }).then(function (examFound) {
+            if (examFound === null) {
                 const message = `exam doesn't exist. Retry with an other exam id.`;
                 return res.status(404).json({message});
             }
-
-            // récupérer tous les tests
-            const ExamPrice = await models['ExamsPrice'].findOne(
-                { where: {institut_id: institutId, exam_id: examId}});
-
-            if(ExamPrice  === null) {
-                const message = `price doesn't exist. Retry with an other exam id.`;
-                return res.status(404).json({message});
-            }
-
-           await ExamPrice.update({
-                exam_id: examId,
-                price: price,
-            }, {
-                where: {[Op.and]: [{institut_id: institutId},{exam_id: examId}]}
-            })
-
-            const message = `Price for exam id = ${ExamPrice.exam_id} has been updated.`;
-            res.json({message, data: ExamPrice})
-
-        } catch (error) {
+        }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
-            res.status(500).json({message, data: error.message})
-        }
-    });
+            return res.status(500).json({message, data: error.message})
+        });
+
+        // récupérer l'examen
+        await models['ExamsPrice'].findOne({
+            where: {institut_id: institutId, exam_id: examId}
+        }).then(function (examPriceFound) {
+            if (examPriceFound) {
+                // le prix existe déjà
+                examPriceFound.update(
+                    {price: price},
+                    {
+                        where: {
+                            institut_id: institutId,
+                            exam_id: examId
+                        }
+                    }
+                ).then(function (examPriceCreated) {
+                    const message = `Price for ${examPriceCreated.price} coin has been updated.`;
+                    return res.status(200).json({message, data: examPriceCreated})
+                }).catch(function (error) {
+                    const message = `Update impossible`;
+                    return res.status(500).json({message, data: error.message})
+                })
+
+            } else {
+                // le prix n'a pas été défini -> il faut le créer
+                const message = `Update impossible. Price does not exist. Try POST method.`;
+                return res.status(500).json({message, data: error.message})
+            }
+        }).catch(function (error) {
+            const message = `Service not available. Please retry later.`;
+            return res.status(500).json({message, data: error.message})
+        });
+    })
 }

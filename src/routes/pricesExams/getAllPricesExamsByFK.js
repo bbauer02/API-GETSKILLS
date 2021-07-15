@@ -3,12 +3,12 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/exams_prices/:institutId', async (req, res) => {
+    app.get('/api/exams_prices', async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
-        const institutId = parseInt(req.params.institutId);
-
+        const institutId = req.body.institut_id;
+        const examId = req.body.exam_id;
 
         // vérifier l'institut
         await models['Institut'].findOne({
@@ -38,26 +38,15 @@ module.exports = (app) => {
         });
 
 
-        // récupérer tous les tests
-        await models['Institut'].findAndCountAll({
-            attributes: ['label'],
-            where: {institut_id: institutId},
-            required: true,
-            include: [{
-                attributes: ['label'],
-                model: models['Exam'],
-                required: true,
-                include: [{
-                    model: models['Test'],
-                    attributes: ['label'],
-                }]
-            }]
-        }).then(function (pricesFound) {
-            const message = `${pricesFound.count} price(s) found`;
-            res.json({message, data: pricesFound.rows})
+        // récupérer le prix de l'épreuve
+        await models['ExamsPrice'].findOne({
+            where: {institut_id: institutId, exam_id: examId}
+        }).then(function (examPriceFound) {
+            const message = `One Exam price price found`;
+            res.json({message, data: examPriceFound})
         }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        })
-    });
+            const message = `No price found`;
+            res.status(500).json({message, data: null})
+        });
+    })
 }

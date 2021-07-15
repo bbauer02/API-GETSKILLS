@@ -11,47 +11,59 @@ module.exports = (app) => {
         const examId = req.body.exam_id;
 
 
-        try {
-            // vérifier l'institut
-            const institut = await models['Institut'].findOne({
-                where: {institut_id: institutId}
-            })
-            if(institut  === null) {
+        // vérifier l'institut
+        await models['Institut'].findOne({
+            where: {institut_id: institutId}
+        }).then(function (institutFound) {
+            if (institutFound === null) {
                 const message = `institut doesn't exist. Retry with an other institut id.`;
                 return res.status(404).json({message});
             }
+        }).catch(function (error) {
+            const message = `Service not available. Please retry later.`;
+            return res.status(500).json({message, data: error.message})
+        });
 
-            // vérifier l'exam
-            const exam = await models['Exam'].findOne({
-                where: {exam_id: institutId}
-            })
-            if(exam  === null) {
+
+        // vérifier l'exam
+        await models['Exam'].findOne({
+            where: {exam_id: institutId}
+        }).then(function (examFound) {
+            if (examFound === null) {
                 const message = `exam doesn't exist. Retry with an other exam id.`;
                 return res.status(404).json({message});
             }
+        }).catch(function (error) {
+            const message = `Service not available. Please retry later.`;
+            return res.status(500).json({message, data: error.message})
+        });
 
-            // récupérer tous les tests
-            const ExamPrice = await models['ExamsPrice'].findOne({
-                where: {
-                    institut_id: institutId,
-                    exam_id: examId
-                }});
 
-            if(ExamPrice  === null) {
-                const message = `price doesn't exist. Retry with an other exam id.`;
-                return res.status(404).json({message});
+        // récupérer l'examen
+        await models['ExamsPrice'].findOne({
+            where: {institut_id: institutId, exam_id: examId}
+        }).then(function (examPriceFound) {
+            if (examPriceFound) {
+                // le prix existe
+                models['ExamsPrice'].destroy({
+                    where: {institut_id: institutId, exam_id: examId}
+                }).then(function (examPriceCreated) {
+                    const message = `Price for ${examPriceCreated.price} coin has been deleted.`;
+                    return res.status(200).json({message, data: examPriceCreated})
+                }).catch(function (error) {
+                    const message = `Destroy impossible`;
+                    return res.status(500).json({message, data: error.message})
+                })
+
+            } else {
+                // le prix n'a pas été défini, il n'exsite pas dans la bd
+                const message = `Destroy impossible. Price does not already exist. Create a new price before delete.`;
+                return res.status(500).json({message, data: error.message})
             }
 
-            await ExamPrice.destroy( {
-                where: {institut_id: institutId, exam_id: examId}
-            })
-
-            const message = `Price for exam id = ${ExamPrice.exam_id} has been destroyed.`;
-            res.json({message, data: ExamPrice})
-
-        } catch (error) {
+        }).catch(function (err) {
             const message = `Service not available. Please retry later.`;
-            res.status(500).json({message, data: error.message})
-        }
+            return res.status(500).json({message, data: error.message})
+        })
     });
 }

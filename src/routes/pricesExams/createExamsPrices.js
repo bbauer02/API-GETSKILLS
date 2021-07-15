@@ -11,49 +11,43 @@ module.exports = (app) => {
             const examId = req.body.exam_id;
             const price = req.body.price;
 
-            try {
-                // vérifier l'institut
-                const institut = await models['Institut'].findOne({
-                    where: {institut_id: institutId}
-                })
-                if (institut === null) {
+
+            // vérifier l'institut
+            await models['Institut'].findOne({
+                where: {institut_id: institutId}
+            }).then(function (institutFound) {
+                if (institutFound === null) {
                     const message = `institut doesn't exist. Retry with an other institut id.`;
                     return res.status(404).json({message});
                 }
+            }).catch(function (error) {
+                const message = `Service not available. Please retry later.`;
+                return res.status(500).json({message, data: error.message})
+            });
 
-                // vérifier l'exam
-                const exam = await models['Exam'].findOne({
-                    where: {exam_id: institutId}
-                })
-                if (exam === null) {
+
+            // vérifier l'exam
+            await models['Exam'].findOne({
+                where: {exam_id: institutId}
+            }).then(function (examFound) {
+                if (examFound === null) {
                     const message = `exam doesn't exist. Retry with an other exam id.`;
                     return res.status(404).json({message});
                 }
-            } catch (error) {
+            }).catch(function (error) {
                 const message = `Service not available. Please retry later.`;
-                res.status(500).json({message, data: error.message})
-            }
+                return res.status(500).json({message, data: error.message})
+            });
+
 
             // récupérer l'examen
             await models['ExamsPrice'].findOne({
                 where: {institut_id: institutId, exam_id: examId}
             }).then(function (examPriceFound) {
                 if (examPriceFound) {
-                    // le prix a déjà été défini -> il faut update
-                    examPriceFound.update(
-                        {price: price}, {
-                            where: {
-                                institut_id: institutId,
-                                exam_id: examId
-                            }
-                        }
-                    ).then(function (examPriceUpdated) {
-                        const message = `Price for ${examPriceUpdated.price} coin has been updated.`;
-                        return res.status(200).json({message, data: examPriceUpdated})
-                    }).catch(function (error) {
-                        const message = `Update Price for an exam impossible`;
-                        return res.status(500).json({message, data: error.message})
-                    })
+                    // le prix existe déjà
+                    const message = `Creation impossible. Price already exist. Try PUT method.`;
+                    return res.status(500).json({message, data: error.message})
 
                 } else {
                     // le prix n'a pas été défini -> il faut le créer
@@ -62,7 +56,7 @@ module.exports = (app) => {
                         exam_id: examId,
                         price: price,
                     }).then(function (examPriceCreated) {
-                        const message = `Price for ${examPriceCreated.price} € has been created.`;
+                        const message = `Price for ${examPriceCreated.price} coin has been created.`;
                         return res.status(200).json({message, data: examPriceCreated})
                     }).catch(function (error) {
                         const message = `Creation impossible`;
@@ -76,6 +70,5 @@ module.exports = (app) => {
             })
 
         }
-    )
-    ;
+    );
 }
