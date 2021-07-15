@@ -58,7 +58,7 @@ module.exports = (app) => {
         }).then(function (pricesFound) {
             return pricesFound.rows.reduce(function (prev, curr) {
                 curr.dataValues.Exams.forEach((exam) => {
-                    let item = {test_id: '', institut_id: '', exam_id: '', price: ''};
+                    let item = { test_id: '', institut_id: '', exam_id: '', price: ''};
                     item.test_id = curr.dataValues.test_id;
                     item.institut_id = exam.Instituts[0].ExamsPrice.institut_id;
                     item.exam_id = exam.Instituts[0].ExamsPrice.exam_id;
@@ -68,7 +68,7 @@ module.exports = (app) => {
                 return prev;
             }, [])
         }).then(function (pricesFound) {
-            const message = `${pricesFound.count} price(s) found`;
+            const message = `${pricesFound} price(s) found`;
             return res.json({message, data: pricesFound})
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
