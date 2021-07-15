@@ -47,9 +47,9 @@ module.exports = (app) => {
                 // le prix existe
                 models['ExamsPrice'].destroy({
                     where: {institut_id: institutId, exam_id: examId}
-                }).then(function (examPriceCreated) {
-                    const message = `Price for ${examPriceCreated.price} coin has been deleted.`;
-                    return res.status(200).json({message, data: examPriceCreated})
+                }).then(function (examPriceDestroyed) {
+                    const message = `Price has been deleted.`;
+                    return res.status(200).json({message, data: {institut_id: institutId, exam_id: examId}})
                 }).catch(function (error) {
                     const message = `Destroy impossible`;
                     return res.status(500).json({message, data: error.message})
