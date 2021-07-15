@@ -16,8 +16,8 @@ module.exports =  (app) => {
                 where: {}
             }];
 
-            const sessionUser = await models['sessionUser'].findAndCountAll(parameters);
-            const message = `${sessionUser.length} sessionUser found`;
+            const sessionUser = await models['sessionUser'].findOne(parameters);
+            const message = 'sessionUser found';
             res.json({message, data: sessionUser});
         }
         catch(error) {
