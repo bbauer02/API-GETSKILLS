@@ -11,9 +11,26 @@ module.exports = (app) => {
         const examId = req.body.exam_id;
         const price = req.body.price;
 
-        // récupérer tous les tests
         try {
+            // vérifier l'institut
+            const institut = await models['Institut'].findOne({
+                where: {institut_id: institutId}
+            })
+            if(institut  === null) {
+                const message = `institut doesn't exist. Retry with an other institut id.`;
+                return res.status(404).json({message});
+            }
 
+            // vérifier l'exam
+            const exam = await models['Exam'].findOne({
+                where: {exam_id: institutId}
+            })
+            if(exam  === null) {
+                const message = `exam doesn't exist. Retry with an other exam id.`;
+                return res.status(404).json({message});
+            }
+
+            // récupérer tous les tests
             const ExamPrice = await models['ExamsPrice'].create({
                 institut_id: institutId,
                 exam_id: examId,
