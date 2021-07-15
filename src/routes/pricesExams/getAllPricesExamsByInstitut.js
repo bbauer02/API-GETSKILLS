@@ -39,22 +39,24 @@ module.exports = (app) => {
 
 
         // récupérer tous les exams pour un institut
-        await models['Institut'].findAndCountAll({
+        // `SELECT i.label as 'institut', t.label as 'test', e.label as 'exam', p.price FROM instituts as i JOIN prices_exams as p ON i.institut_id = p.institut_id JOIN exams as e ON p.exam_id = e.exam_id JOIN tests as t ON e.test_id = t.test_id WHERE i.institut_id = ${institutId}`
+        await models['Test'].findAndCountAll({
             attributes: ['label'],
-            where: {institut_id: institutId},
             required: true,
             include: [{
-                attributes: ['label'],
                 model: models['Exam'],
+                attributes: ['label'],
                 required: true,
                 include: [{
-                    model: models['Test'],
                     attributes: ['label'],
+                    model: models['Institut'],
+                    where: {institut_id: institutId},
+                    required: true,
                 }]
             }]
         }).then(function (pricesFound) {
             const message = `${pricesFound.count} price(s) found`;
-            res.json({message, data: pricesFound.rows})
+            return res.json({message, data: pricesFound})
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({message, data: error.message})
