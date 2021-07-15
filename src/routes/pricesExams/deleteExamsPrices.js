@@ -39,7 +39,7 @@ module.exports = (app) => {
         });
 
 
-        // récupérer l'examen
+        // détruirel'examen
         await models['ExamsPrice'].findOne({
             where: {institut_id: institutId, exam_id: examId}
         }).then(function (examPriceFound) {

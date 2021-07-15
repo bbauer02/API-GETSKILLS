@@ -38,7 +38,7 @@ module.exports = (app) => {
         });
 
 
-        // récupérer tous les tests
+        // récupérer tous les exams pour un institut
         await models['Institut'].findAndCountAll({
             attributes: ['label'],
             where: {institut_id: institutId},

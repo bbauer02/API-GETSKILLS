@@ -40,7 +40,7 @@ module.exports = (app) => {
             });
 
 
-            // récupérer l'examen
+            // création de l'épreuve
             await models['ExamsPrice'].findOne({
                 where: {institut_id: institutId, exam_id: examId}
             }).then(function (examPriceFound) {
