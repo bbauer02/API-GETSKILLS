@@ -58,10 +58,10 @@ module.exports = (app) => {
             } else {
                 // le prix n'a pas été défini, il n'exsite pas dans la bd
                 const message = `Destroy impossible. Price does not already exist. Create a new price before delete.`;
-                return res.status(500).json({message, data: error.message})
+                return res.status(500).json({message, data: null})
             }
 
-        }).catch(function (err) {
+        }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({message, data: error.message})
         })

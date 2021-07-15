@@ -39,7 +39,7 @@ module.exports = (app) => {
             return res.status(500).json({message, data: error.message})
         });
 
-        // récupérer l'examen
+        // mettre à jour l'épreuve
         await models['ExamsPrice'].findOne({
             where: {institut_id: institutId, exam_id: examId}
         }).then(function (examPriceFound) {
@@ -64,7 +64,7 @@ module.exports = (app) => {
             } else {
                 // le prix n'a pas été défini -> il faut le créer
                 const message = `Update impossible. Price does not exist. Try POST method.`;
-                return res.status(500).json({message, data: error.message})
+                return res.status(500).json({message, data: null})
             }
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;

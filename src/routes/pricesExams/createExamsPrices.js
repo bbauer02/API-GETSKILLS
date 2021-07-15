@@ -47,7 +47,7 @@ module.exports = (app) => {
                 if (examPriceFound) {
                     // le prix existe déjà
                     const message = `Creation impossible. Price already exist. Try PUT method.`;
-                    return res.status(500).json({message, data: error.message})
+                    return res.status(500).json({message, data: null})
 
                 } else {
                     // le prix n'a pas été défini -> il faut le créer
@@ -64,7 +64,7 @@ module.exports = (app) => {
                     })
                 }
 
-            }).catch(function (err) {
+            }).catch(function (error) {
                 const message = `Service not available. Please retry later.`;
                 return res.status(500).json({message, data: error.message})
             })
