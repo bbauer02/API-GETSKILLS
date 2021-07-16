@@ -13,8 +13,11 @@ module.exports =  (app) => {
 
             parameters.include = [{
                 model: models['sessionUserOption'],
-                where: {}
-            }];
+                where: {},
+                include: [{
+                    model: models['Exam']
+                }
+            ]}];
 
             const sessionUser = await models['sessionUser'].findOne(parameters);
             const message = 'sessionUser found';

@@ -11,6 +11,7 @@ module.exports = (env) => ({
         sessions  : env.SESSIONS_GET,
         tests     : env.TESTS_GET,
         users     : env.USERS_GET,
+        options   : env.OPTIONS_GET
     },
     POST : {
         instituts : {
@@ -34,6 +35,7 @@ module.exports = (env) => ({
         sessions  : env.SESSIONS_PUT,
         tests     : env.TESTS_PUT,
         users     : env.USERS_PUT,
+        options   : env.OPTIONS_PUT
     },
     DELETE : {
         instituts :{
