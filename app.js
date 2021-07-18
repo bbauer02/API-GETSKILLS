@@ -5,11 +5,10 @@ const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3001;
 const cookieParser = require('cookie-parser');
- 
 
 
 app
-    .use(express.urlencoded({ extended: true }))
+    .use(express.urlencoded({extended: true}))
     .use(express.json())
     .use(cors())
     .use(cookieParser())
@@ -93,15 +92,16 @@ require('./src/routes/exam/findExamByPk')(app);
 
 // Account
 require('./src/routes/account/myAccount')(app);
- 
+
 // Stats
 require('./src/routes/stats/statsUsers')(app);
 
 // Exams Prices
 require('./src/routes/pricesExams/getAllPricesExamsByInstitut')(app);
+require('./src/routes/pricesExams/getAllPricesExamsByFK')(app);
 require('./src/routes/pricesExams/createExamsPrices')(app);
-require('./src/routes/pricesExams/updateExamsPrices')(app);
 require('./src/routes/pricesExams/deleteExamsPrices')(app);
+require('./src/routes/pricesExams/updateExamsPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);

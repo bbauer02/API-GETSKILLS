@@ -42,8 +42,13 @@ module.exports = (app) => {
         await models['ExamsPrice'].findOne({
             where: {institut_id: institutId, exam_id: examId}
         }).then(function (examPriceFound) {
-            const message = `One Exam price price found`;
-            res.json({message, data: examPriceFound})
+            if(examPriceFound === null) {
+                const message = `No Exam price found`;
+                res.json({message, data: null})
+            } else {
+                const message = `One Exam price found`;
+                res.json({message, data: examPriceFound})
+            }
         }).catch(function (error) {
             const message = `No price found`;
             res.status(500).json({message, data: null})
