@@ -81,6 +81,11 @@ module.exports =  (app) => {
             }];
 
             // Options 
+
+            const addUsers = {
+                model: models['sessionUser'],
+            };
+
             // Add Users
             if(req.query.users==="true")
             {
@@ -107,8 +112,9 @@ module.exports =  (app) => {
                         }] 
                     }]
                 };
-                parameters.include.push(addUsers);
             }
+            parameters.include.push(addUsers);
+
 
             // Options 
             // Add Test & Levels
