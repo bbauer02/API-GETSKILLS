@@ -57,6 +57,7 @@
         validation: {
             type: DataTypes.BOOLEAN,
             allowNull:false,
+            defaultValue: false,
             validate : {
                 notEmpty:{msg: `Session:validation cannot be empty!`},
                 notNull: {msg: `Session:validation cannot be NULL!`}
