@@ -15,7 +15,7 @@
             type: DataTypes.INTEGER
         },
         numInscrAnt: {
-            type: DataTypes.TEXT,
+            type: DataTypes.STRING,
             allowNull: true
         },
         inscription: {

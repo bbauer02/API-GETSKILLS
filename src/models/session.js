@@ -45,7 +45,23 @@
                 notEmpty:{msg: `Session:placeAvailable cannot be empty!`},
                 notNull: {msg: `Session:placeAvailable cannot be NULL!`}
             }
-        } ,
+        },
+        nature: {
+            type: DataTypes.INTEGER,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:nature cannot be empty!`},
+                notNull: {msg: `Session:nature cannot be NULL!`}
+            }
+        },
+        validation: {
+            type: DataTypes.BOOLEAN,
+            allowNull:false,
+            validate : {
+                notEmpty:{msg: `Session:validation cannot be empty!`},
+                notNull: {msg: `Session:validation cannot be NULL!`}
+            }
+        },
         test_id:{
             type: DataTypes.INTEGER,
             allowNull:false,
