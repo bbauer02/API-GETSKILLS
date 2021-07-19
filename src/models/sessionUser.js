@@ -14,6 +14,14 @@
         paymentMode: {
             type: DataTypes.INTEGER
         },
+        numInscrAnt: {
+            type: DataTypes.TEXT,
+            allowNull: true
+        },
+        inscription: {
+            type: DataTypes.DATE,
+            defaultValue: new Date()
+        },
         hasPaid: {
             type: DataTypes.BOOLEAN
         },
