@@ -6,7 +6,6 @@
         end: new Date(2021, 9, 5, 17,00),
         limitDateSubscribe : new Date(2021, 7, 31, 23,59),
         placeAvailable: 100,
-        nature: 4,
         validation: false,
         test_id:2,
         level_id:2
@@ -18,7 +17,6 @@
         end: new Date(2021, 5, 5, 17,00),
         limitDateSubscribe : new Date(2021, 4, 31, 23,59),
         placeAvailable: 3,
-        nature: 1,
         validation: true,
         test_id:3,
         level_id:8
