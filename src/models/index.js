@@ -131,7 +131,6 @@ const initDB = async (sequelize) => {
                 end: session.end,
                 limitDateSubscribe: session.limitDateSubscribe,
                 placeAvailable: session.placeAvailable,
-                nature: session.nature,
                 validation: session.validation,
                 test_id: session.test_id,
                 level_id: session.level_id
