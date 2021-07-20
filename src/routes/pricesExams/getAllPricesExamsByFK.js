@@ -7,8 +7,8 @@ module.exports = (app) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
-        const institutId = req.body.institut_id;
-        const examId = req.body.exam_id;
+        const institutId = req.query.institut_id;
+        const examId = req.query.exam_id;
 
         // vérifier l'institut
         await models['Institut'].findOne({
