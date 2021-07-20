@@ -7,7 +7,6 @@ module.exports = (app) => {
 
         const documentId = req.params.documentId;
 
-
         // on vérifie que l'id demandé se trouve dans la table
         await models['Document'].findOne({
             where: {document_id: documentId}
