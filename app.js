@@ -5,6 +5,7 @@ const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3001;
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
 
 app
@@ -12,6 +13,7 @@ app
     .use(express.json())
     .use(cors())
     .use(cookieParser())
+    .use(fileUpload())
 
 // Initialisation de la BDD
 models.initDB(sequelize);
@@ -107,6 +109,7 @@ require('./src/routes/pricesExams/updateExamsPrices')(app);
 require('./src/routes/payment/createCheckoutSession')(app);
 
 // Documents
-require('./src/routes/documents/getDocsByPk')(app);
+require('./src/routes/documents/createNewDoc')(app);
+require('./src/routes/documents/deleteDoc')(app);
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
