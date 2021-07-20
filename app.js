@@ -106,4 +106,7 @@ require('./src/routes/pricesExams/updateExamsPrices')(app);
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
 
+// Documents
+require('./src/routes/documents/getDocsByPk')(app);
+
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
