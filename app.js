@@ -69,6 +69,7 @@ require('./src/routes/test/deleteTest')(app);
 require('./src/routes/test/archiveChildTests')(app);
 require('./src/routes/test/archiveTests')(app);
 require('./src/routes/test/findAllVariations')(app);
+require('./src/routes/test/findAllTestsAndVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
@@ -81,6 +82,7 @@ require('./src/routes/session/updateUserSession')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);
 require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
+require('./src/routes/session/addSessionUserOption')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);
