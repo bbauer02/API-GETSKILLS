@@ -1,16 +1,19 @@
-﻿const express = require('express');
+const express = require('express');
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
+
 
 app
     .use(express.urlencoded({extended: true}))
     .use(express.json())
     .use(cors())
     .use(cookieParser())
+    .use(fileUpload())
 
 // Initialisation de la BDD
 models.initDB(sequelize);
@@ -66,18 +69,15 @@ require('./src/routes/test/deleteTest')(app);
 require('./src/routes/test/archiveChildTests')(app);
 require('./src/routes/test/archiveTests')(app);
 require('./src/routes/test/findAllVariations')(app);
-require('./src/routes/test/findAllTestsAndVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
 require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
-require('./src/routes/session/deleteUserSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
-require('./src/routes/session/findAllSessionsByInstituts')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);
@@ -107,5 +107,12 @@ require('./src/routes/pricesExams/updateExamsPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
+
+// Documents
+require('./src/routes/documents/createNewDoc')(app);
+require('./src/routes/documents/deleteDoc')(app);
+require('./src/routes/documents/getDocsTypes')(app);
+require('./src/routes/documents/getDocsDatas')(app);
+require('./src/routes/documents/getDocById')(app);
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
