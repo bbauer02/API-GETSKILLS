@@ -3,7 +3,7 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 
@@ -78,6 +78,9 @@ require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
+require('./src/routes/session/findAllSessionsByInstituts')(app);
+require('./src/routes/session/findSessionUser')(app);
+require('./src/routes/session/updateSessionUserOption')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);

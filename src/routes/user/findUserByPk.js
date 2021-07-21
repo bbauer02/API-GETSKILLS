@@ -40,7 +40,7 @@ module.exports =  (app) => {
                 as:'systemRole',
                 attributes:['role_id','label','power']
             }];
-            parameters.attributes = {exclude:['password']};
+            // parameters.attributes = {exclude:['password']};
             const User = await models['User'].findOne(parameters);
             if(User === null) {
                 const message = `User doesn't exist.Retry with an other user id.`;
