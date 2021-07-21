@@ -3,10 +3,8 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
- 
-
 
 app
     .use(express.urlencoded({ extended: true }))
@@ -68,15 +66,18 @@ require('./src/routes/test/deleteTest')(app);
 require('./src/routes/test/archiveChildTests')(app);
 require('./src/routes/test/archiveTests')(app);
 require('./src/routes/test/findAllVariations')(app);
+require('./src/routes/test/findAllTestsAndVariations')(app);
 
 // Sessions
 require('./src/routes/session/findAllSessions')(app);
 require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
+require('./src/routes/session/deleteUserSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
+require('./src/routes/session/findAllSessionsByInstituts')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);

@@ -23,7 +23,7 @@ module.exports = (app) => {
             }
       });
       const message = `The user has been deleted from the session.`;
-      res.json({message, data: SessionDeleted});
+      res.json({message, data: sessionUserDeleted});
     }
     catch(error) {
       const message = `Service not available. Please retry later.`;
