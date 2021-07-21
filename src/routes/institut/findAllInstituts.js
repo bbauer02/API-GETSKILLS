@@ -10,6 +10,10 @@ module.exports =  (app) => {
             if(req.query.name) {
                 parameters.where.label = {[Op.like] : `%${req.query.name}%`}
             }
+            // Recherche par nom strict.
+            if(req.query.nameStrict) {
+                parameters.where.label = {[Op.eq] : `${req.query.nameStrict}`}
+            }
             // Recherche par pays
             if(req.query.country) {
                 const country_id = parseInt(req.query.country);
@@ -26,6 +30,10 @@ module.exports =  (app) => {
             // Recherche par email
             if(req.query.email) {
                 parameters.where.email = {[Op.like] : `%${req.query.email}%`}
+            }
+            // Recherche par email strict
+            if(req.query.emailStrict) {
+                parameters.where.email = {[Op.eq] : `${req.query.emailStrict}`}
             }
             // Parameter : LIMIT
             if(req.query.limit) {
