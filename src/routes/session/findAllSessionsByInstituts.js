@@ -16,46 +16,46 @@ module.exports =  (app) => {
                 }
                 parameters.where.institut_id = institut_id;  
 
-            // Sessions après une date
-            if(req.query.after) {
-                const after = moment(req.query.after,"DD/MM/YYYY").format('YYYY-MM-DD');
-                parameters.where.start = {
-                    [Op.gte]: after
-                }
-            }
-            // Sessions avant une date
-            if(req.query.before) {
-                const before = moment(req.query.before,"DD/MM/YYYY").format('YYYY-MM-DD');
-                parameters.where.start = {
-                    [Op.lte]: before
-                }
-            }
-            // Sessions dans entre 2 dates
-            if(req.query.start && req.query.end) {
-                const start = moment(req.query.start,"DD/MM/YYYY").format('YYYY-MM-DD');
-                const end = moment(req.query.end,"DD/MM/YYYY").format('YYYY-MM-DD');
-                parameters.where.start = {
-                    [Op.between]: [start,end]
-                }
-            }
-            else {
-                // Sessions débutant à une date
-                if(req.query.start) {
-                    let start = moment(req.query.start +' 00:00',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
-                    let end = moment(req.query.start + ' 23:59',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
+                // Sessions après une date
+                if(req.query.after) {
+                    const after = moment(req.query.after,"YYYY-MM-DD");
                     parameters.where.start = {
-                        [Op.between]: [start ,end]
+                        [Op.gte]: after
                     }
                 }
-                // Sessions finissant à une date
-                if(req.query.end) {
-                    let start = moment(req.query.end +' 00:00',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
-                    let end = moment(req.query.end + ' 23:59',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
-                    parameters.where.end = {
-                        [Op.between]: [start ,end]
+                // Sessions avant une date
+                if(req.query.before) {
+                    const before = moment(req.query.before,"YYYY-MM-DD");
+                    parameters.where.start = {
+                        [Op.lte]: before
                     }
                 }
-            }
+                // Sessions dans entre 2 dates
+                if(req.query.start && req.query.end) {
+                    const start = moment(req.query.start,"YYYY-MM-DD");
+                    const end = moment(req.query.end,"YYYY-MM-DD");
+                    parameters.where.start = {
+                        [Op.between]: [start,end]
+                    }
+                }
+                else {
+                    // Sessions débutant à une date
+                    if(req.query.start) {
+                        let start = moment(req.query.start +' 00:00',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
+                        let end = moment(req.query.start + ' 23:59',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
+                        parameters.where.start = {
+                            [Op.between]: [start ,end]
+                        }
+                    }
+                    // Sessions finissant à une date
+                    if(req.query.end) {
+                        let start = moment(req.query.end +' 00:00',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
+                        let end = moment(req.query.end + ' 23:59',"DD/MM/YYYY HH:mm").format('YYYY-MM-DD HH:mm');
+                        parameters.where.end = {
+                            [Op.between]: [start ,end]
+                        }
+                    }
+                }
 
             // Parameter : LIMIT
             if(req.query.limit) {
@@ -111,9 +111,9 @@ module.exports =  (app) => {
             }
 
             // Options 
-            // Add Test
+            // Add Test & Levels
 
-            if(req.query.tests==="true")
+            if(req.query.levels==="true")
             {
                 const addTests = {
                     model: models['Test'],
@@ -132,8 +132,7 @@ module.exports =  (app) => {
                 };
                 parameters.include.push(addLevels);
             }
-
-
+            
 
             const Sessions = await models['Session'].findAndCountAll(parameters);
             const message = `${Sessions.count} sessions found`;
