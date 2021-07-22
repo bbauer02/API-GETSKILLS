@@ -83,6 +83,7 @@ require('./src/routes/session/findAllSessionsByInstituts')(app);
 require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
+require('./src/routes/session/deleteUserSession')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);

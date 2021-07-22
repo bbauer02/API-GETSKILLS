@@ -16,6 +16,7 @@ const sessions = require('../db/mock-sessions');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
+const prices_exams = require("../db/mock-prices_exams");
 
 const initDB = async (sequelize) => {
     fs
@@ -173,6 +174,15 @@ const initDB = async (sequelize) => {
                 nbrQuestions: exam.nbrQuestions,
                 duration: exam.duration,
                 successScore: exam.successScore
+            });
+        }
+
+        // TABLE 'prices_exams'
+        for (const price of prices_exams) {
+            await models['ExamsPrice'].create({
+                institut_id: price.institut_id,
+                exam_id: price.exam_id,
+                price: price.price,
             });
         }
 

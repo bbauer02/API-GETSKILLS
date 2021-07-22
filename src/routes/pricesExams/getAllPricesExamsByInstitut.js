@@ -9,7 +9,6 @@ module.exports = (app) => {
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = parseInt(req.params.institutId);
 
-
         // vérifier l'institut
         await models['Institut'].findOne({
             where: {institut_id: institutId}
@@ -22,21 +21,6 @@ module.exports = (app) => {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({message, data: error.message})
         });
-
-
-        // vérifier l'exam
-        await models['Exam'].findOne({
-            where: {exam_id: institutId}
-        }).then(function (examFound) {
-            if (examFound === null) {
-                const message = `exam doesn't exist. Retry with an other exam id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
-
 
         // récupérer tous les exams pour un institut
         // sequelize.query(`SELECT i.label as 'institut', t.label as 'test', e.label as 'exam', p.price FROM instituts as i INNER JOIN prices_exams as p ON i.institut_id = p.institut_id INNER JOIN exams as e ON p.exam_id = e.exam_id INNER JOIN tests as t ON e.test_id = t.test_id WHERE i.institut_id = ${institutId}`)
