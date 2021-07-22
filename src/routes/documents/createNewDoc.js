@@ -7,9 +7,11 @@ const {models} = require("../../models");
 module.exports = (app) => {
     app.post('/api/docs/new', async (req, res) => {
 
+        // TODO: revoir la notion d'institut id
         const institutId = 1 // req.body.institutId;
-        const doctype = 0 // req.body.doctype;
+        const doctype = req.body.doctype;
         const STORE_FILES = process.cwd() + '/public/';
+        const d = new Date();
 
         // vérifier l'institut
         await models['Institut'].findOne({
@@ -32,7 +34,7 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = req.files.newFile;
-        const uploadPath = STORE_FILES + newFile.name;
+        const uploadPath = STORE_FILES + d.getTime();
 
         // déplacement du fichier uploader dans le dossier public
         await newFile.mv(uploadPath)
