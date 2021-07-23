@@ -5,17 +5,18 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.post('/api/sessions/users',  isAuthenticated,isAuthorized, async (req,res) => {
         try{
-            // req.body = object avec values et session
-            const sessionUser = await models['sessionUser'].create(req.body.values);
+            // 0 - Check si assez de place dans la session
+            if ( req.body.session.placeRemaining <= 0 ) {
+                throw new Error('No more places available')
+            }
 
-            // initialiser les parameters pour trouver les exams
-            // 1
+
+            // 1 - initialiser les parameters pour trouver les exams
             const parameters = {};
             parameters.where = {};
 
 
-            // trouver les exams depuis test id et level id(si pas null) depuis le req.body
-            // 2
+            // 2 - trouver les exams depuis test id et level id(si pas null) depuis le req.body
             const test = parseInt(req.body.session.test_id);
             parameters.where.test_id = test;
 
@@ -23,22 +24,24 @@ module.exports = (app) => {
                 const level = parseInt(req.body.session.level_id); 
                 parameters.where.level_id = level;
             }
-
             const Exams = await models['Exam'].findAndCountAll(parameters);
 
+    
+            // 3 - Créer le sessionUser req.body = object avec values et session
+            const sessionUser = await models['sessionUser'].create(req.body.values);
 
-            // post les sessionsUserOptions en bulk
-            // 3
+
+            // 4 - créer l'object pour le bulk
             let sessionUsersOptionsForCreate = [];
-            // console.log(Exams.rows);
             Exams.rows.forEach((exam, index) => {
-                console.log("examId =", exam.dataValues.exam_id, "index =", index);
                 sessionUsersOptionsForCreate[index] = {};
                 sessionUsersOptionsForCreate[index].exam_id = exam.dataValues.exam_id;
                 sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.isOption === true ? false: true;
                 sessionUsersOptionsForCreate[index].sessionUser_id = sessionUser.sessionUser_id;
             })
             
+
+            // 5 - post les sessionsUserOptions en bulk
             await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
 
             const message = `User id: ${sessionUser.user_id} has been added in the session id : ${sessionUser.session_id}.`;

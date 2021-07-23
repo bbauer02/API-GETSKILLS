@@ -77,6 +77,7 @@ require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
+require('./src/routes/session/updateSessionAdmin')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);

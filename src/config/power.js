@@ -32,7 +32,10 @@ module.exports = (env) => ({
         countries : env.COUNTRIES_PUT,
         levels    : env.LEVELS_PUT,
         roles     : env.ROLES_PUT,
-        sessions  : env.SESSIONS_PUT,
+        sessions  : {
+            default: env.SESSIONS_PUT,
+            admin: env.SESSIONS_PUT_ADMIN,
+        },
         tests     : env.TESTS_PUT,
         users     : env.USERS_PUT,
         options   : env.OPTIONS_PUT
