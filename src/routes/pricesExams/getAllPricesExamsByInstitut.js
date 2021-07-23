@@ -9,7 +9,6 @@ module.exports = (app) => {
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = parseInt(req.params.institut_id);
 
-
         // vérifier l'institut
         await models['Institut'].findOne({
             where: {institut_id: institutId}
