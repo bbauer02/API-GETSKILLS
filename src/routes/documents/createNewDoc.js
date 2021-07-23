@@ -1,14 +1,13 @@
 const path = require('path');
 const fs = require("fs");
 const {models} = require("../../models");
-
-
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/docs/new', async (req, res) => {
+    app.post('/api/instituts/docs', isAuthenticated, isAuthorized, async (req, res) => {
 
         // TODO: revoir la notion d'institut id
-        const institutId = 1 // req.body.institutId;
+        const institutId = req.body.institut_id // req.body.institutId;
         const doctype = req.body.doctype;
         const STORE_FILES = process.cwd() + '/public/';
         const d = new Date();

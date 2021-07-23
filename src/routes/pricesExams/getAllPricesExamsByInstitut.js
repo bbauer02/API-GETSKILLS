@@ -3,11 +3,11 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/exams_prices/:institutId', async (req, res) => {
+    app.get('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
-        const institutId = parseInt(req.params.institutId);
+        const institutId = parseInt(req.params.institut_id);
 
 
         // vérifier l'institut
@@ -16,20 +16,6 @@ module.exports = (app) => {
         }).then(function (institutFound) {
             if (institutFound === null) {
                 const message = `institut doesn't exist. Retry with an other institut id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
-
-
-        // vérifier l'exam
-        await models['Exam'].findOne({
-            where: {exam_id: institutId}
-        }).then(function (examFound) {
-            if (examFound === null) {
-                const message = `exam doesn't exist. Retry with an other exam id.`;
                 return res.status(404).json({message});
             }
         }).catch(function (error) {

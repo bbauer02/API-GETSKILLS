@@ -1,8 +1,10 @@
 const {models} = require("../../models");
-module.exports = (app) => {
-    app.get('/api/docs/:institut', async (req, res) => {
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-        const institutId = req.params.institut;
+module.exports = (app) => {
+    app.get('/api/instituts/docs/:institut_id',isAuthenticated, isAuthorized, async (req, res) => {
+
+        const institutId = req.params.institut_id;
 
         // vérifier l'institut
         await models['Institut'].findOne({

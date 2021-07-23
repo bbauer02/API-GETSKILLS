@@ -1,7 +1,9 @@
 const fs = require("fs");
 const {models} = require("../../models");
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+
 module.exports = (app) => {
-    app.get('/api/docs/download/:doc', async (req, res) => {
+    app.get('/api/instituts/docs/download/:doc',isAuthenticated, isAuthorized, async (req, res) => {
 
         const documentId = req.params.doc;
         const type = "application/vnd.oasis.opendocument.text";
