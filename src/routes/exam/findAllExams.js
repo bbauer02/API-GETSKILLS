@@ -18,12 +18,15 @@ module.exports =  (app) => {
             }
             // Parameter : LEVEL
             if(req.query.level) {
-                const level = parseInt(req.query.level);
-                if(isNaN(level) ) {
-                    const message = `Level parameter should be an integer.`;
-                    return res.status(400).json({message})
-                }   
-                parameters.where.level_id = level;
+                if (req.query.level !== "null") {
+                    const level = parseInt(req.query.level);
+                    if(isNaN(level) ) {
+                        const message = `Level parameter should be an integer.`;
+                        return res.status(400).json({message})
+                    }   
+                    parameters.where.level_id = level;
+                }
+                
             }
             // Parameter : PRICE
             if(req.query.price) {
@@ -59,8 +62,7 @@ module.exports =  (app) => {
             }];
             
             const addLevels = {
-                model: models['Level'],
-                attributes:['level_id','label']
+                model: models['Level']
             };
             parameters.include.push(addLevels);
 
