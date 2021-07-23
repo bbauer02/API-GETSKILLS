@@ -7,8 +7,7 @@
         limitDateSubscribe : new Date(2021, 7, 31, 23,59),
         placeAvailable: 100,
         validation: false,
-        test_id:2,
-        level_id:2
+        test_id:4,
     },
     {
         session_id:2,

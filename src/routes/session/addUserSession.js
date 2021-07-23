@@ -19,7 +19,7 @@ module.exports = (app) => {
             const test = parseInt(req.body.session.test_id);
             parameters.where.test_id = test;
 
-            if (req.body.session.level_id !== "null") {
+            if (req.body.session.level_id !== null) {
                 const level = parseInt(req.body.session.level_id); 
                 parameters.where.level_id = level;
             }
@@ -39,7 +39,7 @@ module.exports = (app) => {
                 sessionUsersOptionsForCreate[index].sessionUser_id = sessionUser.sessionUser_id;
             })
             
-            const sessionUserOptions = await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
+            await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
 
             const message = `User id: ${sessionUser.user_id} has been added in the session id : ${sessionUser.session_id}.`;
             res.json({message, data: sessionUser});
