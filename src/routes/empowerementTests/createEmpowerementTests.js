@@ -10,6 +10,7 @@ module.exports = (app) => {
             const institutId = req.body.institut_id;
             const userId = req.body.user_id;
             const testId = req.body.test_id;
+            const code = req.body.code;
 
             // vérifier l'institut
             await models['Institut'].findOne({
@@ -30,7 +31,7 @@ module.exports = (app) => {
                 where: {user_id: userId}
             }).then(function (userFound) {
                 if (userFound === null) {
-                    const message = `user doesn't exist. Retry with an other exam id.`;
+                    const message = `user doesn't exist. Retry with an other user id.`;
                     return res.status(404).json({message});
                 }
             }).catch(function (error) {
@@ -43,7 +44,7 @@ module.exports = (app) => {
                 where: {test_id: testId}
             }).then(function (userFound) {
                 if (userFound === null) {
-                    const message = `test doesn't exist. Retry with an other exam id.`;
+                    const message = `test doesn't exist. Retry with an other test id.`;
                     return res.status(404).json({message});
                 }
             }).catch(function (error) {
@@ -65,8 +66,9 @@ module.exports = (app) => {
                     // le'habillitation n'a pas été défini -> il faut le créer
                     models['empowermentTests'].create({
                         institut_id: institutId,
-                        exam_id: examId,
-                        price: price,
+                        test_id: testId,
+                        user_id: userId,
+                        code: code
                     }).then(function (empowermentTestsCreated) {
                         const message = `EmpowermentTests has been created.`;
                         return res.status(200).json({message, data: empowermentTestsCreated})

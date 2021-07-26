@@ -161,13 +161,12 @@ module.exports = (sequelize, DataTypes) => {
         User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Role,{as:'systemRole',foreignKey:'systemRole_id',sourceKey: 'role_id'});
 
-
         User.hasMany(models.institutHasUser,{as:'instituts',foreignKey:'user_id', sourceKey:'user_id'});
         User.hasMany(models.sessionUser,{foreignKey:'user_id', sourceKey:'user_id'});
         
         User.hasMany(models.RefreshToken, {as: 'refreshTokens', foreignKey: 'user_id',sourceKey:'user_id'});
 
-
+        User.hasMany(models.empowermentTests,{foreignKey:'user_id', sourceKey:'user_id'});
     }
     return User;
 } 
