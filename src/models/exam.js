@@ -9,7 +9,8 @@
             type: DataTypes.INTEGER
         },
         level_id:{
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull:true
         },
         label: {
             type:DataTypes.STRING,
