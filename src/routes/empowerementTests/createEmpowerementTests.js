@@ -62,6 +62,7 @@ module.exports = (app) => {
 
             }).catch(function (error) {
                 const message = `Service not available. Please retry later.`;
+                hasError = true;
                 return res.status(500).json({message, data: error.message})
             });
 
