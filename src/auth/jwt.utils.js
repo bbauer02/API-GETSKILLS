@@ -134,7 +134,7 @@ module.exports = {
             if(userPower >= powerNeed) {
                 return next();
             }
-            else if (decodedToken.systemRole.power >= 10 ) {
+            else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= 10 ) {
                 return next();
             }
             throw new Error(`You have no power here !`);
