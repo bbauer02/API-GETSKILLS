@@ -3,12 +3,12 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.delete('/api/exams_prices/delete', async (req, res) => {
+    app.delete('/api/instituts/exams/price/:exam_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = req.body.institut_id;
-        const examId = req.body.exam_id;
+        const examId = req.params.exam_id;
 
 
         // vérifier l'institut

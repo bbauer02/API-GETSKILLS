@@ -3,7 +3,8 @@ const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  app => {
-    app.post('/api/skills', async (req, res) => {
+    app.post('/api/skills',isAuthenticated, isAuthorized, async (req, res) => {
+
         try {
             const skill = await models['Skill'].create(req.body);
             const message = `The skill '${req.body.label}' has been created.`;

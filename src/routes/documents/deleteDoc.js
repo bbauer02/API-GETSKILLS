@@ -1,11 +1,12 @@
 const path = require('path');
 const fs = require('fs');
 const {models} = require("../../models");
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.delete('/api/docs/:documentId', async (req, res) => {
+    app.delete('/api/instituts/docs/:document_id',isAuthenticated, isAuthorized, async (req, res) => {
 
-        const documentId = req.params.documentId;
+        const documentId = req.params.document_id;
 
         // on vérifie que l'id demandé se trouve dans la table
         await models['Document'].findOne({

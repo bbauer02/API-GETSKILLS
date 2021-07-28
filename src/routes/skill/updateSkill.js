@@ -2,15 +2,18 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.put('/api/skills/:id', async (req, res) => {
+    app.put('/api/skills/:skill_id', isAuthenticated, isAuthorized, async (req, res) => {
+
+        const skillId = req.params.skill_id;
+
         try {
-            const Skill = await models['Skill'].findByPk(req.params.id);
+            const Skill = await models['Skill'].findByPk(skillId);
             if(Skill === null) {
                 const message = `Skill doesn't exist. Retry with an other Skill id.`;
                 return res.status(404).json({message});
             }
-            Skill.update(req.body,{
-                where:{skill_id:req.params.id}
+            Skill.update(req.body, {
+                where:{skill_id:skillId}
             });
             const message = `Skill id:${Skill.skill_id} has been updated `;
             res.json({message, data: Skill});
