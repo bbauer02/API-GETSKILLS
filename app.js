@@ -46,7 +46,7 @@ require('./src/routes/empowerementTests/createEmpowerementTests')(app);
 require('./src/routes/empowerementTests/deleteEmpowerementTests')(app);
 require('./src/routes/empowerementTests/findEmpowermentTestsByPk')(app);
 require('./src/routes/empowerementTests/updateEmpowermentTests')(app);
-
+require('./src/routes/empowerementTests/findEmpowermentTestsByInstituts')(app);
 
 // Institutes
 require('./src/routes/institut/findAllInstituts')(app);

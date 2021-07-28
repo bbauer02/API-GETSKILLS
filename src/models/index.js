@@ -100,9 +100,9 @@ const initDB = async (sequelize) => {
         }
         // TABLE 'institutHasUser'
         await models['institutHasUser'].bulkCreate([
-            {'user_id': 1, 'institut_id': 2, 'role_id': 1},
+            {'user_id': 1, 'institut_id': 2, 'role_id': 2},
             {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 1}
+            {'user_id': 2, 'institut_id': 1, 'role_id': 3}
         ]);
 
         // TABLE 'tests'

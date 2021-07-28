@@ -2,6 +2,8 @@
 const { Op } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
+// UNUSED ROUTE
+
 module.exports =  (app) => {
 
     app.get('/api/instituts/:institut_id/examinators',isAuthenticated, isAuthorized, async (req,res) => {
