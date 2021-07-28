@@ -18,12 +18,24 @@ module.exports =  (app) => {
             }
             // Parameter : LEVEL
             if(req.query.level) {
-                const level = parseInt(req.query.level);
-                if(isNaN(level) ) {
-                    const message = `Level parameter should be an integer.`;
+                if (req.query.level !== "null") {
+                    const level = parseInt(req.query.level);
+                    if(isNaN(level) ) {
+                        const message = `Level parameter should be an integer.`;
+                        return res.status(400).json({message})
+                    }   
+                    parameters.where.level_id = level;
+                }
+                
+            }
+            // Parameter : PRICE
+            if(req.query.price) {
+                const price = parseInt(req.query.price);
+                if(isNaN(price) ) {
+                    const message = `price parameter should be an integer.`;
                     return res.status(400).json({message})
                 }   
-                parameters.where.level_id = level;
+                parameters.where.price = price;
             }
              // Parameter : LIMIT
              if(req.query.limit) {
@@ -43,6 +55,16 @@ module.exports =  (app) => {
                 }
                 parameters.offset = parseInt(req.query.offset);
             }
+
+            parameters.include = [{
+                model: models['Test'],
+                attributes: ['test_id','label']
+            }];
+            
+            const addLevels = {
+                model: models['Level']
+            };
+            parameters.include.push(addLevels);
 
             const Exams = await models['Exam'].findAndCountAll(parameters);
            

@@ -37,22 +37,22 @@ module.exports =  (app) => {
             }   
             // Sessions après une date
             if(req.query.after) {
-                const after = moment(req.query.after,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const after = moment(req.query.after,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.gte]: after
                 }
             }
             // Sessions avant une date
             if(req.query.before) {
-                const before = moment(req.query.before,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const before = moment(req.query.before,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.lte]: before
                 }
             }
             // Sessions dans entre 2 dates
             if(req.query.start && req.query.end) {
-                const start = moment(req.query.start,"DD/MM/YYYY").format('YYYY-MM-DD');
-                const end = moment(req.query.end,"DD/MM/YYYY").format('YYYY-MM-DD');
+                const start = moment(req.query.start,"YYYY-MM-DD");
+                const end = moment(req.query.end,"YYYY-MM-DD");
                 parameters.where.start = {
                     [Op.between]: [start,end]
                 }
@@ -116,10 +116,41 @@ module.exports =  (app) => {
             
 
             // Options 
+            
             const addUsers = {
-                model: models['sessionUser']          
+                model: models['sessionUser'],
             };
+            
+            // Add Users
+            if(req.query.users==="true")
+            {
+                const addUsers = {
+                    model: models['sessionUser'],
+                    include:[
+                        {
+                        model: models['User'],
+                        attributes: {exclude:['password']},
+                        include: [{
+                            model: models['Country'],
+                            as:"country",
+                            attributes : ["label"]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"nationality",
+                            attributes : ["countryNationality"]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"firstlanguage",
+                            attributes : ["countryLanguage"]
+                        }] 
+                    }]
+                };
+               
+            }
             parameters.include.push(addUsers);
+            
                 const addTests = {
                     model: models['Test'],
                     attributes: ['test_id','label','isInternal','parent_id'],
@@ -136,6 +167,12 @@ module.exports =  (app) => {
                     attributes:['level_id','label','ref','description']
                 };
                 parameters.include.push(addLevels);
+                
+                const addInstitut = {
+                    model: models['Institut'],
+                    attributes:['label']
+                };
+                parameters.include.push(addInstitut);
 
                 parameters.distinct= true;
 

@@ -2,7 +2,7 @@
 const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
-    app.get('/api/skills', async (req,res) => {
+    app.get('/api/skills',isAuthenticated, isAuthorized, async (req,res) => {
        try {
 
            const parameters = {};

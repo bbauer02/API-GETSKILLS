@@ -2,18 +2,22 @@
 const {Op} = require("sequelize");
 const {models} = require('../../models');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
+
 module.exports = (app) => {
-    app.delete('/api/skills/:id/:level', async (req, res) => {
-        console.log(req.params.id, req.params.level);
+    app.delete('/api/skills/:skill_id/level/:level_id',isAuthenticated, isAuthorized, async (req, res) => {
+
+        const levelId = req.params.level_id;
+        const skillId = req.params.skill_id;
+
         try {
-            const skill = await models['Skill'].findByPk(req.params.id);
+            const skill = await models['Skill'].findByPk(skillId);
 
             if (skill === null) {
                 const message = `Skill doesn't exist. Retry with an other skill id.`;
                 return res.status(404).json({message});
             }
 
-            switch (parseInt(req.params.level)) {
+            switch (levelId) {
                 case 1:
                     // on récupère tous les petits enfant d'un parent.
                     let skillsChildChild = await models['Skill'].findAll({
@@ -26,7 +30,7 @@ module.exports = (app) => {
                                     {
                                         model: models['Skill'],
                                         as: "parent",
-                                        where: {skill_id: req.params.id}
+                                        where: {skill_id: skillId}
                                     }]
                             },
                         ]

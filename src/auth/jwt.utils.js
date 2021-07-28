@@ -126,6 +126,11 @@ module.exports = {
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
                 }
             }
+
+            if(moduleName === 'skills') {
+                userPower = decodedToken.systemRole.power;
+            }
+
             if(userPower >= powerNeed) {
                 return next();
             }

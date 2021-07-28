@@ -10,7 +10,12 @@ module.exports =  (app) => {
             parameters.include = [
                 {
                     model: models['Institut'],
-                    attributes : ["label"]
+                    attributes : ["label"],
+                    include:[{
+                        model: models['Country'],
+                        as:"institutCountry",
+                        attributes : ["label"]
+                    }],
                 },
                 {
                     model: models['Test']
