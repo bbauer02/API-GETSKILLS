@@ -3,25 +3,11 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = parseInt(req.params.institut_id);
-
-
-        // vérifier l'institut
-        await models['Institut'].findOne({
-            where: {institut_id: institutId}
-        }).then(function (institutFound) {
-            if (institutFound === null) {
-                const message = `institut doesn't exist. Retry with an other institut id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
 
 
         // récupérer tous les exams pour un institut
@@ -37,24 +23,30 @@ module.exports = (app) => {
                 include: [{
                     attributes: ['institut_id', 'label'],
                     model: models['Institut'],
-                    where: {institut_id: institutId},
                     required: true,
                 }]
             }]
         }).then(function (pricesFound) {
-            return pricesFound.rows.reduce(function (prev, curr) {
-                curr.dataValues.Exams.forEach((exam) => {
-                    let item = { test_id: '', institut_id: '', exam_id: '', price: ''};
-                    item.test_id = curr.dataValues.test_id;
-                    item.institut_id = exam.Instituts[0].ExamsPrice.institut_id;
-                    item.exam_id = exam.Instituts[0].ExamsPrice.exam_id;
-                    item.price = exam.Instituts[0].ExamsPrice.price
-                    prev = [...prev, item];
-                })
-                return prev;
-            }, [])
+            if(pricesFound.length === 0) {
+                const message = `np prices found`;
+                return res.status(500).json({message, data: null})
+            } else {
+                return pricesFound.rows.reduce(function (prev, curr) {
+                    curr.dataValues.Exams.forEach((exam) => {
+                        let item = { test_id: '', institut_id: '', exam_id: '', price: ''};
+                        item.test_id = curr.dataValues.test_id;
+                        item.institut_id = exam.Instituts[0].ExamsPrice.institut_id;
+                        item.exam_id = exam.Instituts[0].ExamsPrice.exam_id;
+                        item.price = exam.Instituts[0].ExamsPrice.price;
+                        item.isAdmin = exam.Instituts[0].ExamsPrice.isAdmin;
+                        item.price_id = exam.Instituts[0].ExamsPrice.price_id;
+                        prev = [...prev, item];
+                    })
+                    return prev;
+                }, [])
+            }
         }).then(function (pricesFound) {
-            const message = `${pricesFound} price(s) found`;
+            const message = `${pricesFound.length} price(s) found`;
             return res.json({message, data: pricesFound})
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;

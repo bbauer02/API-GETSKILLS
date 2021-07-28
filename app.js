@@ -103,7 +103,6 @@ require('./src/routes/stats/statsUsers')(app);
 
 // Exams Prices
 require('./src/routes/pricesExams/getAllPricesExamsByInstitut')(app);
-require('./src/routes/pricesExams/getAllPricesExamsByFK')(app);
 require('./src/routes/pricesExams/createExamsPrices')(app);
 require('./src/routes/pricesExams/deleteExamsPrices')(app);
 require('./src/routes/pricesExams/updateExamsPrices')(app);

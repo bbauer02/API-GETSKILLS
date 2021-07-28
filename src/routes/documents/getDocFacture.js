@@ -1,13 +1,13 @@
 const fs = require("fs");
 const {models} = require("../../models");
-const unoconv = require('awesome-unoconv');
+const unoconv = require('unoconv-promise');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/instituts/docs/download/facture/:doc',isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/docs/download/facture/:doc', async (req, res) => {
 
         const documentId = req.params.doc;
-        const type = "application/vnd.oasis.opendocument.text";
+        const type = "application/pdf";
 
         // vérifier le document
         await models['Document'].findOne({
@@ -18,7 +18,15 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             } else {
                 const s = fs.createReadStream(docFound.filepath);
-                unoconv.convert(docFound.filepath, '/home/piazza/Bureau/myTest.pdf');
+                // unoconv.convert(docFound.filepath, '/home/piazza/Bureau/myTest.pdf');
+
+                unoconv.run({
+                    file: docFound.filepath,
+                    fields: {texte: {school_name: 'IUT RCC', school_address: '4 rue tinqueux'}},
+                    output: '/home/piazza/Bureau/myTest.pdf'
+                }).catch(e => {
+                    res.end(e.message)
+                })
 
                 s.on('open', function () {
                     res.set('Content-Type', type);

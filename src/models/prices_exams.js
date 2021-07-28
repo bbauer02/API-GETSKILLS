@@ -1,6 +1,11 @@
 ﻿const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
     const ExamsPrice = sequelize.define('ExamsPrice', {
+        price_id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
         institut_id: {
             type: DataTypes.INTEGER,
         },
@@ -11,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.FLOAT,
             defaultValue: 0.
         },
+        isAdmin: {
+            type: DataTypes.BOOLEAN,
+        }
 
     }, {
         tableName: 'prices_exams',

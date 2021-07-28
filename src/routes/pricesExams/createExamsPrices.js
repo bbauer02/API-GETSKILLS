@@ -10,6 +10,7 @@ module.exports = (app) => {
             const institutId = req.body.institut_id;
             const examId = req.body.exam_id;
             const price = req.body.price;
+            const isAdmin = req.body.is_admin;
 
 
             // vérifier l'institut
@@ -28,7 +29,7 @@ module.exports = (app) => {
 
             // vérifier l'exam
             await models['Exam'].findOne({
-                where: {exam_id: institutId}
+                where: {exam_id: examId}
             }).then(function (examFound) {
                 if (examFound === null) {
                     const message = `exam doesn't exist. Retry with an other exam id.`;
@@ -42,7 +43,7 @@ module.exports = (app) => {
 
             // création de l'épreuve
             await models['ExamsPrice'].findOne({
-                where: {institut_id: institutId, exam_id: examId}
+                where: {institut_id: institutId, exam_id: examId, isAdmin: isAdmin}
             }).then(function (examPriceFound) {
                 if (examPriceFound) {
                     // le prix existe déjà
@@ -55,6 +56,7 @@ module.exports = (app) => {
                         institut_id: institutId,
                         exam_id: examId,
                         price: price,
+                        isAdmin: isAdmin
                     }).then(function (examPriceCreated) {
                         const message = `Price for ${examPriceCreated.price} coin has been created.`;
                         return res.status(200).json({message, data: examPriceCreated})
