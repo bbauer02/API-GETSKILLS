@@ -97,14 +97,14 @@ module.exports = {
         try {
           const decodedToken  =req.accessToken;
             // points d'entrées : sans les id
+
             const entriesPoints = req.url.split('/').filter(e => e !== 'api' && !parseInt(e)  && e !== '' );
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e)  && e !== '' );
 
             // Lecture du fichier de configuration des pouvoirs dynamiquement.
             const httpMethod = req.method.toUpperCase();
             let powerNeed = power[httpMethod];
-            for(const entry of entriesPoints) {
-                
+            for(const entry of entriesPoints) {       
                 // Il y a toujours un point d'entrée au minimum. Donc si il n'y a que un seul point d'entrée, on se branche sur le "default"
                 if(entriesPoints.length ===1) {
                     powerNeed =powerNeed[entry.split('?')[0]]["default"];

@@ -137,7 +137,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         systemRole_id :{
             type: DataTypes.INTEGER,
-            allowNull:true,
+            allowNull:false,
+            defaultValue: 1 
         }
     }, 
     {

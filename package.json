@@ -4,8 +4,8 @@
   "description": "API for the projet \"get-tested\"",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=production node app.js",
-    "dev": "NODE_ENV=development nodemon app.js"
+    "start": "NODE_ENV=production & node app.js",
+    "dev": "NODE_ENV=development & nodemon app.js"
   },
   "author": "Bauer Baptiste",
   "license": "ISC",
