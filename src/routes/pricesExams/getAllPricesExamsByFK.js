@@ -3,12 +3,12 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/exams_prices', async (req, res) => {
+    app.get('/api/instituts/:institut_id/exams/:exam_id/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
-        const institutId = req.query.institut_id;
-        const examId = req.query.exam_id;
+        const institutId = parseInt(req.params.institut_id);
+        const examId = parseInt(req.params.exam_id);
 
         // vérifier l'institut
         await models['Institut'].findOne({

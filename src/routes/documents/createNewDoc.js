@@ -1,15 +1,16 @@
 const path = require('path');
 const fs = require("fs");
 const {models} = require("../../models");
-
-
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/docs/new', async (req, res) => {
+    app.post('/api/instituts/docs', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const institutId = 1 // req.body.institutId;
-        const doctype = 0 // req.body.doctype;
+        // TODO: revoir la notion d'institut id
+        const institutId = req.body.institut_id // req.body.institutId;
+        const doctype = req.body.doctype;
         const STORE_FILES = process.cwd() + '/public/';
+        const d = new Date();
 
         // vérifier l'institut
         await models['Institut'].findOne({
@@ -32,7 +33,7 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = req.files.newFile;
-        const uploadPath = STORE_FILES + newFile.name;
+        const uploadPath = STORE_FILES + d.getTime();
 
         // déplacement du fichier uploader dans le dossier public
         await newFile.mv(uploadPath)

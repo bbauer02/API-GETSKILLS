@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             institut_id: {
                 type: DataTypes.INTEGER,
+                allowNull: true,
             },
             filename: {
                 type: DataTypes.STRING,
