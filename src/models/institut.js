@@ -97,7 +97,8 @@ module.exports = (sequelize, DataTypes) => {
         Institut.belongsTo(models.Country,{as: 'institutCountry',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
         Institut.hasMany(models.institutHasUser,{foreignKey:'institut_id', sourceKey:'institut_id', onDelete:'CASCADE'})
         Institut.hasMany(models.Session,{foreignKey:'institut_id', sourceKey:'institut_id', onDelete:'CASCADE'})
-        Institut.belongsToMany(models.Exam, {through: models.ExamsPrice, foreignKey: 'institut_id'});
+        Institut.belongsToMany(models.Exam, {through: models.InstitutHasPrices, foreignKey: 'institut_id'});
+        Institut.hasMany(models.empowermentTests,{foreignKey:'institut_id', sourceKey:'institut_id'});
     }
     return Institut;
 }

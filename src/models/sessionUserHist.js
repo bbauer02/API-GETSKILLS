@@ -1,6 +1,5 @@
-﻿const {models} = require("./index");
-module.exports = (sequelize, DataTypes) => {
-    const sessionUser =  sequelize.define('sessionUser', {
+﻿module.exports = (sequelize, DataTypes) => {
+    const sessionUserHist =  sequelize.define('sessionUserHist', {
         sessionUser_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -31,26 +30,21 @@ module.exports = (sequelize, DataTypes) => {
         },
     },
     {
-        tableName: 'sessionUsers',
+        tableName: 'session_user_hist',
         timestamps: false,
         uniqueKeys: {
             compositeKey: {
                 fields: ['session_id', 'user_id']
             }
-        },
-        hooks: {
-            beforeDestroy (instance, options) {
-                // console.log(instance.dataValues);
-                models['sessionUserHist'].create(instance.dataValues);
-            }
         }
     });
-    
-    sessionUser.associate = models => { 
-        sessionUser.belongsTo(models.User, { foreignKey: 'user_id', sourceKey: 'user_id'});
-        sessionUser.belongsTo(models.Session, { foreignKey: 'session_id', sourceKey: 'session_id' });
-        sessionUser.hasMany(models.sessionUserOption,{foreignKey:'sessionUser_id',sourceKey: 'sessionUser_id',onDelete:'CASCADE'})
+    /*
+    sessionUserHist.associate = models => { 
+        sessionUserHist.belongsTo(models.User, { foreignKey: 'user_id', sourceKey: 'user_id'});
+        sessionUserHist.belongsTo(models.Session, { foreignKey: 'session_id', sourceKey: 'session_id' });
+        sessionUserHist.hasMany(models.sessionUserOption,{foreignKey:'sessionUser_id',sourceKey: 'sessionUser_id',onDelete:'CASCADE'})
     };
+    */
 
-    return sessionUser;
+    return sessionUserHist;
 }

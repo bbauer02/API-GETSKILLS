@@ -16,7 +16,7 @@ const sessions = require('../db/mock-sessions');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
-const prices_exams = require("../db/mock-prices_exams");
+const prices_exams = require("../db/mock-instituts_has_prices");
 
 const initDB = async (sequelize) => {
     fs

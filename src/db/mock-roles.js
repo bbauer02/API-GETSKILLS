@@ -8,7 +8,7 @@
         power: 2
     },
     {
-        label:"Manageor of the institut",
+        label:"Managor of the institut",
         power: 3
     },
     {
