@@ -3,7 +3,7 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 
@@ -41,6 +41,12 @@ require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
 
+// UserEmpowerment
+require('./src/routes/empowerementTests/createEmpowerementTests')(app);
+require('./src/routes/empowerementTests/deleteEmpowerementTests')(app);
+require('./src/routes/empowerementTests/findEmpowermentTestsByPk')(app);
+require('./src/routes/empowerementTests/updateEmpowermentTests')(app);
+require('./src/routes/empowerementTests/findEmpowermentTestsByInstituts')(app);
 
 //Institutes
 require('./src/routes/institut/findAllInstituts')(app);
@@ -51,6 +57,7 @@ require('./src/routes/institut/deleteInstitut')(app);
 require('./src/routes/institut/addUserInstitut')(app);
 require('./src/routes/institut/deleteUserInstitut')(app);
 require('./src/routes/institut/findInstitutUsers')(app);
+require('./src/routes/institut/findInstitutExaminators')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
@@ -77,6 +84,7 @@ require('./src/routes/session/findSessionByPk')(app);
 require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
+require('./src/routes/session/updateSessionAdmin')(app);
 require('./src/routes/session/addUserSession')(app);
 require('./src/routes/session/updateUserSession')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);

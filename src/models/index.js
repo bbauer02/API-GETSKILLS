@@ -102,7 +102,7 @@ const initDB = async (sequelize) => {
         await models['institutHasUser'].bulkCreate([
             {'user_id': 1, 'institut_id': 2, 'role_id': 1},
             {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 4}
+            {'user_id': 2, 'institut_id': 1, 'role_id': 1}
         ]);
 
         // TABLE 'tests'
@@ -177,13 +177,12 @@ const initDB = async (sequelize) => {
             });
         }
 
-        // TABLE 'instituts_has_prices'
+        // TABLE 'prices_exams'
         for (const price of prices_exams) {
-            await models['InstitutHasPrices'].create({
+            await models['ExamsPrice'].create({
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
                 price: price.price,
-                isAdmin: price.isAdmin
             });
         }
 

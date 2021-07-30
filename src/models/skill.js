@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
                     models['SkillsHist'].create(instance.dataValues);
                 }
             }
-
         });
 
     Skill.hasMany(Skill, {
