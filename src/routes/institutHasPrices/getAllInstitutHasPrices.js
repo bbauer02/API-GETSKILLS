@@ -35,14 +35,14 @@ module.exports = (app) => {
                 // reconstruction de la réponse
                 return pricesFound.rows.reduce(function (prev, curr) {
                     curr.dataValues.Exams.forEach((exam) => {
-                        if(exam.Instituts[0].ExamsPrice.isAdmin === isAdmin) {
+                        if(exam.Instituts[0].InstitutHasPrices.isAdmin === isAdmin) {
                             let item = {test_id: '', institut_id: '', exam_id: '', price: ''};
                             item.test_id = curr.dataValues.test_id;
-                            item.institut_id = exam.Instituts[0].ExamsPrice.institut_id;
-                            item.exam_id = exam.Instituts[0].ExamsPrice.exam_id;
-                            item.price = exam.Instituts[0].ExamsPrice.price;
-                            item.isAdmin = exam.Instituts[0].ExamsPrice.isAdmin;
-                            item.price_id = exam.Instituts[0].ExamsPrice.price_id;
+                            item.institut_id = exam.Instituts[0].InstitutHasPrices.institut_id;
+                            item.exam_id = exam.Instituts[0].InstitutHasPrices.exam_id;
+                            item.price = exam.Instituts[0].InstitutHasPrices.price;
+                            item.isAdmin = exam.Instituts[0].InstitutHasPrices.isAdmin;
+                            item.price_id = exam.Instituts[0].InstitutHasPrices.price_id;
                             prev = [...prev, item];
                         }
                     })
