@@ -183,8 +183,7 @@ const initDB = async (sequelize) => {
             await models['InstitutHasPrices'].create({
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
-                price: price.price,
-                isAdmin: price.isAdmin
+                price: price.price
             });
         }
 

@@ -11,7 +11,6 @@ module.exports = (app) => {
             const institutId = req.body.institut_id;
             const examId = req.body.exam_id;
             const price = req.body.price;
-            const isAdmin = req.body.isAdmin;
 
             // PRINCIPE -> dès qu'une fonction asynchrone lève une erreur, le waterfall permet d'empêcher de passer à la fonction suivante.
             asyncLib.waterfall([
@@ -59,8 +58,7 @@ module.exports = (app) => {
                         models['InstitutHasPrices'].findOne({
                             where: {
                                 institut_id: institutFound.institut_id,
-                                exam_id: examFound.exam_id,
-                                isAdmin: isAdmin
+                                exam_id: examFound.exam_id
                             }
                         }).then(function (examPriceFound) {
                             if (examPriceFound) {
@@ -84,8 +82,7 @@ module.exports = (app) => {
                         models['InstitutHasPrices'].create({
                             institut_id: institutFound.institut_id,
                             exam_id: examFound.exam_id,
-                            price: price,
-                            isAdmin: isAdmin
+                            price: price
                         }).then(function (examPriceCreated) {
                             console.log(examPriceCreated)
                             done(examPriceCreated)

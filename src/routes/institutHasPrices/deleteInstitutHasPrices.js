@@ -15,7 +15,7 @@ module.exports = (app) => {
         }).then(function (examPriceFound) {
             if (examPriceFound) {
                 // le prix existe
-                models['ExamsPrice'].destroy({
+                models['InstitutHasPrices'].destroy({
                     where: {price_id: priceId}
                 }).then(function (examPriceDestroyed) {
                     const message = `Price has been deleted.`;
