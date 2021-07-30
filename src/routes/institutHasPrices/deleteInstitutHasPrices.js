@@ -10,7 +10,7 @@ module.exports = (app) => {
         const priceId = req.body.price_id;
 
         // détruirel'examen
-        await models['ExamsPrice'].findOne({
+        await models['InstitutHasPrices'].findOne({
             where: {price_id: priceId}
         }).then(function (examPriceFound) {
             if (examPriceFound) {

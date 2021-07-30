@@ -33,7 +33,7 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = req.files.newFile;
-        const uploadPath = STORE_FILES + d.getTime();
+        const uploadPath = STORE_FILES + d.getTime() + '.odt';
 
         // déplacement du fichier uploader dans le dossier public
         await newFile.mv(uploadPath)

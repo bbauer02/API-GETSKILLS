@@ -1,6 +1,6 @@
 ﻿const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
-    const ExamsPrice = sequelize.define('ExamsPrice', {
+    const InstitutHasPrices = sequelize.define('InstitutHasPrices', {
         price_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -8,9 +8,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         institut_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
         },
         exam_id: {
             type: DataTypes.INTEGER,
+            allowNull: false,
         },
         price: {
             type: DataTypes.FLOAT,
@@ -18,18 +20,25 @@ module.exports = (sequelize, DataTypes) => {
         },
         isAdmin: {
             type: DataTypes.BOOLEAN,
-        }
+            allowNull: false,
+            primaryKey: true,
+        },
 
     }, {
-        tableName: 'prices_exams',
+        tableName: 'Institut_has_prices',
         timestamps: false,
+        uniqueKeys: {
+            Items_unique: {
+                fields: ['institut_id', 'exam_id', 'isAdmin']
+            }
+        },
         hooks: {
             beforeUpdate (instance, options) {
                 console.log(instance.dataValues);
-                models['ExamPricesHist'].create(instance.dataValues);
+                models['InstitutHasPricesHist'].create(instance.dataValues);
             }
         }
     });
 
-    return ExamsPrice;
+    return InstitutHasPrices;
 }   
