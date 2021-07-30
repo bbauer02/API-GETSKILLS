@@ -13,6 +13,7 @@ module.exports = (app) => {
         // récupérer tous les exams pour un institut
         // sequelize.query(`SELECT i.label as 'institut', t.label as 'test', e.label as 'exam', p.price FROM instituts as i INNER JOIN prices_exams as p ON i.institut_id = p.institut_id INNER JOIN exams as e ON p.exam_id = e.exam_id INNER JOIN tests as t ON e.test_id = t.test_id WHERE i.institut_id = ${institutId}`)
 
+
         await models['Test'].findAndCountAll({
             attributes: ['test_id', 'label'],
             required: true,
