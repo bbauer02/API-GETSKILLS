@@ -48,7 +48,7 @@ require('./src/routes/empowerementTests/findEmpowermentTestsByPk')(app);
 require('./src/routes/empowerementTests/updateEmpowermentTests')(app);
 require('./src/routes/empowerementTests/findEmpowermentTestsByInstituts')(app);
 
-// Institutes
+//Institutes
 require('./src/routes/institut/findAllInstituts')(app);
 require('./src/routes/institut/findInstitutByPk')(app);
 require('./src/routes/institut/createInstitut')(app);
@@ -113,11 +113,10 @@ require('./src/routes/account/myAccount')(app);
 require('./src/routes/stats/statsUsers')(app);
 
 // Exams Prices
-require('./src/routes/pricesExams/getAllPricesExamsByInstitut')(app);
-require('./src/routes/pricesExams/getAllPricesExamsByFK')(app);
-require('./src/routes/pricesExams/createExamsPrices')(app);
-require('./src/routes/pricesExams/deleteExamsPrices')(app);
-require('./src/routes/pricesExams/updateExamsPrices')(app);
+require('./src/routes/institutHasPrices/getAllInstitutHasPrices')(app);
+require('./src/routes/institutHasPrices/createInstitutHasPrices')(app);
+require('./src/routes/institutHasPrices/deleteInstitutHasPrices')(app);
+require('./src/routes/institutHasPrices/updateInstitutHasPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
