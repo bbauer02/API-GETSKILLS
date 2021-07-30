@@ -1,3 +1,5 @@
+require('./crons');
+
 const express = require('express');
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
@@ -92,6 +94,9 @@ require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
 require('./src/routes/session/deleteUserSession')(app);
+
+// Sessions Archive
+require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);

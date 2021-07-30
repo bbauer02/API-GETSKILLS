@@ -1,3 +1,4 @@
+const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
     const User =  sequelize.define('User', {
         user_id: {

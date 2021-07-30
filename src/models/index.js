@@ -13,6 +13,7 @@ const tests = require('../db/mock-tests');
 const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const sessions = require('../db/mock-sessions');
+const sessionsHist = require('../db/mock-sessionsHist');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
@@ -127,6 +128,20 @@ const initDB = async (sequelize) => {
         // TABLE 'sessions'
         for (const session of sessions) {
             await models['Session'].create({
+                institut_id: session.institut_id,
+                start: session.start,
+                end: session.end,
+                limitDateSubscribe: session.limitDateSubscribe,
+                placeAvailable: session.placeAvailable,
+                validation: session.validation,
+                test_id: session.test_id,
+                level_id: session.level_id
+            });
+        }
+
+        // TABLE 'sessionsHist'
+        for (const session of sessionsHist) {
+            await models['SessionHist'].create({
                 institut_id: session.institut_id,
                 start: session.start,
                 end: session.end,
