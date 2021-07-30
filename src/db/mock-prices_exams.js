@@ -1,7 +1,7 @@
 ﻿const prices_exams = [
     {
       institut_id: 1,
-      exam_id: 1,
+      exam_id: 8,
       price: 1000
     },
     {

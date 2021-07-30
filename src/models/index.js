@@ -100,9 +100,9 @@ const initDB = async (sequelize) => {
         }
         // TABLE 'institutHasUser'
         await models['institutHasUser'].bulkCreate([
-            {'user_id': 1, 'institut_id': 2, 'role_id': 1},
+            {'user_id': 1, 'institut_id': 2, 'role_id': 2},
             {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 1}
+            {'user_id': 2, 'institut_id': 1, 'role_id': 3}
         ]);
 
         // TABLE 'tests'
@@ -189,7 +189,7 @@ const initDB = async (sequelize) => {
         // TABLE 'sessionUserOption'
         await models['sessionUserOption'].bulkCreate([
             {
-                'exam_id': 1,
+                'exam_id': 8,
                 'user_price': 50,
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
                 "DateTime": new Date(2021, 5, 2, 9, 00),
@@ -202,7 +202,7 @@ const initDB = async (sequelize) => {
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
                 "DateTime": new Date(2021, 5, 3, 9, 00),
                 "isCandidate": true,
-                "sessionUser_id": 1
+                "sessionUser_id": 3
             },
             {
                 'exam_id': 3,
