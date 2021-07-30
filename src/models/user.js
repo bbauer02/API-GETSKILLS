@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
         password: {
             type: DataTypes.STRING,
             allowNull:false,
-            defaultValue: Math.floor(Math.random() * 1000000000000 ) +1,
             validate : {
                 notEmpty:{msg: `User:Password cannot be empty !`},
                 notNull: {msg: `User:Password cannot be NULL!`}
@@ -151,6 +150,10 @@ module.exports = (sequelize, DataTypes) => {
             afterUpdate: (user) => {
                 delete user.dataValues.password;
             },
+            beforeDestroy (instance, options) {
+                // console.log(instance.dataValues);
+                models['UserHist'].create(instance.dataValues);
+            }
         }
 
 
