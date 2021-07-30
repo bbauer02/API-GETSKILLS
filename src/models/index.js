@@ -17,6 +17,7 @@ const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
 const prices_exams = require("../db/mock-instituts_has_prices");
+const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
 
 const initDB = async (sequelize) => {
     fs
@@ -102,7 +103,7 @@ const initDB = async (sequelize) => {
         await models['institutHasUser'].bulkCreate([
             {'user_id': 1, 'institut_id': 2, 'role_id': 1},
             {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 1}
+            {'user_id': 2, 'institut_id': 1, 'role_id': 4}
         ]);
 
         // TABLE 'tests'
@@ -177,12 +178,13 @@ const initDB = async (sequelize) => {
             });
         }
 
-        // TABLE 'prices_exams'
-        for (const institut of prices_exams) {
+        // TABLE 'Institut_has_prices'
+        for (const price of INSTITUT_HAS_PRICES) {
             await models['InstitutHasPrices'].create({
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
                 price: price.price,
+                isAdmin: price.isAdmin
             });
         }
 
