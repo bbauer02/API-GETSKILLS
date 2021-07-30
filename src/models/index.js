@@ -178,8 +178,8 @@ const initDB = async (sequelize) => {
         }
 
         // TABLE 'prices_exams'
-        for (const price of prices_exams) {
-            await models['ExamsPrice'].create({
+        for (const institut of prices_exams) {
+            await models['InstitutHasPrices'].create({
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
                 price: price.price,
