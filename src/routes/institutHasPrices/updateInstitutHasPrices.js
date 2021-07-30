@@ -9,7 +9,6 @@ module.exports = (app) => {
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const priceId = req.body.price_id;
         const price = req.body.price;
-        const isAdmin = req.body.isAdmin;
 
         // mettre à jour l'épreuve
         await models['InstitutHasPrices'].findOne({
@@ -19,7 +18,6 @@ module.exports = (app) => {
                 // le prix existe déjà
                 examPriceFound.update(
                     {price: price},
-                    {isAdmin: isAdmin},
                     {
                         where: {
                             price_id: priceId
