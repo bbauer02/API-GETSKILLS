@@ -1,20 +1,20 @@
-﻿const { models } = require('../../models');
+﻿const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-module.exports = (app) => {
-    app.get('/api/sessions/:id', isAuthenticated, isAuthorized, async (req, res) => {
+module.exports =  (app) => {
+    app.get('/api/sessions/:id', isAuthenticated,isAuthorized, async (req,res) => {
         try {
-            const parameters = {};
-            parameters.where = { session_id: req.params.id };
-
+            const parameters = {}; 
+            parameters.where = {session_id:req.params.id};
+        
             parameters.include = [
                 {
                     model: models['Institut'],
-                    attributes: ["label"],
-                    include: [{
+                    attributes : ["label"],
+                    include:[{
                         model: models['Country'],
-                        as: "institutCountry",
-                        attributes: ["label"]
+                        as:"institutCountry",
+                        attributes : ["label", "country_id"]
                     }],
                 },
                 {
@@ -25,41 +25,49 @@ module.exports = (app) => {
                 },
                 {
                     model: models['sessionUser'],
-                    include: [{
+                    include:[{
                         model: models['User'],
-                        attributes: { exclude: ['password'] },
+                        attributes: {exclude:['password']},
                         include: [
-                            {
-                                model: models['Country'],
-                                as: "country",
-                                attributes: ["label"]
-                            },
-                            {
-                                model: models['Country'],
-                                as: "nationality",
-                                attributes: ["countryNationality"]
-                            },
-                            {
-                                model: models['Country'],
-                                as: "firstlanguage",
-                                attributes: ["countryLanguage"]
+                        {
+                            model: models['sessionUser'],
+                            include:[{ 
+                                model: models['sessionUserOption'],
+                                include:[{ 
+                                    model: models['Exam']
+                                }]
                             }]
-                    }, 
-                {}]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"country",
+                            attributes : ["label"]
+                        }, 
+                        {
+                            model: models['Country'],
+                            as:"nationality",
+                            attributes : ["countryNationality"]
+                        },
+                        {
+                            model: models['Country'],
+                            as:"firstlanguage", 
+                            attributes : ["countryLanguage"]
+                        }] 
+                    }]
                 }
-            ];
-
+        ];
+            
             const Session = await models['Session'].findOne(parameters);
-            if (Session === null) {
+            if(Session === null) {
                 const message = `Session doesn't exist.Retry with an other Session id.`;
-                return res.status(404).json({ message });
+                return res.status(404).json({message});
             }
             const message = `Session found`;
-            res.json({ message, data: Session });
+            res.json({message, data: Session});
         }
-        catch (error) {
+        catch(error) {
             const message = `Service not available. Please retry later.`;
-            res.status(500).json({ message, data: error.toString() });
+            res.status(500).json({message, data: error.toString()});
         }
     });
 }
