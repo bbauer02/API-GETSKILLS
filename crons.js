@@ -4,9 +4,8 @@ var CronJob = require('cron').CronJob;
 
 // Cron executer tout les mois
 const job = new CronJob('0 0 1 * *', async function () {
-    console.log("\n\nCRON TIME!\n\n")
 
-    // delete les archives UserHist qui ont plus de 10 ans
+    // delete les archives UserHist qui ont plus de 6 mois
     try {
         await sequelize.query("DELETE FROM User_hist WHERE createdAt <=DATE_SUB(NOW(), INTERVAL 6 MONTH)",
             {
@@ -16,15 +15,18 @@ const job = new CronJob('0 0 1 * *', async function () {
         console.log(error.message);
     }
 
-
-
-    // delete les archives users qui ont plus de 6 mois
+    // delete les archives UserHist qui ont plus de 6 mois sans paiment
     /*
-    await sequelize.query("DELETE * FROM 'UserHist' WHERE created_at<=DATE_SUB(NOW(), INTERVAL 6 MONTH",
-    {
-        type: QueryTypes.DELETE
-    });
+    try {
+        await sequelize.query("DELETE FROM User_hist INNER JOIN session_user_hist ON (User_hist.user_id = session_user_hist.user_id) WHERE createdAt <=DATE_SUB(NOW(), INTERVAL 10 YEAR)",
+            {
+                type: QueryTypes.DELETE
+            });
+    } catch (error) {
+        console.log(error.message);
+    }
     */
+    
 
     // delete les archives SessionUserOptionHist qui ont plus de 10 ans
     try {
