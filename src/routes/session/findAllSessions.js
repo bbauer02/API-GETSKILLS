@@ -9,6 +9,7 @@ module.exports =  (app) => {
             parameters.where = {};
             // Conditions
             // filtre par level id
+
             if(req.query.level) {
                 const level_id = parseInt(req.query.level);
                 if(isNaN(level_id) ) {
