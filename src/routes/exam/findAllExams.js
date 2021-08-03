@@ -67,6 +67,7 @@ module.exports =  (app) => {
             parameters.include.push(addLevels);
 
             parameters.include = [{
+                attributes: ['price'],
                 model: models['InstitutHasPrices'],
                 as: 'InstitutHasPrices'
             }];
