@@ -15,6 +15,9 @@ module.exports =  (app) => {
             parameters.attributes = {exclude:['password']};
             parameters.include = [
                 {
+                    model: models['Institut']
+                },
+                {
                     model: models['Role']
                 },
                 {
@@ -42,13 +45,13 @@ module.exports =  (app) => {
                     }]
                 }
             ];
-            const Users = await models['institutHasUser'].findOne(parameters);
-            if(Institut === null) {
+            const InstitutHasUser = await models['institutHasUser'].findOne(parameters);
+            if(InstitutHasUser === null) {
                 const message = `institutHasUser doesn't exist.Retry with an other institut id or user id.`;
                 return res.status(404).json({message});
             }
             const message = `institutHasUser found`;
-            res.json({message, data: Users});
+            res.json({message, data: InstitutHasUser});
 
         }
         catch(error) {
