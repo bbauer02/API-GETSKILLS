@@ -60,6 +60,8 @@ require('./src/routes/institut/addUserInstitut')(app);
 require('./src/routes/institut/deleteUserInstitut')(app);
 require('./src/routes/institut/findInstitutUsers')(app);
 require('./src/routes/institut/findInstitutExaminators')(app);
+require('./src/routes/institut/updateInstitutUser')(app);
+require('./src/routes/institut/findInstitutUser')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);

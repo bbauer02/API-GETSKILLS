@@ -106,7 +106,6 @@ module.exports = (app) => {
                         const message = `An error has occured creating the options.`;
                         return res.status(500).json({ message, data: error.message })
                     });
-
             }
         ]
         )
