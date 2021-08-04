@@ -5,6 +5,8 @@ const sequelize = require("../../db/sequelize");
 const {QueryTypes} = require("sequelize");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const asyncLib = require('async');
+const PDFMerger = require('pdf-merger-js');
+const async = require("async");
 
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
@@ -14,6 +16,8 @@ module.exports = (app) => {
         const institutId = req.params.institut_id;
         const userId = req.query.user_id;
         const sessionId = req.query.session_id;
+        const projectFolder = process.cwd();
+        const tmpFolder = process.cwd() + '/tmp/';
 
         asyncLib.waterfall([
                 function (done) {
@@ -122,40 +126,72 @@ module.exports = (app) => {
                     models['Document'].findOne({
                         where: {document_id: documentId}
                     }).then(function (docFound) {
-                        done(datasForPdf, docFound)
+                        done(null, datasForPdf, docFound)
 
                     }).catch(function (error) {
                         const message = `Service not available. Please retry later.`;
                         return res.status(500).json({message, data: error.message})
                     });
+                },
+
+                function (datasForPdf, docFound, done) {
+                    //console.log(datasForPdf);
+                    if (docFound === null) {
+                        const message = `document doesn't exist. Retry with an other document id.`;
+                        return res.status(404).json({message});
+                    } else {
+                        done(null, datasForPdf, docFound)
+                    }
+                },
+
+                function (datasForPdf, docFound, done) {
+                    datasForPdf.forEach((data, index) => {
+                        console.log("---------- DATA ---------\n", data);
+                        createPdf(docFound, index, data)
+                    })
+                    done(null);
+                },
+
+                function (done) {
+                    try {
+                        const merger = new PDFMerger();
+                        console.log('tmp', fs.readdirSync(tmpFolder).length);
+                        if(fs.readdirSync(tmpFolder).length>1) {
+                            fs.readdirSync(tmpFolder).forEach(fileName => {
+                                merger.add(tmpFolder + '/' + fileName);
+                            })
+                            merger.save(projectFolder + '/merged.pdf');
+                        } else {
+                            fs.copyFileSync(tmpFolder + 'temp0.pdf', projectFolder + '/merged.pdf');
+                        }
+
+                        done(null);
+                    } catch (e) {
+                        console.log(e.message)
+                    }
                 }
             ],
 
-            function (datasForPdf, docFound) {
-                //console.log(datasForPdf);
-                if (docFound === null) {
-                    const message = `document doesn't exist. Retry with an other document id.`;
-                    return res.status(404).json({message});
-                } else {
-                    datasForPdf.forEach(data => {
-                        console.log("---------- DATA ---------\n", data);
-                        unoconv.run({
-                            file: docFound.filepath,
-                            fields: data,
-                            output: process.cwd() + '/public/' + "temp.pdf",
-                        }).then(filePath => {
-                            const s = fs.createReadStream(filePath);
-                            const myFilename = encodeURIComponent("myDocument.pdf");
-                            res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
-                            res.setHeader('Content-Type', type);
-                            s.pipe(res);
-                        })
-                    })
-                }
+            function () {
+                const s = fs.createReadStream(projectFolder + '/merged.pdf');
+                const myFilename = encodeURIComponent("myDocument.pdf");
+                res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
+                res.setHeader('Content-Type', type);
+                s.pipe(res);
             }
         );
 
     });
+}
+
+function createPdf(docFound, index, data) {
+    unoconv.run({
+        file: docFound.filepath,
+        fields: data,
+        output: process.cwd() + '/tmp/' + "temp" + index + ".pdf"
+    }).catch(function (error) {
+        return console.log(error.message);
+    })
 }
 
 /**
