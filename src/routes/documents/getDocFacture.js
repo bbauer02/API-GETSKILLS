@@ -4,8 +4,9 @@ const unoconv = require('unoconv-promise');
 const sequelize = require("../../db/sequelize");
 const {QueryTypes} = require("sequelize");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
-const asyncLib = require('async');
 const PDFMerger = require('pdf-merger-js');
+const path = require("path");
+const del = require("del");
 
 /**
  * Permet de lancer une requete
@@ -14,18 +15,154 @@ const PDFMerger = require('pdf-merger-js');
  * @returns {Promise<void>}
  * @constructor
  */
-async function Requete(reqString, name) {
-    sequelize.query(
-        reqString, {type: QueryTypes.SELECT}
-    ).then(function (itemsFound) {
-        if (!itemsFound) {
-            throw new Error(name + ": not found")
-        } else {
-            return itemsFound
-        }
-    }).catch(function(error) {
-        throw new Error(error.message)
+async function Requete (reqString, name) {
+    let items = [];
+    try {
+        items = await sequelize.query(reqString, {type: QueryTypes.SELECT});
+    } catch (err) {
+        throw new Error("An error occurred. Try to another id or POST one " + name + " - " + err.message)
+    }
+
+    if (!items) {
+        throw new Error(name + " not found");
+    } else {
+        return items;
+    }
+}
+
+/**
+ * Construction d'un répertoire de données
+ * @param institut
+ * @param session
+ * @param users
+ * @param exams
+ * @returns {Promise<void>}
+ */
+function ConstructDatasForPDf (institut, session, users, exams) {
+    // console.log('institut->', institut);
+    // console.log('session->', session);
+    // console.log('users->', users);
+    // console.log('exams->', exams);
+
+    let datasForPdf = [];
+
+    users.forEach((user, index) => {
+        const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
+        let data = Object.assign(session, institut, user);
+        let obj = "";
+        examens.forEach((examen) => {
+            obj += "\u2022 " + examen.EXAM + "\n";
+        })
+        data = Object.assign(data, {EXAM_0: obj});
+        datasForPdf = [...datasForPdf, {...data}];
     })
+    return datasForPdf;
+}
+
+/**
+ * Récupération du document souhaité
+ * @param documentId
+ * @returns {Promise<void>}
+ */
+async function getDocument (documentId) {
+    let document = null;
+    try {
+        document = await models['Document'].findByPk(documentId);
+    } catch (err) {
+        throw new Error("An error occurred. Try to another id document or POST one document." + err.message)
+    }
+
+    if (!document) {
+        throw new Error("Document not found for id=" + documentId)
+    } else {
+        return document.dataValues.filepath;
+    }
+}
+
+/**
+ * Fonction de création d'un pdf
+ * @param odtTemplate
+ * @param folder
+ * @param datasForPdf
+ * @returns {Promise<void>}
+ */
+async function createPdf (odtTemplate, folder, datasForPdf) {
+    let index = 0;
+    for (const data of datasForPdf) {
+        try {
+            await unoconv.run({
+                file: odtTemplate,
+                fields: data,
+                output: folder + '/temp-' + index + ".pdf"
+            })
+        } catch (err) {
+            throw new Error("An error occurred when pdf is genereated. " + err.message)
+        }
+
+        index += 1;
+    }
+}
+
+/**
+ * Création d'un dossier de temporaire qui contient les pdf.
+ * @returns {string}
+ */
+function createRepository () {
+    try {
+        fs.mkdirSync(path.join(__dirname, 'temporary'));
+        console.log("Temporary folder has been created successfully.")
+        return path.join(__dirname, 'temporary');
+    } catch (e) {
+        throw new Error('An error occured when trying to create temporary folder. \n' + e.message);
+    }
+}
+
+
+/**
+ * Obtenir la liste des fichiers PDF créés dans le dossier
+ * @param folder
+ * @returns {string[]}
+ */
+function getPdfCreated (folder) {
+    try {
+        return fs.readdirSync(folder)
+    } catch (err) {
+        throw new Error('Error on get PDF from temporary folder : ' + err.message)
+    }
+}
+
+/**
+ * Fusionner des PDF
+ * @param files
+ * @returns {Promise<string>}
+ */
+async function mergePdf (files) {
+    try {
+        const merger = new PDFMerger();
+
+        for await (const fileName of files) {
+            merger.add(path.join(__dirname, 'temporary', fileName));
+        }
+
+        await merger.save(path.join(__dirname, 'temporary', 'merged.pdf'));
+
+        return 'merged.pdf';
+
+    } catch (error) {
+        throw new Error('Error during merge pdf files : ' + error.message)
+    }
+}
+
+/**
+ * Détruire les fichiers/dossiers temporaires
+ * @returns {Promise<void>}
+ */
+async function destroyTemporaryFolders () {
+    try {
+        await del(path.join(__dirname, 'temporary'));
+    } catch (e) {
+        console.log(e.message)
+    }
 }
 
 
@@ -33,165 +170,56 @@ module.exports = (app) => {
     app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
 
         const documentId = req.params.doc;
-        const type = "application/pdf";
         const institutId = req.params.institut_id;
-        const userId = req.query.user_id;
         const sessionId = req.query.session_id;
-        const projectFolder = process.cwd();
-        const tmpFolder = process.cwd() + '/tmp/';
 
+        /**
+         * Envoyer le PDF dans la réponse HTTP
+         * @param pdfFile
+         */
+        function reponseHTTPWithPdf (pdfFile) {
+            const s = fs.createReadStream(pdfFile);
+            const myFilename = encodeURIComponent("myDocument.pdf");
+            res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
+            res.setHeader('Content-Type', "application/pdf");
+            s.pipe(res);
+        }
 
         try {
+
             const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
             const sessions = await Requete(REQ_SESSION(sessionId), 'session');
             const users = await Requete(REQ_USERS(sessionId), 'users');
             const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
+            await destroyTemporaryFolders();
+            const datasForPdf = ConstructDatasForPDf(instituts[0], sessions[0], users, exams);
+            const odtTemplate = await getDocument(documentId);
+            const folder = createRepository();
+            await createPdf(odtTemplate, folder, datasForPdf);
+
+            const files = getPdfCreated(path.join(__dirname, 'temporary'))
+
+            if (files.length === 0) {
+                throw new Error('No PDF files created.')
+            }
+
+            if (files.length === 1) {
+                reponseHTTPWithPdf(path.join(__dirname, 'temporary', files[0]))
+            }
+
+            if (files.length > 1) {
+                const pdfFileNameMerged = await mergePdf(files);
+                reponseHTTPWithPdf(path.join(__dirname, 'temporary', pdfFileNameMerged))
+            }
+
 
         } catch (e) {
             return res.status(400).json({message: e.message, data: null})
         }
 
-
-        asyncLib.waterfall([
-
-                function (institut, session, users, exams, done) {
-                    // console.log('institut->', institut);
-                    // console.log('session->', session);
-                    // console.log('users->', users);
-                    // console.log('exams->', exams);
-
-                    let datasForPdf = [];
-
-                    users.forEach((user, index) => {
-                        const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
-                        let data = Object.assign(session, institut, user);
-                        let obj = "";
-                        examens.forEach((examen) => {
-                            obj += "\u2022 " + examen.EXAM + "\n";
-                        })
-                        data = Object.assign(data, {EXAM_0: obj});
-                        datasForPdf = [...datasForPdf, {...data}];
-                        // console.log(datasForPdf);
-                    })
-
-                    done(null, datasForPdf);
-                },
-
-                function (datasForPdf, done) {
-                    // console.log(datasForPdf);
-                    models['Document'].findOne({
-                        where: {document_id: documentId}
-                    }).then(function (docFound) {
-                        done(null, datasForPdf, docFound)
-
-                    }).catch(function (error) {
-                        const message = `Service not available. Please retry later.`;
-                        return res.status(500).json({message, data: error.message})
-                    });
-                },
-
-                function (datasForPdf, docFound, done) {
-                    //console.log(datasForPdf);
-                    if (docFound === null) {
-                        const message = `document doesn't exist. Retry with an other document id.`;
-                        return res.status(404).json({message});
-                    } else {
-                        done(null, datasForPdf, docFound)
-                    }
-                },
-
-                async function (datasForPdf, docFound, done) {
-
-                    fs.mkdirSync(tmpFolder, (err, folder) => {
-                        if (err) {
-                            console.log(err.message)
-                        }
-                    });
-
-                    await createPdf(docFound, datasForPdf)
-
-                    fs.readdir(tmpFolder, (err, files) => {
-                        if (err) {
-                            console.log(err.message)
-                        } else {
-                            console.log("\nCurrent directory filenames:");
-                            files.forEach(file => {
-                                console.log(file);
-                            })
-                        }
-                    });
-
-                    done(null);
-                },
-
-                function (done) {
-                    try {
-                        const merger = new PDFMerger();
-                        const d = fs.readdirSync(tmpFolder, {withFileTypes: true});
-                        console.log(d, tmpFolder);
-                        if (d.length > 1) {
-                            d.forEach(fileName => {
-                                merger.add(tmpFolder + '/' + fileName);
-                            })
-                            merger.save(projectFolder + '/merged.pdf');
-                        } else {
-                            fs.copyFileSync(tmpFolder + 'temp0.pdf', projectFolder + '/merged.pdf');
-                        }
-
-                        done(null);
-                    } catch (e) {
-                        console.log(e.message)
-                    }
-                }
-            ],
-            function () {
-                const s = fs.createReadStream(projectFolder + '/merged.pdf');
-                const myFilename = encodeURIComponent("myDocument.pdf");
-                res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
-                res.setHeader('Content-Type', type);
-                s.pipe(res);
-
-                // suppression des fichiers temporaires
-                fs.unlinkSync(projectFolder + '/merged.pdf')
-                fs.rmdirSync(tmpFolder)
-            }
-        );
-
-
-        /*
-         await createPdf({filepath: projectFolder + "/public/monFichier.odt"}, [{SCHOOL_NAME: "mon école"}])
-
-         fs.readdir(tmpFolder, (err, files) => {
-             if (err) {
-                 console.log(err.message)
-             } else {
-                 console.log("\nCurrent directory filenames:");
-                 files.forEach(file => {
-                     console.log(file);
-                 })
-             }
-         });
-
-         */
-
     });
 }
 
-async function createPdf (docFound, datasForPdf) {
-
-    let index = 0;
-    for await (const data of datasForPdf) {
-        unoconv.run({
-            file: docFound.filepath,
-            fields: data,
-            output: process.cwd() + '/tmp/' + "temp" + index + ".pdf"
-        }).catch(function (error) {
-            return console.log(error.message);
-        })
-        index += 1;
-    }
-
-}
 
 /**
  * obtenir un institut avec son id
