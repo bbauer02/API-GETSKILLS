@@ -102,6 +102,45 @@ const exams = [
         nbrQuestions:0,
         duration: 60,
         successScore: 100
+    },
+    {
+        exam_id: 9,
+        test_id: 2,
+        level_id: 13,
+        label: "Exam 1",
+        isWritten: true,
+        isOption: false,
+        price: 150,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 10,
+        test_id: 2,
+        level_id: 13,
+        label: "Exam 2",
+        isWritten: false,
+        isOption: true,
+        price: 150,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 11,
+        test_id: 2,
+        level_id: 13,
+        label: "Exam 3",
+        isWritten: false,
+        isOption: true,
+        price: 150,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
     }
     
 ];

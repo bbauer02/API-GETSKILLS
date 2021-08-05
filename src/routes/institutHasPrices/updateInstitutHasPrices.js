@@ -3,45 +3,16 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id/exams/:exam_id/price/', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/instituts/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
-        const institutId = req.params.institut_id;
-        const examId = req.params.exam_id;
+        const priceId = req.body.price_id;
         const price = req.body.price;
 
-
-        // vérifier l'institut
-        await models['Institut'].findOne({
-            where: {institut_id: institutId}
-        }).then(function (institutFound) {
-            if (institutFound === null) {
-                const message = `institut doesn't exist. Retry with an other institut id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
-
-
-        // vérifier l'exam
-        await models['Exam'].findOne({
-            where: {exam_id: institutId}
-        }).then(function (examFound) {
-            if (examFound === null) {
-                const message = `exam doesn't exist. Retry with an other exam id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
-
         // mettre à jour l'épreuve
-        await models['ExamsPrice'].findOne({
-            where: {institut_id: institutId, exam_id: examId}
+        await models['InstitutHasPrices'].findOne({
+            where: {price_id: priceId}
         }).then(function (examPriceFound) {
             if (examPriceFound) {
                 // le prix existe déjà
@@ -49,8 +20,7 @@ module.exports = (app) => {
                     {price: price},
                     {
                         where: {
-                            institut_id: institutId,
-                            exam_id: examId
+                            price_id: priceId
                         }
                     }
                 ).then(function (examPriceCreated) {

@@ -1,6 +1,6 @@
 ﻿const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
-    const ExamsPriceHist = sequelize.define('ExamPricesHist', {
+    const InstitutHasPriceHist = sequelize.define('InstitutHasPricesHist', {
         institut_id: {
             type: DataTypes.INTEGER,
         },
@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 0.
         },
     }, {
-        tableName: 'prices_exams_hist',
+        tableName: 'Institut_Has_Prices_Hist',
         timestamps: true,
     });
 
-    return ExamsPriceHist;
+    return InstitutHasPriceHist;
 }   

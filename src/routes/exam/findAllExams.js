@@ -66,10 +66,25 @@ module.exports =  (app) => {
             };
             parameters.include.push(addLevels);
 
-            const Exams = await models['Exam'].findAndCountAll(parameters);
-           
-            const message = `${Exams.count} exams found`;
-           res.json({message, data: Exams.rows});
+            parameters.include = [{
+                attributes: ['price'],
+                model: models['InstitutHasPrices'],
+                as: 'InstitutHasPrices'
+            }];
+
+            if(req.query.institut) {
+                const institut = parseInt(req.query.institut);
+                if(isNaN(institut) ) {
+                    const message = `institut parameter should be an integer.`;
+                    return res.status(400).json({message})
+                } 
+                parameters.where['$InstitutHasPrices.institut_id$'] = {
+                    [Op.or]:[institut,null]
+                }
+            }
+            const Exams = await models['Exam'].findAll(parameters);
+            const message = `${Exams.length} exams found`;
+           res.json({message, data: Exams});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
