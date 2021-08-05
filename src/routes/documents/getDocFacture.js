@@ -82,11 +82,11 @@ async function getDocument (documentId) {
 /**
  * Fonction de création d'un pdf
  * @param odtTemplate
- * @param folder
+ * @param outPutFolder
  * @param datasForPdf
  * @returns {Promise<void>}
  */
-async function createPdf (odtTemplate, folder, datasForPdf) {
+async function createPdf (odtTemplate, outPutFolder, datasForPdf) {
     let index = 0;
     for (const data of datasForPdf) {
         try {
