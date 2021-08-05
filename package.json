@@ -27,6 +27,7 @@
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
     "mysql2": "^2.2.5",
+    "pdf-merger-js": "^3.2.1",
     "sequelize": "^6.6.2",
     "stripe": "^8.160.0",
     "unoconv-promise": "^1.0.8"
