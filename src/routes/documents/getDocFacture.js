@@ -166,6 +166,7 @@ async function destroyTemporaryFolders () {
 }
 
 
+
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
 
@@ -187,26 +188,41 @@ module.exports = (app) => {
 
         try {
 
+            // requetes
             const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
             const sessions = await Requete(REQ_SESSION(sessionId), 'session');
             const users = await Requete(REQ_USERS(sessionId), 'users');
             const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
+
+            // destruction du dossier temporaire si existant
             await destroyTemporaryFolders();
+
+            // création d'un tableau d'objets contenant toutes les infos
             const datasForPdf = ConstructDatasForPDf(instituts[0], sessions[0], users, exams);
+
+            // récupération du template oo
             const odtTemplate = await getDocument(documentId);
+
+            // récupération du dossier du
             const folder = createRepository();
+
+            // création des pdf en boucle sur les données construites
             await createPdf(odtTemplate, folder, datasForPdf);
 
+            // récupération des fichiers PDF qui ont été générés
             const files = getPdfCreated(path.join(__dirname, 'temporary'))
 
+            // pas de fichier PDF trouvés
             if (files.length === 0) {
                 throw new Error('No PDF files created.')
             }
 
+            // 1 fichier PDF généré
             if (files.length === 1) {
                 reponseHTTPWithPdf(path.join(__dirname, 'temporary', files[0]))
             }
 
+            // plusieurs fichiers PDF à fusionner ensemble
             if (files.length > 1) {
                 const pdfFileNameMerged = await mergePdf(files);
                 reponseHTTPWithPdf(path.join(__dirname, 'temporary', pdfFileNameMerged))
