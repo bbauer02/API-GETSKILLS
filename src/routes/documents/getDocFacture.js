@@ -203,7 +203,7 @@ module.exports = (app) => {
             // récupération du template oo
             const odtTemplate = await getDocument(documentId);
 
-            // récupération du dossier du
+            // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();
 
             // création des pdf en boucle sur les données construites
