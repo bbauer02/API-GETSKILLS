@@ -1,6 +1,7 @@
 ﻿const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
+// TODO: isAuthenticated, isAuthorized
 module.exports = (app) => {
   app.delete('/api/empowermentTests/:id', async (req, res) => {
     try {

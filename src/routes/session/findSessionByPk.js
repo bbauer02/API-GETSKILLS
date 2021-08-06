@@ -14,7 +14,7 @@ module.exports =  (app) => {
                     include:[{
                         model: models['Country'],
                         as:"institutCountry",
-                        attributes : ["label"]
+                        attributes : ["label", "country_id"]
                     }],
                 },
                 {
