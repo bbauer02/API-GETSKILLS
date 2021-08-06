@@ -1,4 +1,4 @@
-﻿module.exports = (sequelize, DataTypes) => {
+﻿﻿module.exports = (sequelize, DataTypes) => {
     const Exam =  sequelize.define('Exam', {
         exam_id: {
             type: DataTypes.INTEGER,
@@ -46,7 +46,6 @@
         tableName: 'exams', 
         timestamps: false
     }); 
-
     Exam.associate = models => {
         Exam.belongsTo(models.Test,{foreignKey:'test_id',onDelete:'SET NULL'});
         Exam.belongsTo(models.Level,{foreignKey:'level_id',onDelete:'SET NULL'});
