@@ -220,6 +220,7 @@ const initDB = async (sequelize) => {
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
+/* exams correspondent pas aux tests + niveaux ?
             {
                 'exam_id': 3,
                 'user_price': null,
@@ -243,6 +244,58 @@ const initDB = async (sequelize) => {
                 "DateTime": new Date(2021, 6, 3, 9, 00),
                 "isCandidate": true,
                 "sessionUser_id": 2
+            },
+*/
+            // Session 2 JLPT N3 -> 3 epreuves pour Bauer Baptiste
+            {
+                'exam_id': 12,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+            {
+                'exam_id': 13,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+            {
+                'exam_id': 14,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+
+            // Session 2 JLPT N3 -> 3 epreuves pour Christophe Lefevre
+            {
+                'exam_id': 12,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
+            },
+            {
+                'exam_id': 13,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
+            },
+            {
+                'exam_id': 14,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
             }
 
         ]);

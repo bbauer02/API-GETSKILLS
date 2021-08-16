@@ -141,6 +141,45 @@ const exams = [
         nbrQuestions:0,
         duration: 60,
         successScore: 100
+    },
+    {
+        exam_id: 12,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Oral",
+        isWritten: false,
+        isOption: false,
+        price: 100,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 13,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Ecrite",
+        isWritten: true,
+        isOption: false,
+        price: 100,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 14,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Ecrite Bonus",
+        isWritten: true,
+        isOption: true,
+        price: 100,
+        coeff: 2,
+        nbrQuestions:0,
+        duration: 60,
+        successScore: 100
     }
     
 ];

@@ -1,4 +1,6 @@
 ﻿module.exports = (sequelize, DataTypes) => {
+
+    // certification pour examinateur
     const empowermentTests = sequelize.define('empowermentTests', {
         empowermentTests_id: {
             type: DataTypes.INTEGER,
@@ -19,7 +21,7 @@
         },
         code: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         }
     }, {
         tableName: 'empowerment_tests',
