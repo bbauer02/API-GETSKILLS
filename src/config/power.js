@@ -6,15 +6,23 @@ module.exports = (env) => ({
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
-            }
+            },
+            empowermentTests: env.EMPOWERMENT_GET,
+            sessionsHist: env.INSTITUTS_SESSION_HIST_GET
         },
-        exams: env.EXAMS_GET,
+        exams: {
+            default: env.EXAMS_GET
+        },
         countries: env.COUNTRIES_GET,
         levels: env.LEVELS_GET,
-        roles: env.ROLES_GET,
+        roles: {
+            default: env.ROLES_GET
+        },
         sessions: env.SESSIONS_GET,
         tests: env.TESTS_GET,
-        users: env.USERS_GET,
+        users: {
+            default: env.USERS_GET
+        },
         options: env.OPTIONS_GET,
         skills: {
             default: env.SKILLS_GET
@@ -27,7 +35,9 @@ module.exports = (env) => ({
             docs: env.DOCS_POST,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
-            }
+            },
+            empowermentTests: env.EMPOWERMENT_POST,
+            newUser: env.INSTITUTS_NEW_USER_POST
         },
         exams: env.EXAMS_POST,
         countries: env.COUNTRIES_POST,
@@ -65,7 +75,10 @@ module.exports = (env) => ({
             docs: env.DOCS_DELETE,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_DELETE
-            }
+            },
+            users: env.INSTITUTS_USERS_DELETE,
+            empowermentTests: env.EMPOWERMENT_DELETE
+
         },
         exams: env.EXAMS_DELETE,
         countries: env.COUNTRIES_DELETE,

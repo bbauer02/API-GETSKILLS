@@ -2,8 +2,6 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// institut_id pour isAuthorized -> check role du currentUser dans cet institut
-
 module.exports = (app) => {
     app.put('/api/instituts/:institut_id/users/:user_id',isAuthenticated, isAuthorized,async (req, res) => {
         try {

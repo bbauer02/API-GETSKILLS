@@ -1,10 +1,9 @@
 const { ValidationError, UniqueConstraintError } = require('sequelize');
 const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
-// TO DO add isAuthenticated & isAuthorized
 
 module.exports = (app) => {
-    app.post('/api/instituts/:idInstitut/sessions/:idSession/newUser', async (req, res) => {
+    app.post('/api/instituts/:institut_id/sessions/:idSession/newUser', isAuthenticated, isAuthorized, async (req, res) => {
 
 
         async function createUser() {
@@ -35,7 +34,7 @@ module.exports = (app) => {
                 const valuesForPostInstitutHasUser = {};
                 valuesForPostInstitutHasUser.role_id = 1;
                 valuesForPostInstitutHasUser.user_id = _userCreated.dataValues.user_id;
-                valuesForPostInstitutHasUser.institut_id = Number(req.params.idInstitut);
+                valuesForPostInstitutHasUser.institut_id = Number(req.params.institut_id);
 
                 const institutHasUserCreated = await models['institutHasUser'].create(valuesForPostInstitutHasUser);
                 return institutHasUserCreated;
