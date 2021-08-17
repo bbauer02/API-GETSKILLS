@@ -48,7 +48,7 @@ function ConstructDatasForPDf (institut, session, users, exams, factures, factur
 
     let datasForPdf = [];
 
-    users.forEach((user, index) => {
+    users.forEach((user) => {
         const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
         const myFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
         const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
@@ -291,8 +291,8 @@ const REQ_INSTITUT = (institutId) => {
  */
 const REQ_SESSION = (sessionId) => {
     let requete = "SELECT ";
-    requete += "DATE_FORMAT(sessions.start, '%d %M %Y') as SESSION_START_DATE, ";
-    requete += "DATE_FORMAT(sessions.start, '%Hh%i') as SESSION_START_HOUR, ";
+    requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
+    requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
     requete += "IFNULL(levels.label, '') as LEVEL, ";
     requete += "tests.label as TEST ";
     requete += "FROM sessions "
@@ -321,7 +321,8 @@ const REQ_USERS = (sessionId) => {
     requete += "users.city as USER_CITY, ";
     requete += "users.phone as USER_PHONE, ";
     requete += "users.email as USER_MAIL, ";
-    requete += "DATE_FORMAT(users.birthday, '%d %M %Y') as USER_BIRTHDAY, ";
+    requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
+    requete += "DATEDIFF(users.birthday, '1899-12-30') as USER_BIRTHDAY, ";
     requete += "countries.label as USER_COUNTRY ";
     requete += "from users ";
 
