@@ -41,7 +41,7 @@ const initDB = async (sequelize) => {
     });
 
     try {
-        await sequelize.sync({force: true})
+        await sequelize.sync({ force: true })
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
 
@@ -102,9 +102,9 @@ const initDB = async (sequelize) => {
         }
         // TABLE 'institutHasUser'
         await models['institutHasUser'].bulkCreate([
-            {'user_id': 1, 'institut_id': 2, 'role_id': 1},
-            {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 4}
+            { 'user_id': 1, 'institut_id': 2, 'role_id': 1 },
+            { 'user_id': 1, 'institut_id': 1, 'role_id': 1 },
+            { 'user_id': 2, 'institut_id': 1, 'role_id': 4 }
         ]);
 
         // TABLE 'tests'
@@ -205,22 +205,15 @@ const initDB = async (sequelize) => {
         // TABLE 'sessionUserOption'
         await models['sessionUserOption'].bulkCreate([
             {
-                'exam_id': 1,
-                'user_price': 50,
+                'exam_id': 8,
+                'user_price': null,
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
                 "DateTime": new Date(2021, 5, 2, 9, 00),
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
-            {
-                'exam_id': 2,
-                'user_price': null,
-                'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
-                "DateTime": new Date(2021, 5, 3, 9, 00),
-                "isCandidate": true,
-                "sessionUser_id": 1
-            },
-/* exams correspondent pas aux tests + niveaux ?
+
+            /* exams correspondent pas aux tests + niveaux ?
             {
                 'exam_id': 3,
                 'user_price': null,
@@ -245,7 +238,8 @@ const initDB = async (sequelize) => {
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
-*/
+            */
+
             // Session 2 JLPT N3 -> 3 epreuves pour Bauer Baptiste
             {
                 'exam_id': 12,
@@ -304,7 +298,7 @@ const initDB = async (sequelize) => {
     }
 }
 
-module.exports = {initDB, models}
+module.exports = { initDB, models }
 
 
 
