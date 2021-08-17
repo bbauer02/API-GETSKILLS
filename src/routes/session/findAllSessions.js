@@ -174,7 +174,6 @@ module.exports =  (app) => {
                     attributes:['label']
                 };
                 parameters.include.push(addInstitut);
-
                 parameters.distinct= true;
 
             parameters.group = ['session.session_id'];
