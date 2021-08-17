@@ -35,7 +35,7 @@ const exams = [
         isOption: false,
         price: 150,
         coeff: 1,
-        nbrQuestions:100,
+        nbrQuestions: 100,
         duration: 60,
         successScore: 100
     },
@@ -48,7 +48,7 @@ const exams = [
         isOption: false,
         price: 150,
         coeff: 1,
-        nbrQuestions:100,
+        nbrQuestions: 100,
         duration: 60,
         successScore: 100
     },
@@ -61,7 +61,7 @@ const exams = [
         isOption: true,
         price: 150,
         coeff: 1,
-        nbrQuestions:100,
+        nbrQuestions: 100,
         duration: 60,
         successScore: 100
     },
@@ -74,7 +74,7 @@ const exams = [
         isOption: false,
         price: 200,
         coeff: 2,
-        nbrQuestions:100,
+        nbrQuestions: 100,
         duration: 120,
         successScore: 100
     },
@@ -87,19 +87,19 @@ const exams = [
         isOption: true,
         price: 150,
         coeff: 2,
-        nbrQuestions:0,
+        nbrQuestions: 0,
         duration: 60,
         successScore: 100
     },
     {
         exam_id: 8,
         test_id: 4,
-        label: "Epreuve SpecialZ",
+        label: "Epreuve Special Orale",
         isWritten: false,
         isOption: true,
         price: 150,
         coeff: 2,
-        nbrQuestions:0,
+        nbrQuestions: 0,
         duration: 60,
         successScore: 100
     },
@@ -112,7 +112,7 @@ const exams = [
         isOption: false,
         price: 150,
         coeff: 2,
-        nbrQuestions:0,
+        nbrQuestions: 0,
         duration: 60,
         successScore: 100
     },
@@ -125,7 +125,7 @@ const exams = [
         isOption: true,
         price: 150,
         coeff: 2,
-        nbrQuestions:0,
+        nbrQuestions: 0,
         duration: 60,
         successScore: 100
     },
@@ -138,11 +138,50 @@ const exams = [
         isOption: true,
         price: 150,
         coeff: 2,
-        nbrQuestions:0,
+        nbrQuestions: 0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 12,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Oral",
+        isWritten: false,
+        isOption: false,
+        price: 100,
+        coeff: 2,
+        nbrQuestions: 0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 13,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Ecrite",
+        isWritten: true,
+        isOption: false,
+        price: 100,
+        coeff: 2,
+        nbrQuestions: 0,
+        duration: 60,
+        successScore: 100
+    },
+    {
+        exam_id: 14,
+        test_id: 3,
+        level_id: 8,
+        label: "Epreuve Ecrite Bonus",
+        isWritten: true,
+        isOption: true,
+        price: 100,
+        coeff: 2,
+        nbrQuestions: 0,
         duration: 60,
         successScore: 100
     }
-    
+
 ];
 
 module.exports = exams;

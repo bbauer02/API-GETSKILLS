@@ -4,12 +4,12 @@ const moment = require('moment');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/instituts/:id/sessionsHist', isAuthenticated,isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:institut_id/sessionsHist', isAuthenticated,isAuthorized, async (req,res) => {
         try {
             const parameters = {};
             parameters.where = {};
 
-                const institut_id = parseInt(req.params.id);
+                const institut_id = parseInt(req.params.institut_id);
                 if(isNaN(institut_id) ) {
                     const message = `Institut parameter should be an integer.`;
                     return res.status(400).json({message})

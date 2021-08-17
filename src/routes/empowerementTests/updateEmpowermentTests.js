@@ -2,9 +2,8 @@
 const { Op } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// TODO: isAuthenticated, isAuthorized
 module.exports = (app) => {
-    app.put('/api/empowermentTests/:id', async (req, res) => {
+    app.put('/api/empowermentTests/:id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         const institutId = req.body.institut_id;

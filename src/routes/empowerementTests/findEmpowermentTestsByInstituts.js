@@ -1,15 +1,14 @@
 ﻿const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// TODO: isAuthenticated, isAuthorized
 module.exports = (app) => {
-    app.get('/api/instituts/:idInstitut/empowermentTests', async (req, res) => {
+    app.get('/api/instituts/:institut_id/empowermentTests', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         const parameters = {};
         parameters.where = {};
 
-        const institutId = parseInt(req.params.idInstitut);
+        const institutId = parseInt(req.params.institut_id);
         if (isNaN(institutId)) {
             const message = `Institut parameter should be an integer.`;
             return res.status(400).json({ message })
