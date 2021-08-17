@@ -5,7 +5,7 @@ const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 
