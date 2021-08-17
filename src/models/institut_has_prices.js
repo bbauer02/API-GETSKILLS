@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     });
-
+    InstitutHasPrices.associate = models => {
+        InstitutHasPrices.belongsTo(models.Exam,{foreignKey:'exam_id'});
+        InstitutHasPrices.belongsTo(models.Institut,{foreignKey:'institut_id'});
+    };
     return InstitutHasPrices;
 }   
