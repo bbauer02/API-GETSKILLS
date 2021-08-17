@@ -10,8 +10,8 @@
         }
     });
     institutHasUser.associate = models => {
-        institutHasUser.belongsTo(models.User, { foreignKey: 'user_id', sourceKey: 'user_id' });
-        institutHasUser.belongsTo(models.Institut, { foreignKey: 'institut_id', sourceKey: 'institut_id' });
+        institutHasUser.belongsTo(models.User, { foreignKey: 'user_id', sourceKey: 'user_id', onDelete: 'CASCADE' });
+        institutHasUser.belongsTo(models.Institut, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete: 'CASCADE' });
         institutHasUser.belongsTo(models.Role,{foreignKey:'role_id'});
     }
     return institutHasUser; 

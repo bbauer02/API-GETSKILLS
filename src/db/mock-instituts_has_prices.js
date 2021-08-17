@@ -1,4 +1,4 @@
-﻿const instituts_has_prices = [
+﻿﻿const instituts_has_prices = [
     {
         institut_id: 1,
         exam_id: 1,

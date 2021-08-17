@@ -1,4 +1,4 @@
-﻿const {models} = require("./index");
+﻿﻿﻿const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
     const InstitutHasPrices = sequelize.define('InstitutHasPrices', {
         price_id: {
@@ -28,9 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             }
         }
     });
-    InstitutHasPrices.associate = models => {
-        InstitutHasPrices.belongsTo(models.Exam,{foreignKey:'exam_id'});
-        InstitutHasPrices.belongsTo(models.Institut,{foreignKey:'institut_id'});
-    };
+
     return InstitutHasPrices;
 }   

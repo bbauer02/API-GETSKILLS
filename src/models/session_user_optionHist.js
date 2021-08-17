@@ -29,7 +29,7 @@
     },
     {
         tableName: 'session_user_option_hist', 
-        timestamps: false
+        timestamps: true
     });
     /*
     sessionUserOption.associate = models => { 

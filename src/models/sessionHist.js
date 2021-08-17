@@ -70,7 +70,7 @@
     },
     {
         tableName: 'Session_hist',
-        timestamps: false
+        timestamps: true
     });
     /*
     Session.associate = models => { 
