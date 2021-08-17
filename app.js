@@ -12,7 +12,9 @@ const fileUpload = require('express-fileupload');
 
 app
     .use(express.urlencoded({extended: true}))
-    .use(express.json())
+    .use(express.json({
+        verify: (req, res, buffer) => req['rawBody'] = buffer,
+    }))
     .use(cors())
     .use(cookieParser())
     .use(fileUpload())
@@ -129,6 +131,7 @@ require('./src/routes/institutHasPrices/updateInstitutHasPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
+require('./src/routes/payment/webhooks')(app);
 
 // Documents
 require('./src/routes/documents/createNewDoc')(app);
