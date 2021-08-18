@@ -1,5 +1,4 @@
-﻿
-const exams = [
+﻿const exams = [
     {
         exam_id: 1,
         test_id: 2,
@@ -183,5 +182,3 @@ const exams = [
     }
 
 ];
-
-module.exports = exams;
