@@ -1,5 +1,5 @@
 const DOC_TYPES = [
-    "Convocation", "Dossier de candidature", "Attestation", "Facture", "Diplôme"
+    "Facture", "Convocation", "Dossier de candidature", "Attestation", "Diplôme"
 ]
 
 module.exports = (app) => {
