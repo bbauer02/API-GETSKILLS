@@ -55,7 +55,8 @@ module.exports = (env) => ({
             default: env.INSTITUTS_PUT,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_PUT
-            }
+            },
+            users: env.INSTITUTS_USERS_PUT,
         },
         exams: env.EXAMS_PUT,
         countries: env.COUNTRIES_PUT,
