@@ -13,6 +13,7 @@ const tests = require('../db/mock-tests');
 const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const sessions = require('../db/mock-sessions');
+const sessionsHist = require('../db/mock-sessionsHist');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
@@ -40,7 +41,7 @@ const initDB = async (sequelize) => {
     });
 
     try {
-        await sequelize.sync({force: true})
+        await sequelize.sync({ force: true })
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
 
@@ -101,9 +102,9 @@ const initDB = async (sequelize) => {
         }
         // TABLE 'institutHasUser'
         await models['institutHasUser'].bulkCreate([
-            {'user_id': 1, 'institut_id': 2, 'role_id': 1},
-            {'user_id': 1, 'institut_id': 1, 'role_id': 1},
-            {'user_id': 2, 'institut_id': 1, 'role_id': 4}
+            { 'user_id': 1, 'institut_id': 2, 'role_id': 1 },
+            { 'user_id': 1, 'institut_id': 1, 'role_id': 1 },
+            { 'user_id': 2, 'institut_id': 1, 'role_id': 4 }
         ]);
 
         // TABLE 'tests'
@@ -128,6 +129,20 @@ const initDB = async (sequelize) => {
         // TABLE 'sessions'
         for (const session of sessions) {
             await models['Session'].create({
+                institut_id: session.institut_id,
+                start: session.start,
+                end: session.end,
+                limitDateSubscribe: session.limitDateSubscribe,
+                placeAvailable: session.placeAvailable,
+                validation: session.validation,
+                test_id: session.test_id,
+                level_id: session.level_id
+            });
+        }
+
+        // TABLE 'sessionsHist'
+        for (const session of sessionsHist) {
+            await models['SessionHist'].create({
                 institut_id: session.institut_id,
                 start: session.start,
                 end: session.end,
@@ -190,21 +205,15 @@ const initDB = async (sequelize) => {
         // TABLE 'sessionUserOption'
         await models['sessionUserOption'].bulkCreate([
             {
-                'exam_id': 1,
-                'user_price': 50,
+                'exam_id': 8,
+                'user_price': null,
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
                 "DateTime": new Date(2021, 5, 2, 9, 00),
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
-            {
-                'exam_id': 2,
-                'user_price': null,
-                'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
-                "DateTime": new Date(2021, 5, 3, 9, 00),
-                "isCandidate": true,
-                "sessionUser_id": 1
-            },
+
+            /* exams correspondent pas aux tests + niveaux ?
             {
                 'exam_id': 3,
                 'user_price': null,
@@ -228,6 +237,59 @@ const initDB = async (sequelize) => {
                 "DateTime": new Date(2021, 6, 3, 9, 00),
                 "isCandidate": true,
                 "sessionUser_id": 2
+            },
+            */
+
+            // Session 2 JLPT N3 -> 3 epreuves pour Bauer Baptiste
+            {
+                'exam_id': 12,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+            {
+                'exam_id': 13,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+            {
+                'exam_id': 14,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 2
+            },
+
+            // Session 2 JLPT N3 -> 3 epreuves pour Christophe Lefevre
+            {
+                'exam_id': 12,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
+            },
+            {
+                'exam_id': 13,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
+            },
+            {
+                'exam_id': 14,
+                'user_price': null,
+                'addressExam': "Reims",
+                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "isCandidate": true,
+                "sessionUser_id": 3
             }
 
         ]);
@@ -236,7 +298,7 @@ const initDB = async (sequelize) => {
     }
 }
 
-module.exports = {initDB, models}
+module.exports = { initDB, models }
 
 
 

@@ -2,7 +2,7 @@
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
-    app.get('/api/empowermentTests/:id', async (req,res) => {
+    app.get('/api/empowermentTests/:id', isAuthenticated, isAuthorized, async (req,res) => {
         try {
             const EmpowermentTests = await models['empowermentTests'].findByPk(req.params.id);
             if(EmpowermentTests === null) {

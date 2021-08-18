@@ -35,7 +35,7 @@
         birthday: new Date(1988, 9, 14),
         nationality_id: 112,
         firstlanguage_id: 46,
-        systemRole_id: 1
+        systemRole_id: 3
     },
     {
         login: "cLefebre",
@@ -53,7 +53,8 @@
         country_id: 76,
         birthday: new Date(1987, 10, 14),
         nationality_id: 76,
-        firstlanguage_id: 76
+        firstlanguage_id: 76,
+        systemRole_id: 1
     }
 ];
 module.exports = users;

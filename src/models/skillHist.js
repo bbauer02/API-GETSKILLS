@@ -21,7 +21,7 @@
         },
         {
             tableName: 'skills_hist',
-            timestamps: false,
+            timestamps: true,
         }
     );
 

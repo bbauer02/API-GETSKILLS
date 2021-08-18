@@ -4,19 +4,26 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
 
-    app.get('/api/instituts/:institut_id/examinators',isAuthenticated, isAuthorized, async (req,res) => {
+    app.get('/api/instituts/:institut_id/users/:user_id',isAuthenticated, isAuthorized, async (req,res) => {
         try {
-            const parameters = {};            
+            const parameters = {}; 
+            parameters.where = {
+                institut_id: req.params.institut_id,
+                user_id: req.params.user_id
+            };
+            
             parameters.attributes = {exclude:['password']};
             parameters.include = [
+                {
+                    model: models['Institut']
+                },
                 {
                     model: models['Role']
                 },
                 {
+                    
                     model: models['User'],
                     attributes:{exclude:['password']},
-                    where : { user_id : {[Op.not] : null}},
-                    require: true,
                     include:[{
                         model: models['Country'],
                         as:'country',
@@ -35,24 +42,16 @@ module.exports =  (app) => {
                     {
                         model: models['Role'],
                         as:'systemRole'
-                    },
-                    {
-                        model: models['empowermentTests'],
-                        required: true,
-                        include:[{
-                            model: models['Test'],
-                            attributes: ["label"]
-                        }]
                     }]
                 }
             ];
-
-            parameters.where = {
-                institut_id: req.params.institut_id            };
-
-            const Users = await models['institutHasUser'].findAndCountAll(parameters);
-            const message = `${Users.count} users found`;
-            res.json({message, data: Users.rows});
+            const InstitutHasUser = await models['institutHasUser'].findOne(parameters);
+            if(InstitutHasUser === null) {
+                const message = `institutHasUser doesn't exist.Retry with an other institut id or user id.`;
+                return res.status(404).json({message});
+            }
+            const message = `institutHasUser found`;
+            res.json({message, data: InstitutHasUser});
 
         }
         catch(error) {

@@ -31,7 +31,7 @@
     },
     {
         tableName: 'session_user_hist',
-        timestamps: false,
+        timestamps: true,
         uniqueKeys: {
             compositeKey: {
                 fields: ['session_id', 'user_id']

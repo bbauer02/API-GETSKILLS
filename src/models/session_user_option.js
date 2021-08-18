@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     });
     sessionUserOption.associate = models => { 
-        sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', sourceKey: 'sessionUser_id' });
+        sessionUserOption.belongsTo(models.sessionUser, { foreignKey: 'sessionUser_id', sourceKey: 'sessionUser_id', onDelete: 'CASCADE' });
         sessionUserOption.belongsTo(models.Exam,{foreignKey:'exam_id'});
     };
     

@@ -1,16 +1,20 @@
+require('./crons');
+
 const express = require('express');
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3003;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 
 
 app
     .use(express.urlencoded({extended: true}))
-    .use(express.json())
+    .use(express.json({
+        verify: (req, res, buffer) => req['rawBody'] = buffer,
+    }))
     .use(cors())
     .use(cookieParser())
     .use(fileUpload())
@@ -58,6 +62,9 @@ require('./src/routes/institut/addUserInstitut')(app);
 require('./src/routes/institut/deleteUserInstitut')(app);
 require('./src/routes/institut/findInstitutUsers')(app);
 require('./src/routes/institut/findInstitutExaminators')(app);
+require('./src/routes/institut/updateInstitutUser')(app);
+require('./src/routes/institut/findInstitutUser')(app);
+require('./src/routes/institut/addNewUserInstitut')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
@@ -92,6 +99,10 @@ require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
 require('./src/routes/session/deleteUserSession')(app);
+require('./src/routes/session/addNewUserSession')(app);
+
+// Sessions Archive
+require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);
 
 // Skills
 require('./src/routes/skill/findAllSkills')(app);
@@ -120,6 +131,7 @@ require('./src/routes/institutHasPrices/updateInstitutHasPrices')(app);
 
 // Payment
 require('./src/routes/payment/createCheckoutSession')(app);
+require('./src/routes/payment/webhooks')(app);
 
 // Documents
 require('./src/routes/documents/createNewDoc')(app);
