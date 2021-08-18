@@ -1,5 +1,6 @@
 const sequelize = require("../../db/sequelize");
 const {QueryTypes} = require("sequelize");
+const TVA = 20.00;
 
 /**
  * Permet de lancer une requete
@@ -23,11 +24,12 @@ async function Requete (reqString, name) {
     }
 }
 
+
 /**
  * Construction d'un répertoire de données à partir des requêtes
  * @returns {Promise<void>}
  */
-export async function ConstructDatasForPDf (institutId, sessionId, userId) {
+module.exports = async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
     // requetes
     const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
@@ -80,8 +82,6 @@ export async function ConstructDatasForPDf (institutId, sessionId, userId) {
     // console.log(datasForPdf);
     return datasForPdf;
 }
-
-
 
 /**
  * obtenir un institut avec son id
@@ -151,7 +151,7 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "join sessions on sessions.session_id = sessionUsers.session_id ";
     requete += "join countries on countries.country_id = users.country_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
-    if(userId) requete += "AND users.user_id = " + userId + " ";
+    if (userId) requete += "AND users.user_id = " + userId + " ";
     requete += "order by user_id";
     return requete;
 }
@@ -205,13 +205,12 @@ const REQ_FACTURE = (sessionId) => {
     requete += "order by user_id";
     return requete
 }
-const TVA = 20.00;
 
 const REQ_FACTURE_INFOS = (sessionId) => {
     let requete = "SELECT ";
     requete += "sessionUsers.user_id as USER_ID, ";
     requete += "COUNT(exams.label) as NB_LIGNE, ";
-    requete += "SUM(((1 * session_user_option.user_price) * (1+("+TVA+"/100)))) as TOTAL_TTC ";
+    requete += "SUM(((1 * session_user_option.user_price) * (1+(" + TVA + "/100)))) as TOTAL_TTC ";
     requete += "from session_user_option ";
     requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";
     requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
@@ -222,3 +221,4 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     requete += "order by user_id";
     return requete;
 }
+

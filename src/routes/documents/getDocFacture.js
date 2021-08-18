@@ -1,29 +1,31 @@
-import {ConstructDatasForPDf} from "./manageQueryDocs";
-import {createRepository, destroyTemporaryFolders, getFilesIn} from "./manageFileSystem";
-import {createPdf, mergePdf} from "./managePDF";
+const ConstructDatasForPDf = require("./manageQueryDocs");
+const {createRepository, destroyTemporaryFolders, getFilesIn} = require("./manageFileSystem");
+const {createPdf, mergePdf} = require("./managePDF");
 const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
 
 
-
 /**
  * Récupération du document souhaité
- * @param documentId
+ * @param institutId
+ * @param docTypeId
  * @returns {Promise<void>}
  */
-async function getDocument (documentId) {
+async function getDocument (institutId, docTypeId) {
     let document = null;
 
     try {
-        document = await models['Document'].findByPk(documentId);
+        document = await models['Document'].findOne({
+            where: {institut_id: institutId, doctype: docTypeId}
+        })
     } catch (err) {
         throw new Error("An error occurred. Try to another id document or POST one document." + err.message)
     }
 
     if (!document) {
-        throw new Error("Document not found for id=" + documentId)
+        throw new Error("Type of document not found for your institut.")
     } else {
         return document.dataValues.filepath;
     }
@@ -32,7 +34,7 @@ async function getDocument (documentId) {
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
 
-        const documentId = req.params.doc;
+        const docTypeId = req.params.doc;
         const institutId = req.params.institut_id;
         const sessionId = req.query.session_id;
         const userId = req.query.user_id;
@@ -58,7 +60,7 @@ module.exports = (app) => {
             const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
 
             // récupération du template oo
-            const odtTemplate = await getDocument(documentId);
+            const odtTemplate = await getDocument(institutId, docTypeId);
 
             // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();

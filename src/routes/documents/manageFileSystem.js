@@ -1,11 +1,12 @@
 const del = require("del");
 const fs = require("fs");
+const path = require("path");
 
 /**
  * Création d'un dossier de temporaire qui contient les pdf.
  * @returns {string}
  */
-export function createRepository () {
+function createRepository () {
     try {
         fs.mkdirSync(path.join(__dirname, 'temporary'));
         console.log("Temporary folder has been created successfully.")
@@ -19,7 +20,7 @@ export function createRepository () {
  * Détruire les fichiers/dossiers temporaires
  * @returns {Promise<void>}
  */
-export async function destroyTemporaryFolders () {
+async function destroyTemporaryFolders () {
     try {
         await del(path.join(__dirname, 'temporary'));
     } catch (e) {
@@ -32,10 +33,12 @@ export async function destroyTemporaryFolders () {
  * @param folder
  * @returns {string[]}
  */
-export function getFilesIn (folder) {
+function getFilesIn (folder) {
     try {
         return fs.readdirSync(folder)
     } catch (err) {
         throw new Error('Error on get PDF from temporary folder : ' + err.message)
     }
 }
+
+module.exports = {getFilesIn, destroyTemporaryFolders, createRepository}

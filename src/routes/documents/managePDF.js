@@ -1,5 +1,8 @@
 const unoconv = require('unoconv-promise');
 const PDFMerger = require('pdf-merger-js');
+const path = require("path");
+
+
 
 /**
  * Fonction de création d'un pdf
@@ -8,7 +11,7 @@ const PDFMerger = require('pdf-merger-js');
  * @param datasForPdf
  * @returns {Promise<void>}
  */
-export async function createPdf (odtTemplate, outPutFolder, datasForPdf) {
+async function createPdf (odtTemplate, outPutFolder, datasForPdf) {
     let index = 0;
 
     for (const data of datasForPdf) {
@@ -26,14 +29,12 @@ export async function createPdf (odtTemplate, outPutFolder, datasForPdf) {
     }
 }
 
-
-
 /**
  * Fusionner des PDF
  * @param files
  * @returns {Promise<string>}
  */
-export async function mergePdf (files) {
+async function mergePdf (files) {
     try {
         const merger = new PDFMerger();
 
@@ -49,3 +50,5 @@ export async function mergePdf (files) {
         throw new Error('Error during merge pdf files : ' + error.message)
     }
 }
+
+module.exports = {createPdf, mergePdf}
