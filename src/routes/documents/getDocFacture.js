@@ -32,16 +32,21 @@ async function Requete (reqString, name) {
 
 /**
  * Construction d'un répertoire de données à partir des requêtes
- * @param institut
- * @param session
- * @param users
- * @param exams
  * @returns {Promise<void>}
  */
-function ConstructDatasForPDf (institut, session, users, exams, factures, facturesInfo) {
-    // console.log('institut->', institut);
-    // console.log('session->', session);
-    // console.log('users->', users);
+async function ConstructDatasForPDf (institutId, sessionId) {
+
+    // requetes
+    const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
+    const sessions = await Requete(REQ_SESSION(sessionId), 'session');
+    const users = await Requete(REQ_USERS(sessionId), 'users');
+    const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
+    const factures = await Requete(REQ_FACTURE(sessionId), 'factures');
+    const facturesInfo = await Requete(REQ_FACTURE_INFOS(sessionId), 'factures infos');
+
+     console.log('institut->', instituts);
+     console.log('session->', sessions);
+     console.log('users->', users);
     // console.log('exams->', exams);
     // console.log('factures->', factures);
     // console.log('factures info->', facturesInfo);
@@ -53,7 +58,7 @@ function ConstructDatasForPDf (institut, session, users, exams, factures, factur
         const myFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
         const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
 
-        let data = Object.assign(session, institut, user);
+        let data = Object.assign(sessions[0], instituts[0], user);
         let oExams = "";
         let ofact = {};
 
@@ -64,17 +69,17 @@ function ConstructDatasForPDf (institut, session, users, exams, factures, factur
         let count = 0;
         myFactures.forEach((line) => {
             count += 1;
-            ofact['REFERENCE_LIGNE_' + count]=line.REFERENCE;
-            ofact['DESIGNATION_LIGNE_' + count]=line.DESIGNATION;
-            ofact['QUANTITY_LIGNE_' + count]=line.QUANTITY;
-            ofact['PU_LIGNE_' + count]=line.PU;
-            ofact['HT_LIGNE_' + count]=line.HT;
-            ofact['TVA_LIGNE_' + count]=line.TVA;
-            ofact['TTC_LIGNE_' + count]=line.TTC;
+            ofact['REFERENCE_LIGNE_' + count] = line.REFERENCE;
+            ofact['DESIGNATION_LIGNE_' + count] = line.DESIGNATION;
+            ofact['QUANTITY_LIGNE_' + count] = line.QUANTITY;
+            ofact['PU_LIGNE_' + count] = line.PU;
+            ofact['HT_LIGNE_' + count] = line.HT;
+            ofact['TVA_LIGNE_' + count] = line.TVA;
+            ofact['TTC_LIGNE_' + count] = line.TTC;
         })
 
         data = Object.assign(data, {EXAMS: oExams});
-        data = Object.assign(data, factInfos[0] );
+        data = Object.assign(data, factInfos[0]);
         data = Object.assign(data, ofact);
         datasForPdf = [...datasForPdf, {...data}];
     })
@@ -212,19 +217,11 @@ module.exports = (app) => {
 
         try {
 
-            // requetes
-            const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
-            const sessions = await Requete(REQ_SESSION(sessionId), 'session');
-            const users = await Requete(REQ_USERS(sessionId), 'users');
-            const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
-            const factures = await Requete(REQ_FACTURE(sessionId), 'factures');
-            const facturesInfo = await Requete(REQ_FACTURE_INFOS(sessionId), 'factures infos');
-
             // destruction du dossier temporaire si existant
             await destroyTemporaryFolders();
 
             // création d'un tableau d'objets contenant toutes les infos
-            const datasForPdf = ConstructDatasForPDf(instituts[0], sessions[0], users, exams, factures, facturesInfo);
+            const datasForPdf = await ConstructDatasForPDf(institutId, sessionId);
 
             // récupération du template oo
             const odtTemplate = await getDocument(documentId);
