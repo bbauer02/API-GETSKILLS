@@ -29,7 +29,9 @@ module.exports = (app) => {
 
                 const valuesForPostInstitutHasUser = {};
                 valuesForPostInstitutHasUser.role_id = Number(req.body.roleInstitut);
-                valuesForPostInstitutHasUser.user_id = _userCreated.dataValues.user_id;
+
+                // Pioche l'id du user créer, sinon l'id du user existant (ajout d'un user déjà existant)
+                valuesForPostInstitutHasUser.user_id = _userCreated?.dataValues?.user_id || _userCreated.user_id;
                 valuesForPostInstitutHasUser.institut_id = Number(req.params.institut_id);
 
                 const institutHasUserCreated = await models['institutHasUser'].create(valuesForPostInstitutHasUser);
@@ -46,8 +48,7 @@ module.exports = (app) => {
 
             // Si userCreated est défini, user = userCreated
             // Sinon cela va dire que le user exister déjà et qu'on l'ajoute
-            // seulement à l'institut, dans ce cas user deviendra un object 
-            // pour créer un nouveau InstitutHasUser
+            // seulement à l'institut
             console.log("\n\n\nREQBODY ===", req.body.user_id, "\n\n\n");
             let user = {}
 
@@ -56,12 +57,8 @@ module.exports = (app) => {
             if (req.body.user_id === undefined) {
                 const userCreated = await createUser();
                 user = userCreated;
-            }
-            // Sinon, on construit un object pour le post de InstitutHasUser
-            else {
-                user.user_id = req.body.user;
-                user.institut_id = req.params.institut_id;
-                user.role_id = req.body.role_id;
+            } else {
+                user.user_id = req.body.user_id;
             }
 
             // On créer le institutHasUser
