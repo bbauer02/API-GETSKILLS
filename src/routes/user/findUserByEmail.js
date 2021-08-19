@@ -1,7 +1,7 @@
 ﻿const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.get('/api/instituts/:insitut_id/users/email/:email', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/users/email/:email', isAuthenticated, isAuthorized, async (req, res) => {
 
         // Cherche l'utilisateur
         async function findUser() {
@@ -61,7 +61,7 @@ module.exports = (app) => {
 
                 if (institutHasUser !== null) {
                     const message = `This user is already in this institut`;
-                    return res.status(500).json({ message });
+                    return res.status(404).json({ message });
                 }
 
             } catch (error) {
@@ -72,7 +72,7 @@ module.exports = (app) => {
 
         try {
             const User = await findUser();
-            await checkIfUserIsAlreadyInInstitut();
+            await checkIfUserIsAlreadyInInstitut(User);
 
             const message = `User has been found`;
             res.json({ message, data: User });
