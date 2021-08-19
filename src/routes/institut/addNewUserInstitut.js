@@ -5,10 +5,10 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/newUser', isAuthenticated, isAuthorized, async (req, res) => {
 
+        // Créer utilisateur
         async function createUser() {
             try {
 
-                // 0 - Créer User
                 const valuesForPostUser = { ...req.body };
 
                 // useless?
@@ -23,10 +23,10 @@ module.exports = (app) => {
             }
         }
 
+        // Ajouter l'utilsateur dans l'institut
         async function postInstitutHasUser(_userCreated) {
             try {
 
-                // 1 - Post Institut has user
                 const valuesForPostInstitutHasUser = {};
                 valuesForPostInstitutHasUser.role_id = Number(req.body.roleInstitut);
                 valuesForPostInstitutHasUser.user_id = _userCreated.dataValues.user_id;
@@ -41,12 +41,40 @@ module.exports = (app) => {
             }
         }
 
-        try {
-            const userCreated = await createUser();
-            const institutHasUserCreated = await postInstitutHasUser(userCreated);
 
-            const message = `User has been created and added to the institut.`;
-            res.json({message, data:institutHasUserCreated});
+        try {
+
+            // Si userCreated est défini, user = userCreated
+            // Sinon cela va dire que le user exister déjà et qu'on l'ajoute
+            // seulement à l'institut, dans ce cas user deviendra un object 
+            // pour créer un nouveau InstitutHasUser
+            console.log("\n\n\nREQBODY ===", req.body.user_id, "\n\n\n");
+            let user = {}
+
+            // Si user id n'est pas défini, une créer le user
+            // Le but étant d'avoir un user_id pour créer le institutHasUser
+            if (req.body.user_id === undefined) {
+                const userCreated = await createUser();
+                user = userCreated;
+            }
+            // Sinon, on construit un object pour le post de InstitutHasUser
+            else {
+                user.user_id = req.body.user;
+                user.institut_id = req.params.institut_id;
+                user.role_id = req.body.role_id;
+            }
+
+            // On créer le institutHasUser
+            const institutHasUserCreated = await postInstitutHasUser(user);
+
+            // Le message change selon les actions effectuer
+            const message = req.body.user_id !== undefined
+                ?
+                `User has been added to the institut.`
+                :
+                `User has been created and added to the institut.`;
+
+            res.json({ message, data: institutHasUserCreated });
 
         } catch (error) {
             const message = `An error has occured .`;
