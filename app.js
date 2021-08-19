@@ -40,6 +40,7 @@ require('./src/routes/role/findRoleByPk')(app);
 
 // Users
 require('./src/routes/user/findUserByPk')(app);
+require('./src/routes/user/findUserByEmail')(app);
 require('./src/routes/user/findAllUsers')(app);
 require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
