@@ -3,7 +3,6 @@ const PDFMerger = require('pdf-merger-js');
 const path = require("path");
 
 
-
 /**
  * Fonction de création d'un pdf
  * @param odtTemplate
@@ -11,7 +10,7 @@ const path = require("path");
  * @param datasForPdf
  * @returns {Promise<void>}
  */
-async function createPdf (odtTemplate, outPutFolder, datasForPdf) {
+async function createPdfWithTemplate (odtTemplate, outPutFolder, datasForPdf) {
     let index = 0;
 
     for (const data of datasForPdf) {
@@ -51,4 +50,4 @@ async function mergePdf (files) {
     }
 }
 
-module.exports = {createPdf, mergePdf}
+module.exports = {createPdfWithTemplate, mergePdf}

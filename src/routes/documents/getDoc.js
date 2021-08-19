@@ -1,10 +1,11 @@
-const ConstructDatasForPDf = require("./manageQueryDocs");
+const {ConstructDatasForPDf} = require("./manageQueryDocs");
 const {createRepository, destroyTemporaryFolders, getFilesIn} = require("./manageFileSystem");
 const {createPdf, mergePdf} = require("./managePDF");
 const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
+const {createPdfWithTemplate} = require("./managePDF");
 
 
 /**
@@ -34,10 +35,10 @@ async function getDocument (institutId, docTypeId) {
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
 
-        const docTypeId = req.params.doc;
-        const institutId = req.params.institut_id;
-        const sessionId = req.query.session_id;
-        const userId = req.query.user_id;
+        const docTypeId = parseInt(req.params.doc);
+        const institutId = parseInt(req.params.institut_id);
+        const sessionId = parseInt(req.query.session_id);
+        const userId = parseInt(req.query.user_id);
 
         /**
          * Envoyer le PDF dans la réponse HTTP
@@ -60,13 +61,15 @@ module.exports = (app) => {
             const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
 
             // récupération du template oo
-            const odtTemplate = await getDocument(institutId, docTypeId);
+            let odtTemplate = null
+            if(docTypeId > 0) odtTemplate = await getDocument(institutId, docTypeId);
 
             // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();
 
             // création des pdf en boucle sur les données construites
-            await createPdf(odtTemplate, folder, datasForPdf);
+            if(docTypeId > 0) await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
+            if(docTypeId === 0) createPdf(folder, datasForPdf);
 
             // récupération des fichiers PDF qui ont été générés
             const files = getFilesIn(path.join(__dirname, 'temporary'))

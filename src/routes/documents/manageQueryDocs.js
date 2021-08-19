@@ -29,7 +29,7 @@ async function Requete (reqString, name) {
  * Construction d'un répertoire de données à partir des requêtes
  * @returns {Promise<void>}
  */
-module.exports = async function ConstructDatasForPDf (institutId, sessionId, userId) {
+async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
     // requetes
     const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
@@ -53,29 +53,14 @@ module.exports = async function ConstructDatasForPDf (institutId, sessionId, use
         const myFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
         const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
 
-        let data = Object.assign(sessions[0], instituts[0], user);
-        let oExams = "";
-        let ofact = {};
+        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], {ARTICLES: myFactures});
+        let oExams = {};
 
-        examens.forEach((examen) => {
-            oExams += "\u2022 " + examen.EXAM + "\n";
+        examens.forEach((exam, index) => {
+            oExams['EXAM_'+index] = exam.EXAM;
         })
+        data = Object.assign(data, oExams);
 
-        let count = 0;
-        myFactures.forEach((line) => {
-            count += 1;
-            ofact['REFERENCE_LIGNE_' + count] = line.REFERENCE;
-            ofact['DESIGNATION_LIGNE_' + count] = line.DESIGNATION;
-            ofact['QUANTITY_LIGNE_' + count] = line.QUANTITY;
-            ofact['PU_LIGNE_' + count] = line.PU;
-            ofact['HT_LIGNE_' + count] = line.HT;
-            ofact['TVA_LIGNE_' + count] = line.TVA;
-            ofact['TTC_LIGNE_' + count] = line.TTC;
-        })
-
-        data = Object.assign(data, {EXAMS: oExams});
-        data = Object.assign(data, factInfos[0]);
-        data = Object.assign(data, ofact);
         datasForPdf = [...datasForPdf, {...data}];
     })
 
@@ -221,4 +206,6 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     requete += "order by user_id";
     return requete;
 }
+
+module.exports = {Requete, ConstructDatasForPDf}
 
