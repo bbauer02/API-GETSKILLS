@@ -53,7 +53,7 @@ module.exports = (app) => {
                 // 2 - Post Institut has user
                 const valuesForPostInstitutHasUser = {};
                 valuesForPostInstitutHasUser.role_id = 1;
-                valuesForPostInstitutHasUser.user_id = _user.dataValues.user_id;
+                valuesForPostInstitutHasUser.user_id = _user.user_id;
                 valuesForPostInstitutHasUser.institut_id = Number(req.params.institut_id);
 
                 const institutHasUserCreated = await models['institutHasUser'].create(valuesForPostInstitutHasUser);

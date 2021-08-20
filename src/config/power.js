@@ -85,8 +85,11 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_DELETE
             },
             users: env.INSTITUTS_USERS_DELETE,
-            empowermentTests: env.EMPOWERMENT_DELETE
-
+            empowermentTests: env.EMPOWERMENT_DELETE,
+            sessions: {
+                default: env.SESSIONS_DELETE,
+                users: env.SESSIONS_USER_DELETE
+            }
         },
         exams: env.EXAMS_DELETE,
         countries: env.COUNTRIES_DELETE,
