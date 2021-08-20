@@ -26,8 +26,12 @@ async function Requete (reqString, name) {
 
 
 /**
- * Construction d'un répertoire de données à partir des requêtes
- * @returns {Promise<void>}
+ * Construction d'un répertoire de données à partir des requête
+ * @param institutId
+ * @param sessionId
+ * @param userId
+ * @returns {Promise<*[]>} renvoie un tableau de données triées par utilisateur
+ * @constructor
  */
 async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
@@ -36,13 +40,15 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     const sessions = await Requete(REQ_SESSION(sessionId), 'session');
     const users = await Requete(REQ_USERS(sessionId, userId), 'users');
     const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
+    const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
     const factures = await Requete(REQ_FACTURE(sessionId), 'factures');
     const facturesInfo = await Requete(REQ_FACTURE_INFOS(sessionId), 'factures infos');
 
     // console.log('institut->', instituts);
     // console.log('session->', sessions);
     // console.log('users->', users);
-    // console.log('exams->', exams);
+    console.log('exams->', exams);
+    // console.log('exams infos ->', examsInfos);
     // console.log('factures->', factures);
     // console.log('factures info->', facturesInfo);
 
@@ -52,14 +58,18 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
         const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
         const myFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
         const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
+        const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID);
 
-        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], {ARTICLES: myFactures});
+        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], {ARTICLES: myFactures}, examenInfos[0]);
         let oExams = {};
 
+        let nbExams = 0;
         examens.forEach((exam, index) => {
-            oExams['EXAM_'+index] = exam.EXAM;
+            oExams[`EXAM_${++index}`] = exam.EXAM;
+            nbExams += 1;
         })
-        data = Object.assign(data, oExams);
+
+        data = Object.assign(data, oExams, {NB_EXAMS: nbExams});
 
         datasForPdf = [...datasForPdf, {...data}];
     })
@@ -127,6 +137,7 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "users.city as USER_CITY, ";
     requete += "users.phone as USER_PHONE, ";
     requete += "users.email as USER_MAIL, ";
+    requete += "IFNULL(DATEDIFF(sessionUsers.inscription, '1899-12-30'), '-') as USER_DATE_INSCR, ";
     requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
     requete += "DATEDIFF(users.birthday, '1899-12-30') as USER_BIRTHDAY, ";
     requete += "countries.label as USER_COUNTRY ";
@@ -150,10 +161,8 @@ const REQ_USERS = (sessionId, userId) => {
 const REQ_EXAMS = (sessionId) => {
     let requete = "SELECT ";
     requete += "users.user_id as USER_ID, ";
-    requete += "exams.label as EXAM, ";
-    requete += "session_user_option.isCandidate as EXAM_IS_CANDIDATE, ";
-    requete += "session_user_option.DateTime as USER_DATE_INSCRIPTION ";
-    requete += "from sessions "
+    requete += "exams.label as EXAM ";
+    requete += "from sessions ";
     requete += "join tests on tests.test_id = sessions.test_id ";
     requete += "left join exams on tests.test_id = exams.test_id ";
     requete += "left join levels on exams.level_id = levels.level_id ";
@@ -161,9 +170,31 @@ const REQ_EXAMS = (sessionId) => {
     requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
     requete += "join users on sessionUsers.user_id = users.user_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "GROUP BY users.user_id, exams.label, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
     requete += "order by user_id";
     return requete
 }
+
+const REQ_EXAMS_INFOS = (sessionId) => {
+    let requete = "SELECT ";
+    requete += "users.user_id as USER_ID, ";
+    requete += "session_user_option.isCandidate as EXAM_IS_CANDIDATE, ";
+    requete += "session_user_option.DateTime as USER_DATE_INSCRIPTION, ";
+    requete += "session_user_option.addressExam as EXAM_ADDRESS ";
+    requete += "from sessions ";
+    requete += "join tests on tests.test_id = sessions.test_id ";
+    requete += "left join exams on tests.test_id = exams.test_id ";
+    requete += "left join levels on exams.level_id = levels.level_id ";
+    requete += "join sessionUsers on sessionUsers.session_id = sessions.session_id ";
+    requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
+    requete += "join users on sessionUsers.user_id = users.user_id ";
+    requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "GROUP BY users.user_id, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
+    requete += "order by user_id";
+    return requete
+}
+
+
 
 /**
  * récupérer les prix des examens par utilisateur
@@ -174,13 +205,12 @@ const REQ_EXAMS = (sessionId) => {
 const REQ_FACTURE = (sessionId) => {
     let requete = "SELECT ";
     requete += "sessionUsers.user_id as USER_ID, "
-    requete += "' ' as REFERENCE, ";
     requete += "exams.label as DESIGNATION, ";
     requete += "1 as QUANTITY, ";
-    requete += "session_user_option.user_price as PU, ";
-    requete += "(1 * session_user_option.user_price) as HT, ";
+    requete += "IFNULL(session_user_option.user_price, 0) as PU, ";
+    requete += "IFNULL(1 * session_user_option.user_price, 0) as HT, ";
     requete += "20 as TVA, ";
-    requete += "((1 * session_user_option.user_price) * (1+(20/100))) as TTC "
+    requete += "IFNULL(((1 * session_user_option.user_price) * (1+(20/100))),0) as TTC "
     requete += "from session_user_option ";
     requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";
     requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
@@ -195,6 +225,7 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     let requete = "SELECT ";
     requete += "sessionUsers.user_id as USER_ID, ";
     requete += "COUNT(exams.label) as NB_LIGNE, ";
+    requete += "SUM(((1 * session_user_option.user_price))) as TOTAL_HT, ";
     requete += "SUM(((1 * session_user_option.user_price) * (1+(" + TVA + "/100)))) as TOTAL_TTC ";
     requete += "from session_user_option ";
     requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";

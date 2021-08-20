@@ -61,15 +61,13 @@ module.exports = (app) => {
             const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
 
             // récupération du template oo
-            let odtTemplate = null
-            if(docTypeId > 0) odtTemplate = await getDocument(institutId, docTypeId);
+            const odtTemplate = await getDocument(institutId, docTypeId);
 
             // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();
 
             // création des pdf en boucle sur les données construites
-            if(docTypeId > 0) await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
-            if(docTypeId === 0) createPdf(folder, datasForPdf);
+            await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
 
             // récupération des fichiers PDF qui ont été générés
             const files = getFilesIn(path.join(__dirname, 'temporary'))
