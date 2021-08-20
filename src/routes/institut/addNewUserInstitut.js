@@ -49,12 +49,12 @@ module.exports = (app) => {
             // Si userCreated est défini, user = userCreated
             // Sinon cela va dire que le user exister déjà et qu'on l'ajoute
             // seulement à l'institut
-            console.log("\n\n\nREQBODY ===", req.body.user_id, "\n\n\n");
             let user = {}
 
             // Si user id n'est pas défini, une créer le user
             // Le but étant d'avoir un user_id pour créer le institutHasUser
-            if (req.body.user_id === undefined) {
+            // valeur par défautl de user_id === '', donner par formik
+            if (req.body.user_id === '') {
                 const userCreated = await createUser();
                 user = userCreated;
             } else {

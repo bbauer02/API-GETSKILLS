@@ -3,6 +3,8 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/users/email/:email', isAuthenticated, isAuthorized, async (req, res) => {
 
+        const session_id = req.params.session
+
         // Cherche l'utilisateur
         async function findUser() {
             try {
@@ -70,9 +72,42 @@ module.exports = (app) => {
             }
         }
 
+        // Check s'il est déjà dans la session
+        async function checkIfUserIsAlreadyInSession(User) {
+            try {
+
+                const parameters = {};
+                parameters.where = {
+                    institut_id: req.params.institut_id,
+                    user_id: User.dataValues.user_id
+                };
+
+                const institutHasUser = await models['institutHasUser'].findOne(parameters);
+
+                if (institutHasUser !== null) {
+                    const message = `This user is already in this institut`;
+                    return res.status(404).json({ message });
+                }
+
+            } catch (error) {
+                const message = `User is already in the institut.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+
+
         try {
             const User = await findUser();
+
+            // Check si présent dans l'institut
             await checkIfUserIsAlreadyInInstitut(User);
+
+            // Check supplémentaire pour savoir s'il est inscrit dans la session
+            if (req.params.session === true) {
+                await checkIfUserIsAlreadyInSession(User);
+            }
+            
 
             const message = `User has been found`;
             res.json({ message, data: User });

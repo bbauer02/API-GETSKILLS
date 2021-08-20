@@ -49,7 +49,7 @@ module.exports = (app) => {
         async function checkSessionPlaceAvailable() {
             try {
 
-                // 2 - Check si assez de place dans la session
+                // 2 - Check si assez de place dans la session + si session pas encore validée
                 const session = await models['Session'].findOne({
                     where: { session_id: req.params.idSession },
                     include: {
@@ -64,6 +64,9 @@ module.exports = (app) => {
                     return res.status(404).json({ message });
                 } else if (session.dataValues.sessionUsers.length + 1 > session.dataValues.placeAvailable) {
                     const message = `session is full!`;
+                    return res.status(500).json({ message });
+                } else if (session.dataValues.validation === true) {
+                    const message = `session is validate, can't add user!`;
                     return res.status(500).json({ message });
                 } else {
                     return true;
