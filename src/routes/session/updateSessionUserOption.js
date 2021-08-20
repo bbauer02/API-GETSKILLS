@@ -2,10 +2,8 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// TO DO add isAuthenticated & isAuthorized here
-
 module.exports = (app) => {
-    app.put('/api/sessionUsers/:sessionUser_id/exams/:exam_id/options/:option_id', async (req, res) => {
+    app.put('/api/instituts/:id_institut/sessionUsers/:sessionUser_id/exams/:exam_id/options/:option_id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
             const sessionUserOption = await models['sessionUserOption'].findOne({
                 where: {

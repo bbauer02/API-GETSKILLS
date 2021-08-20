@@ -2,9 +2,16 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// TO DO add isAuthorized + isAuthenticated
+// IMPORTANT  //
+/*
+A la difference de updateSession,
+updateSessionAdmin n'efface pas l'attribut validation de la session
+Cette route est destinée à invalider la session uniquement par les superadmins
+ce qui n'est pas possible pour les admins d'instituts
+*/
+
 module.exports = (app) => {
-    app.put('/api/instituts/:instituts_id/sessions/:session_id/admin', async (req, res) => {
+    app.put('/api/instituts/:instituts_id/sessions/:session_id/admin', isAuthorized, isAuthenticated, async (req, res) => {
         try {
             const Session = await models['Session'].findOne({
                 where: {

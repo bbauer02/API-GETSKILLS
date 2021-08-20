@@ -2,9 +2,9 @@
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-  app.delete('/api/instituts/:institut_id/empowermentTests/:id', isAuthenticated, isAuthorized, async (req, res) => {
+  app.delete('/api/instituts/:institut_id/empowermentTests/:empowerment_id', isAuthenticated, isAuthorized, async (req, res) => {
     try {
-      const EmpowermentTests = await models['empowermentTests'].findByPk(req.params.id);
+      const EmpowermentTests = await models['empowermentTests'].findByPk(req.params.empowerment_id);
       if(EmpowermentTests === null) {
         const message = `EmpowermentTests doesn't exist.Retry with an other EmpowermentTests id.`;
         return res.status(404).json({message});
