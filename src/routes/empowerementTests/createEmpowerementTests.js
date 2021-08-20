@@ -27,7 +27,7 @@ module.exports = (app) => {
                 }
 
             } catch (error) {
-                const message = `An error has occured while cheking the institut_id`;
+                const message = `An error has occured while checking the institut_id`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -46,7 +46,7 @@ module.exports = (app) => {
                     return res.status(404).json({ message });
                 }
             } catch (error) {
-                const message = `An error has occured while cheking the user_id`;
+                const message = `An error has occured while checking the user_id`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -80,7 +80,7 @@ module.exports = (app) => {
                 }
 
             } catch (error) {
-                const message = `An error has occured while cheking the power of the user (futur examinator) in the institut`;
+                const message = `An error has occured while checking the power of the user (futur examinator) in the institut`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -122,7 +122,7 @@ module.exports = (app) => {
                 if (empowermentFound) {
                     // l'habillitation existe déjà
                     const message = `EmpowermentTests already exist.`;
-                    return res.status(500).json({ message, data: empowermentTestsFound })
+                    return res.status(500).json({ message, data: empowermentFound })
                 } else {
                     return empowermentFound;
                 }
