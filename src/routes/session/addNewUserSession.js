@@ -27,13 +27,33 @@ module.exports = (app) => {
         }
 
 
-        async function postInstitutHasUser(_userCreated) {
+        async function checkInstitutHasUser(_user) {
             try {
 
-                // 1 - Post Institut has user
+                // 1 - Check si le user est déjà inscrit dans l'institut
+                const institutHasUser = await models['institutHasUser'].findOne({
+                    where: {
+                        user_id: _user.user_id,
+                        institut_id: Number(req.params.institut_id)
+                    }
+                });
+
+                return institutHasUser !== null
+
+            } catch (error) {
+                const message = `An error has occured checking if the user was already in the institut.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+
+        async function postInstitutHasUser(_user) {
+            try {
+
+                // 2 - Post Institut has user
                 const valuesForPostInstitutHasUser = {};
                 valuesForPostInstitutHasUser.role_id = 1;
-                valuesForPostInstitutHasUser.user_id = _userCreated.dataValues.user_id;
+                valuesForPostInstitutHasUser.user_id = _user.dataValues.user_id;
                 valuesForPostInstitutHasUser.institut_id = Number(req.params.institut_id);
 
                 const institutHasUserCreated = await models['institutHasUser'].create(valuesForPostInstitutHasUser);
@@ -49,7 +69,7 @@ module.exports = (app) => {
         async function checkSessionPlaceAvailable() {
             try {
 
-                // 2 - Check si assez de place dans la session + si session pas encore validée
+                // 3 - Check si assez de place dans la session + si session pas encore validée
                 const session = await models['Session'].findOne({
                     where: { session_id: req.params.idSession },
                     include: {
@@ -79,17 +99,15 @@ module.exports = (app) => {
         }
 
 
-
-
         async function findAllSessionExams() {
             try {
 
-                // 3 - initialiser les parameters pour trouver les exams
+                // 4 - initialiser les parameters pour trouver les exams
                 const parameters = {};
                 parameters.where = {};
 
 
-                // 4 - trouver les exams depuis test id et level id(si pas null) depuis le req.body
+                // 5 - trouver les exams depuis test id et level id(si pas null) depuis le req.body
                 const test = parseInt(req.body.test_id);
                 parameters.where.test_id = test;
 
@@ -107,12 +125,12 @@ module.exports = (app) => {
         }
 
 
-        async function postSessionUser(_userCreated) {
+        async function postSessionUser(_user) {
             try {
 
-                // 5 - Créer le sessionUser req.body = object avec values et session
+                // 6 - Créer le sessionUser req.body = object avec values et session
                 const valuesForPostSessionUser = {};
-                valuesForPostSessionUser.user_id = _userCreated.dataValues.user_id;
+                valuesForPostSessionUser.user_id = _user.user_id;
                 valuesForPostSessionUser.session_id = req.params.idSession;
                 valuesForPostSessionUser.hasPaid = req.body.hasPaid;
                 valuesForPostSessionUser.paymentMode = req.body.paymentMode;
@@ -127,11 +145,10 @@ module.exports = (app) => {
         }
 
 
-
         async function postAllUserOptions(_sessionUserCreated, _allExamsFromSession) {
             try {
 
-                // 6 - créer l'object pour le bulk
+                // 7 - créer l'object pour le bulk
                 let sessionUsersOptionsForCreate = [];
                 _allExamsFromSession.rows.forEach((exam, index) => {
                     sessionUsersOptionsForCreate[index] = {};
@@ -141,7 +158,7 @@ module.exports = (app) => {
                 })
 
 
-                // 7 - post les sessionsUserOptions en bulk
+                // 8 - post les sessionsUserOptions en bulk
                 const allUserOptionsCreated = await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
                 return allUserOptionsCreated;
 
@@ -151,19 +168,55 @@ module.exports = (app) => {
             }
         }
 
+
         try {
-            const userCreated = await createUser();
-            const institutHasUserCreated = await postInstitutHasUser(userCreated);
+
+            let user = {}
+
+            // Si le user id n'est pas défini, créer le user
+            // Le but étant d'avoir un user_id pour créer le institutHasUser
+            // valeur par défautl de user_id === '', donner par formik
+            if (req.body.user_id === '') {
+                const userCreated = await createUser();
+                user = userCreated;
+            }
+
+            // Sinon cela va dire que le user existe déjà et qu'on l'ajoute
+            // seulement à l'institut 
+            // On a donc déjà l'id, qu'on donnera à user pour la méthode postInstitutHasUser
+            else {
+                user.user_id = req.body.user_id;
+            }
+
+            // On check si le user est déjà inscrit à l'institut
+            const isAlreadyInInstitut = await checkInstitutHasUser(user);
+
+            // S'il n'est pas inscrit, on créer le institutHasUser 
+            if (isAlreadyInInstitut === false) {
+                await postInstitutHasUser(user);
+            }
+
+            // On check s'il y a assez de place dans la session, et si elle est déjà validée ou non.
             await checkSessionPlaceAvailable();
+
+            // On cherche tout les exams correspondants au test et au level de la session
             const allExamsFromSession = await findAllSessionExams();
-            const sessionUserCreated = await postSessionUser(userCreated);
+
+            // On inscrit le user à la session
+            const sessionUserCreated = await postSessionUser(user);
+
+            // On créer tout les sessionUserOptions
             await postAllUserOptions(sessionUserCreated, allExamsFromSession);
 
-            const message = `User has been created ,added to the institut, the session, and UserHasOptions have been created successfuly`;
+            const message = isAlreadyInInstitut === true ?
+            `User has been created, added the session, and UserHasOptions has been created successfuly`
+            :
+            `User has been created, added to the institut, added the session, and UserHasOptions has been created successfuly`
+            ;
             res.json({ message, data: sessionUserCreated });
 
         } catch (error) {
-            const message = `An error has occured .`;
+            const message = `An error has occured.`;
             return res.status(500).json({ message, data: error.message })
         }
     }

@@ -40,7 +40,11 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
             empowermentTests: env.EMPOWERMENT_POST,
-            newUser: env.INSTITUTS_NEW_USER_POST
+            newUser: env.INSTITUTS_NEW_USER_POST,
+            sessions: {
+                default: env.SESSIONS_POST,
+                newUsers: env.INSTITUTS_NEW_USER_POST
+            }
         },
         exams: env.EXAMS_POST,
         countries: env.COUNTRIES_POST,

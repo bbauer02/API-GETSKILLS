@@ -113,7 +113,7 @@ module.exports = {
                     powerNeed = powerNeed[entry.split('?')[0]];
                 }
 
-                console.log("\n\n\n entry=", entry, "\n\nentrypoints = ", entriesPoints, "\n\n");
+                console.log("\n\nentrypoints = ", entriesPoints, "\n\n");
             }
 
             // On vérifie les droits de l'utilisateur
