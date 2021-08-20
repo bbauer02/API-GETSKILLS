@@ -3,7 +3,6 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/users/email/:email', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const session_id = req.params.session
 
         // Cherche l'utilisateur
         async function findUser() {
@@ -67,7 +66,7 @@ module.exports = (app) => {
                 }
 
             } catch (error) {
-                const message = `User is already in the institut.`;
+                const message = `An error has occured checking if the User was in already in this institut.`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -78,19 +77,27 @@ module.exports = (app) => {
 
                 const parameters = {};
                 parameters.where = {
-                    institut_id: req.params.institut_id,
                     user_id: User.dataValues.user_id
                 };
 
-                const institutHasUser = await models['institutHasUser'].findOne(parameters);
+                if(req.query.sessions) {
+                    const session = parseInt(req.query.flang);  
+                    if(isNaN(session) ) {
+                        const message = `Session id should be an integer.`;
+                    return res.status(400).json({message})
+                    } 
+                    parameters.where.session_id = session;
+                }
 
-                if (institutHasUser !== null) {
-                    const message = `This user is already in this institut`;
+                const sessionHasUser = await models['sessionUser'].findOne(parameters);
+
+                if (sessionHasUser !== null) {
+                    const message = `This user is already in this session`;
                     return res.status(404).json({ message });
                 }
 
             } catch (error) {
-                const message = `User is already in the institut.`;
+                const message = `An error has occured checking if the User was in already in this session.`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -104,7 +111,8 @@ module.exports = (app) => {
             await checkIfUserIsAlreadyInInstitut(User);
 
             // Check supplémentaire pour savoir s'il est inscrit dans la session
-            if (req.params.session === true) {
+            // Nécéssite ?sessions=session_id
+            if (req.query.sessions) {
                 await checkIfUserIsAlreadyInSession(User);
             }
             
