@@ -81,7 +81,7 @@ module.exports = (app) => {
                 };
 
                 if(req.query.sessions) {
-                    const session = parseInt(req.query.flang);  
+                    const session = parseInt(req.query.sessions);  
                     if(isNaN(session) ) {
                         const message = `Session id should be an integer.`;
                     return res.status(400).json({message})
@@ -108,15 +108,16 @@ module.exports = (app) => {
             const User = await findUser();
 
             // Check si présent dans l'institut
-            await checkIfUserIsAlreadyInInstitut(User);
+            if (!req.query.sessions) {
+                await checkIfUserIsAlreadyInInstitut(User);
+            }
 
-            // Check supplémentaire pour savoir s'il est inscrit dans la session
+            // Sinon check pour savoir s'il est inscrit à la session
             // Nécéssite ?sessions=session_id
-            if (req.query.sessions) {
+            else {
                 await checkIfUserIsAlreadyInSession(User);
             }
             
-
             const message = `User has been found`;
             res.json({ message, data: User });
 
