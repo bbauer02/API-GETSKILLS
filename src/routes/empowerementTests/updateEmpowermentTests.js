@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id/empowermentTests/:id', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/instituts/:institut_id/empowerments/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         const institutId = req.body.institut_id;
@@ -82,7 +82,7 @@ module.exports = (app) => {
         async function updateEmpowerment() {
             try {
                 const checkEmpowerment = await models['empowermentTests'].findOne({
-                    where: { institut_id: institutId, user_id: userId, test_id: testId }
+                    where: { empowermentTest_id: req.params.empowermentTest_id }
                 });
 
                 if (empowermentTestsFound) {

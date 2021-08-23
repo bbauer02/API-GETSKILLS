@@ -2,7 +2,7 @@
 
     // certification pour examinateur
     const empowermentTests = sequelize.define('empowermentTests', {
-        empowermentTests_id: {
+        empowermentTest_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
