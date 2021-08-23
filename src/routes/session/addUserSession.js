@@ -3,7 +3,7 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/sessions/:idSession/newUser', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/sessions/:session_id/newUser', isAuthenticated, isAuthorized, async (req, res) => {
 
 
         async function createUser() {
@@ -71,7 +71,7 @@ module.exports = (app) => {
 
                 // 3 - Check si assez de place dans la session + si session pas encore validée
                 const session = await models['Session'].findOne({
-                    where: { session_id: req.params.idSession },
+                    where: { session_id: req.params.session_id },
                     include: {
                         model: models['sessionUser'],
                         as: "sessionUsers",
@@ -131,7 +131,7 @@ module.exports = (app) => {
                 // 6 - Créer le sessionUser req.body = object avec values et session
                 const valuesForPostSessionUser = {};
                 valuesForPostSessionUser.user_id = _user.user_id;
-                valuesForPostSessionUser.session_id = req.params.idSession;
+                valuesForPostSessionUser.session_id = req.params.session_id;
                 valuesForPostSessionUser.hasPaid = req.body.hasPaid;
                 valuesForPostSessionUser.paymentMode = req.body.paymentMode;
 

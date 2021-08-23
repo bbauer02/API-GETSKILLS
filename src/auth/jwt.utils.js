@@ -112,8 +112,6 @@ module.exports = {
                 else {
                     powerNeed = powerNeed[entry.split('?')[0]];
                 }
-
-                console.log("\n\nentrypoints = ", entriesPoints, "\n\n");
             }
 
             // On vérifie les droits de l'utilisateur
@@ -130,8 +128,6 @@ module.exports = {
                 }
             }
 
-            // Si admin institut peut voir tout les users -> changer son roleSystem en manageor (power 3)
-
             if (
                 moduleName === 'skills' ||
                 moduleName === 'roles' ||
@@ -144,7 +140,7 @@ module.exports = {
                 userPower = decodedToken.systemRole.power;
             }
 
-            console.log("\n\n\n user power =", userPower, "\n power needed =", powerNeed, "\n module name =", moduleName.split('?')[0], "\n\n");
+            console.log("\n\n\n user power =", userPower, "\n power needed =", powerNeed, "\n entries points =", entriesPoints, "\n\n");
 
             if (userPower >= powerNeed) {
                 return next();

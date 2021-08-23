@@ -11,7 +11,10 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_GET
             },
             empowermentTests: env.EMPOWERMENT_GET,
-            sessionsHist: env.INSTITUTS_SESSION_HIST_GET
+            sessionsHist: env.INSTITUTS_SESSION_HIST_GET,
+            sessions: {
+                default: env.SESSION_GET
+            }
         },
         exams: {
             default: env.EXAMS_GET
@@ -64,6 +67,12 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_PUT
             },
             users: env.INSTITUTS_USERS_PUT,
+            sessions: {
+                default: env.SESSIONS_PUT,
+                admin: {
+                    default: env.SESSIONS_ADMIN_PUT
+                }
+            }
         },
         exams: env.EXAMS_PUT,
         countries: env.COUNTRIES_PUT,
