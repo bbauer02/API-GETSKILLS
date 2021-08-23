@@ -1,5 +1,9 @@
+/**
+ * Conserver facture en position 0
+ * @type {string[]}
+ */
 const DOC_TYPES = [
-    "Facture", "Convocation", "Dossier de candidature", "Attestation", "Diplôme"
+    "Facture", "Dossier Candidat", "Attestation d'inscription", "Convocation", "Attestation de présence"
 ]
 
 module.exports = (app) => {

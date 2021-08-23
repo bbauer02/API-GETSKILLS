@@ -47,7 +47,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     // console.log('institut->', instituts);
     // console.log('session->', sessions);
     // console.log('users->', users);
-    console.log('exams->', exams);
+    // console.log('exams->', exams);
     // console.log('exams infos ->', examsInfos);
     // console.log('factures->', factures);
     // console.log('factures info->', facturesInfo);
@@ -137,7 +137,7 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "users.city as USER_CITY, ";
     requete += "users.phone as USER_PHONE, ";
     requete += "users.email as USER_MAIL, ";
-    requete += "IFNULL(DATEDIFF(sessionUsers.inscription, '1899-12-30'), '-') as USER_DATE_INSCR, ";
+    requete += "DATEDIFF(IFNULL(sessionUsers.inscription, '1899-12-30'), '1899-12-30') as USER_DATE_INSCR, ";
     requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
     requete += "DATEDIFF(users.birthday, '1899-12-30') as USER_BIRTHDAY, ";
     requete += "countries.label as USER_COUNTRY ";

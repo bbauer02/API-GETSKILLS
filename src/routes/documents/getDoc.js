@@ -16,20 +16,34 @@ const {createPdfWithTemplate} = require("./managePDF");
  */
 async function getDocument (institutId, docTypeId) {
     let document = null;
+    const TEMPLATES_FOLDER = process.cwd() + '/public/templates/';
 
     try {
+        // recherche du template demandé
         document = await models['Document'].findOne({
             where: {institut_id: institutId, doctype: docTypeId}
         })
+        console.log(document);
+        return document.dataValues.filepath;
+
     } catch (err) {
-        throw new Error("An error occurred. Try to another id document or POST one document." + err.message)
+        // si le template n'existe pas, on prend ceux par défaut
+        if(!document) {
+            switch (docTypeId) {
+                case 1:
+                    return TEMPLATES_FOLDER + 'Standard_dossier.odt';
+                case 2:
+                    return TEMPLATES_FOLDER + 'Standard_inscription.odt';
+                case 3:
+                    return TEMPLATES_FOLDER + 'Standard_convocation.odt';
+                case 4:
+                    return TEMPLATES_FOLDER + 'Standard_presence.odt';
+                default:
+                    throw new Error('no template found')
+            }
+        }
     }
 
-    if (!document) {
-        throw new Error("Type of document not found for your institut.")
-    } else {
-        return document.dataValues.filepath;
-    }
 }
 
 module.exports = (app) => {
@@ -61,7 +75,7 @@ module.exports = (app) => {
             const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
 
             // récupération du template oo
-            const odtTemplate = await getDocument(institutId, docTypeId);
+            let odtTemplate = await getDocument(institutId, docTypeId);
 
             // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();
