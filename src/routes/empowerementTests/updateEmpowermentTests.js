@@ -1,5 +1,6 @@
 ﻿const { models } = require('../../models');
 const { Op } = require('sequelize');
+const { ValidationError, UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
@@ -80,11 +81,17 @@ module.exports = (app) => {
 
         async function updateUser(User) {
             try {
-                User.update(req.body, {
+                await User.update(req.body, {
                     where: { user_id: User.dataValues.user_id }
                 });
 
             } catch (error) {
+                if(error instanceof UniqueConstraintError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
+                if(error instanceof ValidationError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
                 const message = `An error has occured while updating the User`;
                 return res.status(500).json({ message, data: error.message })
             }
@@ -99,7 +106,7 @@ module.exports = (app) => {
                 });
 
                 if (checkEmpowerment) {
-                    checkEmpowerment.update(
+                    await checkEmpowerment.update(
                         req.body, {
                         where: { empowermentTest_id: req.params.empowermentTest_id }
                     }
@@ -109,6 +116,12 @@ module.exports = (app) => {
                 }
 
             } catch (error) {
+                if(error instanceof UniqueConstraintError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
+                if(error instanceof ValidationError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
                 const message = `An error has occured while update the Empowerment`;
                 return res.status(500).json({ message, data: error.message })
             }

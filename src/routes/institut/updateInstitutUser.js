@@ -28,12 +28,12 @@ module.exports = (app) => {
             }
 
             // Met à jour l'utilisateur
-            User.update(req.body,{
+            await User.update(req.body,{
                 where:{user_id:req.params.user_id}
             });
 
             // Met à jour son rôle dans l'institut
-            InstitutHasUser.update(institutHasUserForUpdate,{
+            await InstitutHasUser.update(institutHasUserForUpdate,{
                 where:{
                     user_id: req.params.user_id,
                     institut_id: req.params.institut_id
