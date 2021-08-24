@@ -5,6 +5,7 @@ const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
+const DOC_TYPES = require("./index");
 const {createPdfWithTemplate} = require("./managePDF");
 
 
@@ -23,13 +24,14 @@ async function getDocument (institutId, docTypeId) {
         document = await models['Document'].findOne({
             where: {institut_id: institutId, doctype: docTypeId}
         })
-        console.log(document);
         return document.dataValues.filepath;
 
     } catch (err) {
         // si le template n'existe pas, on prend ceux par défaut
         if(!document) {
             switch (docTypeId) {
+                case 0:
+                    return TEMPLATES_FOLDER + 'Standard_facture.odt';
                 case 1:
                     return TEMPLATES_FOLDER + 'Standard_dossier.odt';
                 case 2:
@@ -54,13 +56,15 @@ module.exports = (app) => {
         const sessionId = parseInt(req.query.session_id);
         const userId = parseInt(req.query.user_id);
 
+
+
         /**
          * Envoyer le PDF dans la réponse HTTP
          * @param pdfFile
          */
         function reponseHTTPWithPdf (pdfFile) {
             const s = fs.createReadStream(pdfFile);
-            const myFilename = encodeURIComponent("myDocument.pdf");
+            const myFilename = encodeURIComponent(DOC_TYPES[docTypeId] + ".pdf");
             res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
             res.setHeader('Content-Type', "application/pdf");
             s.pipe(res);

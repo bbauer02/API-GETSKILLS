@@ -1,6 +1,34 @@
 const sequelize = require("../../db/sequelize");
 const {QueryTypes} = require("sequelize");
-const TVA = 20.00;
+const paymentList = {
+    1: {
+        payment_id: 1,
+        label: 'Carte Bancaire'
+    },
+    2: {
+        payment_id: 2,
+        label: 'PayPal'
+    },
+    3: {
+        payment_id: 3,
+        label: 'Virement bancaire'
+    },
+    4: {
+        payment_id: 4,
+        label: 'Chèque'
+    }
+};
+const civilityList =
+    {
+        1: {
+            civility_id: 1,
+            label: 'Mr.'
+        },
+        2: {
+            civility_id: 2,
+            label: 'Mme.'
+        }
+    };
 
 /**
  * Permet de lancer une requete
@@ -41,7 +69,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     const users = await Requete(REQ_USERS(sessionId, userId), 'users');
     const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
     const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
-    const factures = await Requete(REQ_FACTURE(sessionId), 'factures');
+    const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'factures');
     const facturesInfo = await Requete(REQ_FACTURE_INFOS(sessionId), 'factures infos');
 
     // console.log('institut->', instituts);
@@ -56,12 +84,32 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
     users.forEach((user) => {
         const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
-        const myFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
+        const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
         const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
         const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID);
 
-        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], {ARTICLES: myFactures}, examenInfos[0]);
+
+        user.PAIEMENT_INSCRIPTION = paymentList[user.PAIEMENT_INSCRIPTION].label;
+        user.USER_GENDER = civilityList[user.USER_GENDER].label;
+
+        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], examenInfos[0]);
         let oExams = {};
+        let oFactures = {
+            DESCRIPTIONS: '',
+            QUANTITES: '',
+            ARTICLES_PU: '',
+            ARTICLES_HT: '',
+            ARTICLES_TVA: '',
+            ARTICLES_TTC: '',
+            TOTAL_TTC: 0,
+            TOTAL_HT: 0,
+            TOTAL_TVA: 0
+        };
+        let infoFactures = {
+            LIST_TVA: '',
+            LIST_HT: '',
+            LIST_TTC: ''
+        };
 
         let nbExams = 0;
         examens.forEach((exam, index) => {
@@ -69,7 +117,47 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
             nbExams += 1;
         })
 
-        data = Object.assign(data, oExams, {NB_EXAMS: nbExams});
+        const RC = "\n";
+        const RC2 = "\n\n";
+
+        const listTva = factures.reduce((prev, curr) => {
+            if(!prev.includes(curr.TVA)) {
+                prev.push(curr.TVA);
+            }
+            return prev;
+        }, []);
+
+        infoFactures.LIST_TVA = listTva.reduce((prev, curr) => {
+            prev += curr + "\n";
+            return prev;
+        }, '');
+
+        listTva.forEach((tva) => {
+            infoFactures.LIST_HT += linesFactures.filter((fact) => fact.TVA === tva).reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY),0) + "\n";
+            infoFactures.LIST_TTC += linesFactures.filter((fact) => fact.TVA === tva).reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY) * (1+(tva/100)),0) + "\n";
+        })
+
+        linesFactures.forEach((line, index) => {
+            let carriage = RC;
+            if (line.DESCRIPTION.length > 40 && line.DESCRIPTION.length <= 80) {
+                carriage = RC2;
+            }
+            if (line.DESCRIPTION.length > 80) {
+                oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + carriage;
+            } else {
+                oFactures.DESCRIPTIONS += line.DESCRIPTION + carriage;
+            }
+            oFactures.QUANTITES += line.QUANTITY + carriage;
+            oFactures.ARTICLES_PU += line.PU + carriage;
+            oFactures.ARTICLES_HT += line.QUANTITY * line.PU + carriage;
+            oFactures.ARTICLES_TVA += line.TVA + carriage;
+            oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU) * (1 + (line.TVA / 100)) + carriage;
+            oFactures.TOTAL_HT += line.QUANTITY * line.PU;
+            oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (line.TVA / 100);
+            oFactures.TOTAL_TTC += (line.QUANTITY  * line.PU) * (1 + (line.TVA / 100));
+        })
+
+        data = Object.assign(data, oExams, {NB_EXAMS: nbExams}, oFactures, infoFactures);
 
         datasForPdf = [...datasForPdf, {...data}];
     })
@@ -87,8 +175,8 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 const REQ_INSTITUT = (institutId) => {
     let requete = "SELECT ";
     requete += "instituts.label as SCHOOL_NAME, instituts.label as SCHOOL_NAME_PIED, ";
-    requete += "instituts.adress1 as SCHOOL_ADDRESS1, instituts.adress1 as SCHOOL_ADDRESS1_PIED, ";
-    requete += "instituts.adress2 as SCHOOL_ADDRESS2, instituts.adress2 as SCHOOL_ADDRESS2_PIED, ";
+    requete += "IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,'\r\n',instituts.adress2)) as SCHOOL_ADDRESS1, IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,' - ',instituts.adress2)) as SCHOOL_ADDRESS1_PIED, ";
+    requete += "instituts.adress1 as SCHOOL_ADDRESS2, instituts.adress1 as SCHOOL_ADDRESS2_PIED, ";
     requete += "instituts.zipcode as SCHOOL_ZIPCODE, instituts.zipcode as SCHOOL_ZIPCODE_PIED, ";
     requete += "instituts.city as SCHOOL_CITY, instituts.city as SCHOOL_CITY_PIED, ";
     requete += "instituts.phone as SCHOOL_PHONE, instituts.phone as SCHOOL_PHONE_PIED, ";
@@ -127,22 +215,25 @@ const REQ_SESSION = (sessionId) => {
  */
 const REQ_USERS = (sessionId, userId) => {
     let requete = "SELECT ";
-    requete += "case users.civility WHEN 1 THEN 'Mister' WHEN 2 THEN 'Miss' ELSE '' END as USER_GENDER, ";
+    requete += "users.civility as USER_GENDER, ";
     requete += "users.user_id as USER_ID, ";
     requete += "users.lastname as USER_LASTNAME, ";
     requete += "users.firstname as USER_FIRSTNAME, ";
-    requete += "users.adress1 as USER_ADRESS1, ";
+    requete += "IF(ISNULL(users.adress2) OR users.adress2 = '', users.adress1, CONCAT(users.adress1,'\r\n',users.adress2)) as USER_ADRESS1, ";
     requete += "users.adress2 as USER_ADRESS2, ";
     requete += "users.zipcode as USER_ZIPCODE, ";
     requete += "users.city as USER_CITY, ";
     requete += "users.phone as USER_PHONE, ";
     requete += "users.email as USER_MAIL, ";
+    requete += "sessionUsers.paymentMode as PAIEMENT_INSCRIPTION, "
     requete += "DATEDIFF(IFNULL(sessionUsers.inscription, '1899-12-30'), '1899-12-30') as USER_DATE_INSCR, ";
     requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
     requete += "DATEDIFF(users.birthday, '1899-12-30') as USER_BIRTHDAY, ";
-    requete += "countries.label as USER_COUNTRY ";
+    requete += "countries.label as USER_COUNTRY, ";
+    requete += "countries.countryNationality as USER_NATIONALITY, ";
+    requete += "countries.countryLanguage as USER_LANGUAGE, ";
+    requete += "CONCAT(DATE_FORMAT(sessionUsers.inscription, '%Y'), DATE_FORMAT(sessionUsers.inscription, '%m'), sessionUsers.sessionUser_id) as USER_NUM_INSCR "
     requete += "from users ";
-
     requete += "join sessionUsers on sessionUsers.user_id = users.user_id ";
     requete += "join sessions on sessions.session_id = sessionUsers.session_id ";
     requete += "join countries on countries.country_id = users.country_id ";
@@ -189,11 +280,11 @@ const REQ_EXAMS_INFOS = (sessionId) => {
     requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
     requete += "join users on sessionUsers.user_id = users.user_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "AND session_user_option.isCandidate = true ";
     requete += "GROUP BY users.user_id, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
     requete += "order by user_id";
     return requete
 }
-
 
 
 /**
@@ -202,21 +293,22 @@ const REQ_EXAMS_INFOS = (sessionId) => {
  * @returns {string}
  * @constructor
  */
-const REQ_FACTURE = (sessionId) => {
+const REQ_FACTURE = (sessionId, institutId) => {
     let requete = "SELECT ";
     requete += "sessionUsers.user_id as USER_ID, "
-    requete += "exams.label as DESIGNATION, ";
-    requete += "1 as QUANTITY, ";
-    requete += "IFNULL(session_user_option.user_price, 0) as PU, ";
-    requete += "IFNULL(1 * session_user_option.user_price, 0) as HT, ";
+    requete += "exams.label as DESCRIPTION, ";
+    requete += "1 as QUANTITY, "
     requete += "20 as TVA, ";
-    requete += "IFNULL(((1 * session_user_option.user_price) * (1+(20/100))),0) as TTC "
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU ";
     requete += "from session_user_option ";
-    requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";
+    requete += "JOIN sessionUsers ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
     requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN Institut_has_prices ON Institut_has_prices.exam_id = exams.exam_id ";
+    requete += "JOIN instituts ON instituts.institut_id = Institut_has_prices.institut_id "
     requete += "JOIN tests ON exams.test_id = tests.test_id ";
     requete += "JOIN sessions ON sessions.test_id = tests.test_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "AND instituts.institut_id = " + institutId + " ";
     requete += "order by user_id";
     return requete
 }
@@ -226,7 +318,7 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     requete += "sessionUsers.user_id as USER_ID, ";
     requete += "COUNT(exams.label) as NB_LIGNE, ";
     requete += "SUM(((1 * session_user_option.user_price))) as TOTAL_HT, ";
-    requete += "SUM(((1 * session_user_option.user_price) * (1+(" + TVA + "/100)))) as TOTAL_TTC ";
+    requete += "SUM(((1 * session_user_option.user_price) * (1+(20/100)))) as TOTAL_TTC ";
     requete += "from session_user_option ";
     requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";
     requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
@@ -236,6 +328,10 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     requete += "GROUP BY sessionUsers.user_id "
     requete += "order by user_id";
     return requete;
+}
+
+const REQ_FACTURE_TVA = (sessionId) => {
+
 }
 
 module.exports = {Requete, ConstructDatasForPDf}
