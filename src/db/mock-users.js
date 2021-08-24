@@ -35,7 +35,7 @@
         birthday: new Date(1988, 9, 14),
         nationality_id: 112,
         firstlanguage_id: 46,
-        systemRole_id: 3
+        systemRole_id: 1
     },
     {
         login: "cLefebre",
