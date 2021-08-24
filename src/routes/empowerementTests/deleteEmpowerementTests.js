@@ -2,7 +2,7 @@
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-  app.delete('/api/instituts/:institut_id/empowerments/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
+  app.delete('/api/instituts/:institut_id/empowermentTests/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
     try {
       const EmpowermentTests = await models['empowermentTests'].findByPk(req.params.empowermentTest_id);
       if (EmpowermentTests === null) {

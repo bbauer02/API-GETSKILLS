@@ -10,7 +10,11 @@ module.exports = (app) => {
             parameters.include = [{
                 model: models['User'],
                 attributes: { exclude: ['password'] }
-            }];
+            },
+            {
+                model: models['Test']
+            }
+            ];
 
             parameters.where = { empowermentTest_id: req.params.empowermentTest_id };
 
