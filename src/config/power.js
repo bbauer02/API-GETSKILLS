@@ -4,9 +4,7 @@ module.exports = (env) => ({
             default: env.INSTITUTS_GET,
             users: {
                 default: env.INSTITUTS_USERS_GET,
-                email: {
-                    default: env.INSTITUTS_USERS_MAIL_GET
-                }
+                email: env.INSTITUTS_USERS_MAIL_GET
             },
             docs: env.SKILLS_GET,
             exams: {
@@ -14,9 +12,7 @@ module.exports = (env) => ({
             },
             empowermentTests: env.EMPOWERMENT_GET,
             sessionsHist: env.INSTITUTS_SESSION_HIST_GET,
-            sessions: {
-                default: env.SESSION_GET
-            }
+            sessions: env.SESSION_GET
         },
         exams: {
             default: env.EXAMS_GET

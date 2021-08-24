@@ -1,14 +1,15 @@
 ﻿const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/users/email/:email', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/users/email', isAuthenticated, isAuthorized, async (req, res) => {
 
 
         // Cherche l'utilisateur
         async function findUser() {
             try {
                 const parameters = {};
-                parameters.where = { email: req.params.email };
+
+                parameters.where = { email: req.query.email };
                 parameters.order = ['lastname'];
                 parameters.include = [
                     {
@@ -80,12 +81,12 @@ module.exports = (app) => {
                     user_id: User.dataValues.user_id
                 };
 
-                if(req.query.sessions) {
-                    const session = parseInt(req.query.sessions);  
-                    if(isNaN(session) ) {
+                if (req.query.sessions) {
+                    const session = parseInt(req.query.sessions);
+                    if (isNaN(session)) {
                         const message = `Session id should be an integer.`;
-                    return res.status(400).json({message})
-                    } 
+                        return res.status(400).json({ message })
+                    }
                     parameters.where.session_id = session;
                 }
 
@@ -117,7 +118,7 @@ module.exports = (app) => {
             else {
                 await checkIfUserIsAlreadyInSession(User);
             }
-            
+
             const message = `User has been found`;
             res.json({ message, data: User });
 
