@@ -28,7 +28,13 @@ module.exports = (app) => {
             try {
 
                 const valuesForPostInstitutHasUser = {};
-                valuesForPostInstitutHasUser.role_id = Number(req.body.roleInstitut);
+                
+                // Si on essyae de mettre un superAdmin (role 10)
+                if (Number(req.body.roleInstitut) === 10) {
+                    throw new Error("You can't do that");
+                } else {
+                    valuesForPostInstitutHasUser.role_id = Number(req.body.roleInstitut);
+                }
 
                 // Pioche l'id du user créer, sinon l'id du user existant (ajout d'un user déjà existant)
                 valuesForPostInstitutHasUser.user_id = _userCreated?.dataValues?.user_id || _userCreated.user_id;

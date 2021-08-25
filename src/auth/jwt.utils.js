@@ -101,7 +101,6 @@ module.exports = {
             // On détermine maintenant le pouvoir nécéssaire à la lecture de cette route : 
             // On récupére un tableau des différents points d'entrées qui composent l'URL.
             const filteredURL = req.url.split('?')[0];
-            console.log(filteredURL);
             const entriesPoints = filteredURL.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
             // On récupére les 'ids' de l'URL si il y en a. 
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
@@ -128,7 +127,6 @@ module.exports = {
                 }
             }
 
-            console.log(userPower, powerNeed);
             if (userPower >= powerNeed) {
                 return next();
             }
