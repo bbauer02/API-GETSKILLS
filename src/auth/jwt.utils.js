@@ -100,7 +100,9 @@ module.exports = {
             const decodedToken = req.accessToken;
             // On détermine maintenant le pouvoir nécéssaire à la lecture de cette route : 
             // On récupére un tableau des différents points d'entrées qui composent l'URL.
-            const entriesPoints = req.url.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
+            const filteredURL = req.url.split('?')[0];
+            console.log(filteredURL);
+            const entriesPoints = filteredURL.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
             // On récupére les 'ids' de l'URL si il y en a. 
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
             // on fixe un pouvoir par default à 0 en cas d'oublie de définition des pouvoirs d'une route. 

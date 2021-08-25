@@ -34,6 +34,10 @@ require('./src/routes/login')(app);
 require('./src/routes/country/findAllCountries')(app);
 require('./src/routes/country/findCountryByPk')(app);
 
+// Languages
+require('./src/routes/language/findAllLanguages')(app);
+require('./src/routes/language/findLanguageByPk')(app);
+
 // Roles
 require('./src/routes/role/findAllRoles')(app);
 require('./src/routes/role/findRoleByPk')(app);
