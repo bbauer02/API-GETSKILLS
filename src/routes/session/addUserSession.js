@@ -3,7 +3,7 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/sessions/:session_id/newuser', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/sessions/:session_id/users', isAuthenticated, isAuthorized, async (req, res) => {
 
 
         async function createUser() {

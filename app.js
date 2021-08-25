@@ -65,7 +65,6 @@ require('./src/routes/institut/findInstitutUsers')(app);
 require('./src/routes/institut/findInstitutExaminators')(app);
 require('./src/routes/institut/updateInstitutUser')(app);
 require('./src/routes/institut/findInstitutUser')(app);
-require('./src/routes/institut/addNewUserInstitut')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
