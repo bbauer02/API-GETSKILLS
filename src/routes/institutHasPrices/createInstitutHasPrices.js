@@ -1,7 +1,6 @@
 const {models} = require('../../models');
 const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
-const asyncLib = require('async');
 
 /**
  * tester si un institut existe en fonction de son ID
