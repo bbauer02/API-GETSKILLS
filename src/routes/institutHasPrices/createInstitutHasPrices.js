@@ -77,16 +77,16 @@ module.exports = (app) => {
             const priceCreated = await models['InstitutHasPrices'].create(req.body)
 
             if (priceCreated === null) {
-                return res.status(500).json({message: 'error: cannot create exam price'});
+                throw new Error('cannot create exam price');
 
             } else {
                 // FIN -> envoi de la réponse
-                const message = `Price for ${examPriceCreated.price} coin has been created.`;
-                return res.status(200).json({message, data: examPriceCreated})
+                const message = `Price for ${priceCreated.price} coin has been created.`;
+                return res.status(200).json({message, data: priceCreated})
             }
 
         } catch (e) {
-            return res.status(500).json({message: e.message, data: null});
+            return res.status(500).json({message: 'error:' + e.message, data: null});
         }
     })
 }
