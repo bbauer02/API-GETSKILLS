@@ -3,7 +3,7 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/newUser', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/newuser', isAuthenticated, isAuthorized, async (req, res) => {
 
         // Créer utilisateur
         async function createUser() {
@@ -51,7 +51,7 @@ module.exports = (app) => {
             // Si le user id n'est pas défini, créer le user
             // Le but étant d'avoir un user_id pour créer le institutHasUser
             // valeur par défautl de user_id === '', donner par formik
-            if (req.body.user_id === '') {
+            if (req.body.user_id === '' || req.body.user_id === null || req.body.user_id === undefined) {
                 const userCreated = await createUser();
                 user = userCreated;
             }

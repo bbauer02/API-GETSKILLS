@@ -2,7 +2,7 @@
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/empowermentTests/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/empowermenttests/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
         try {
 
             const parameters = {};

@@ -10,8 +10,8 @@ module.exports = (env) => ({
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
             },
-            empowermentTests: env.EMPOWERMENT_GET,
-            sessionsHist: env.INSTITUTS_SESSION_HIST_GET,
+            empowermenttests: env.EMPOWERMENT_GET,
+            sessionshist: env.INSTITUTS_SESSION_HIST_GET,
             sessions: {
                 default: env.SESSION_GET,
                 users: env.SESSIONS_USER_GET
@@ -43,11 +43,11 @@ module.exports = (env) => ({
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
-            empowermentTests: env.EMPOWERMENT_POST,
-            newUser: env.INSTITUTS_NEW_USER_POST,
+            empowermenttests: env.EMPOWERMENT_POST,
+            newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
                 default: env.SESSIONS_POST,
-                newUsers: env.INSTITUTS_NEW_USER_POST
+                newuser: env.INSTITUTS_NEW_USER_POST
             }
         },
         exams: env.EXAMS_POST,
@@ -67,7 +67,7 @@ module.exports = (env) => ({
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_PUT
             },
-            empowermentTests: env.EMPOWERMENT_PUT,
+            empowermenttests: env.EMPOWERMENT_PUT,
             users: env.INSTITUTS_USERS_PUT,
             sessions: {
                 default: env.SESSIONS_PUT,
@@ -96,7 +96,7 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_DELETE
             },
             users: env.INSTITUTS_USERS_DELETE,
-            empowermentTests: env.EMPOWERMENT_DELETE,
+            empowermenttests: env.EMPOWERMENT_DELETE,
             sessions: {
                 default: env.SESSIONS_DELETE,
                 users: env.SESSIONS_USER_DELETE

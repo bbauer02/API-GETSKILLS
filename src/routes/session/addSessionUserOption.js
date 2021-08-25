@@ -3,7 +3,7 @@ const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/sessionUsersOptions', isAuthorized, isAuthenticated, async (req,res) => {
+    app.post('/api/instituts/:institut_id/options', isAuthorized, isAuthenticated, async (req,res) => {
         try{
             const sessionUserOption = await models['sessionUserOption'].create(req.body);
             const message = `Option has been added in the sessionUser id : ${sessionUserOption.sessionUser_id}.`;

@@ -3,7 +3,7 @@ const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/users', isAuthenticated, isAuthorized, async (req,res) => {
+    app.post('/api/instituts/:institut_id/users', isAuthenticated, isAuthorized, async (req,res) => {
         try{
             const institutHasUser = await models['institutHasUser'].create(req.body);
             const message = `User id: ${institutHasUser.user_id} has been added in the institut id : ${institutHasUser.institut_id}.`;
