@@ -15,7 +15,11 @@ function webhook(req, res) {
 
   if(event.type ==='checkout.session.completed') {
     const session = event.data.object;
+    console.log(event.data);
     console.log('Event data', session);
+  }
+  if( event.type == 'application_fee.created') {
+    console.log("application_fee.created")
   }
   res.status(200).end();
 }
