@@ -14,7 +14,7 @@ module.exports = (app) => {
 
 
         // ETAPE 1 -> on vérifie que l'institut existe
-        const instituts = models['Institut'].findOne({
+        models['Institut'].findOne({
             where: {institut_id: institutId}
         }).then(function (institutFound) {
             if (institutFound === null) {
@@ -30,7 +30,7 @@ module.exports = (app) => {
 
 
         // ETAPE 2 -> on vérifie que l'épreuve demandée existe
-        const exams = models['Exam'].findOne({
+        models['Exam'].findOne({
             where: {exam_id: examId}
         }).then(function (examFound) {
             if (examFound === null) {
@@ -47,7 +47,7 @@ module.exports = (app) => {
 
 
         // ETAPE 3 -> on vérifie que le prix est absent de la base de données
-        const institutHasPrices = models['InstitutHasPrices'].findOne({
+        models['InstitutHasPrices'].findOne({
             where: {
                 institut_id: institutFound.institut_id,
                 exam_id: examFound.exam_id
