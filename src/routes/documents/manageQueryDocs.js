@@ -88,7 +88,6 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
         const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID); // épreuves demandées par l'utilisateur
         const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID); // liste des articles de la facture
-        const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID); // informations sur la facture
         const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID); // informations sur les examens
 
         // retours chariots
@@ -167,7 +166,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
 
         // on regroupe toutes les données concernant un USER dans un objet DATA
-        data = Object.assign(sessions[0], instituts[0], user, factInfos[0], examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFactures, oInfoFactures);
+        data = Object.assign(sessions[0], instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFactures, oInfoFactures);
 
         // on l'ajoute dans un tableau
         datasForPdf = [...datasForPdf, {...data}];
@@ -299,46 +298,59 @@ const REQ_EXAMS_INFOS = (sessionId) => {
 
 
 /**
- * récupérer les prix des examens par utilisateur
+ * Récupérer les prix des examens par utilisateur.
  * @param sessionId
+ * @param institutId
  * @returns {string}
  * @constructor
  */
 const REQ_FACTURE = (sessionId, institutId) => {
     let requete = "SELECT ";
-    requete += "sessionUsers.user_id as USER_ID, "
-    requete += "exams.label as DESCRIPTION, ";
-    requete += "1 as QUANTITY, "
-    requete += "Institut_has_prices.tva as TVA, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU ";
+    requete += "sessionUsers.user_id        as USER_ID, "
+    requete += "exams.label                 as DESCRIPTION, ";
+    requete += "COUNT(exams.label)          as QUANTITY, "
+    requete += "Institut_has_prices.tva     as TVA, ";
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU, ";
+    requete += "SUM(exams.price)            as TOTAL_TTC ";
     requete += "from session_user_option ";
-    requete += "JOIN sessionUsers ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
-    requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN Institut_has_prices ON Institut_has_prices.exam_id = exams.exam_id ";
-    requete += "JOIN instituts ON instituts.institut_id = Institut_has_prices.institut_id "
-    requete += "JOIN tests ON exams.test_id = tests.test_id ";
-    requete += "JOIN sessions ON sessions.test_id = tests.test_id ";
-    requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "JOIN sessionUsers           ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
+    requete += "JOIN exams                  ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id ";
+    requete += "JOIN instituts              ON instituts.institut_id = Institut_has_prices.institut_id "
+    requete += "JOIN tests                  ON exams.test_id = tests.test_id ";
+    requete += "JOIN sessions               ON sessions.test_id = tests.test_id ";
+    requete += "WHERE sessions.session_id = " + sessionId + " ";
     requete += "AND instituts.institut_id = " + institutId + " ";
-    requete += "order by user_id";
+    requete += "GROUP BY sessionUsers.user_id, exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price "
+    requete += "ORDER BY user_id";
     return requete
 }
 
-const REQ_FACTURE_INFOS = (sessionId) => {
+/**
+ * Récupérer les données pour générer les factures pour Get-skills
+ * @param sessionId
+ * @param institutId
+ * @returns {string}
+ * @constructor
+ */
+const REQ_FACTURE_PAR_SESSION = (sessionId, institutId) => {
     let requete = "SELECT ";
-    requete += "sessionUsers.user_id as USER_ID, ";
-    requete += "COUNT(exams.label) as NB_LIGNE, ";
-    requete += "SUM(((1 * session_user_option.user_price))) as TOTAL_HT, ";
-    requete += "SUM(((1 * session_user_option.user_price) * (1+(20/100)))) as TOTAL_TTC ";
+    requete += "exams.label                 as DESCRIPTION, ";
+    requete += "COUNT(exams.label)          as QUANTITY, "
+    requete += "Institut_has_prices.tva     as TVA, ";
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU, ";
+    requete += "SUM(exams.price)            as TOTAL_TTC ";
     requete += "from session_user_option ";
-    requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = sessionUsers.sessionUser_id ";
-    requete += "JOIN exams ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN tests ON exams.test_id = tests.test_id ";
-    requete += "JOIN sessions ON sessions.test_id = tests.test_id ";
-    requete += "where sessions.session_id = " + sessionId + " ";
-    requete += "GROUP BY sessionUsers.user_id "
-    requete += "order by user_id";
-    return requete;
+    requete += "JOIN sessionUsers           ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
+    requete += "JOIN exams                  ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id ";
+    requete += "JOIN instituts              ON instituts.institut_id = Institut_has_prices.institut_id "
+    requete += "JOIN tests                  ON exams.test_id = tests.test_id ";
+    requete += "JOIN sessions               ON sessions.test_id = tests.test_id ";
+    requete += "WHERE sessions.session_id = " + sessionId + " ";
+    requete += "GROUP BY sessionUsers.user_id, exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price "
+    requete += "ORDER BY exams.label";
+    return requete
 }
 
 module.exports = {ConstructDatasForPDf}
