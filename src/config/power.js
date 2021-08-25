@@ -14,7 +14,9 @@ module.exports = (env) => ({
             sessionshist: env.INSTITUTS_SESSION_HIST_GET,
             sessions: {
                 default: env.SESSION_GET,
-                users: env.SESSIONS_USER_GET
+                users: {
+                    default: env.SESSIONS_USER_GET
+                }
             }
         },
         exams: {

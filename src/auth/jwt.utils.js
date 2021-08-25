@@ -126,6 +126,7 @@ module.exports = {
                 }
             }
 
+            console.log(userPower, powerNeed);
             if (userPower >= powerNeed) {
                 return next();
             }

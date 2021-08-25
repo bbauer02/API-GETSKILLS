@@ -150,9 +150,9 @@ module.exports = (app) => {
                                 attributes: ["countryNationality"]
                             },
                             {
-                                model: models['Country'],
+                                model: models['Language'],
                                 as: "firstlanguage",
-                                attributes: ["countryLanguage"]
+                                attributes: ["label"]
                             }]
                         }]
                 };

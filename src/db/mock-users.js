@@ -15,7 +15,7 @@
         country_id: 76,
         birthday: new Date(1982, 7, 4),
         nationality_id: 76,
-        firstlanguage_id: 76,
+        firstlanguage_id: 1,
         systemRole_id: 5
     },
     {
@@ -34,7 +34,7 @@
         country_id: 76,
         birthday: new Date(1988, 9, 14),
         nationality_id: 112,
-        firstlanguage_id: 46,
+        firstlanguage_id: 2,
         systemRole_id: 1
     },
     {
@@ -53,7 +53,7 @@
         country_id: 76,
         birthday: new Date(1987, 10, 14),
         nationality_id: 76,
-        firstlanguage_id: 76,
+        firstlanguage_id: 3,
         systemRole_id: 1
     }
 ];
