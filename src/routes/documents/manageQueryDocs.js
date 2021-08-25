@@ -83,16 +83,23 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     let datasForPdf = [];
 
     users.forEach((user) => {
-        const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID);
-        const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID);
-        const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID);
-        const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID);
 
+        // on construit les données pour chaque utilisateur
 
+        const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID); // épreuves demandées par l'utilisateur
+        const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID); // liste des articles de la facture
+        const factInfos = facturesInfo.filter((fact) => fact.USER_ID === user.USER_ID); // informations sur la facture
+        const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID); // informations sur les examens
+
+        // retours chariots
+        const RC = "\n";
+        const RC2 = "\n\n";
+
+        // construction de l'utilisateur
         user.PAIEMENT_INSCRIPTION = paymentList[user.PAIEMENT_INSCRIPTION].label;
         user.USER_GENDER = civilityList[user.USER_GENDER].label;
 
-        let data = Object.assign(sessions[0], instituts[0], user, factInfos[0], examenInfos[0]);
+
         let oExams = {};
         let oFactures = {
             DESCRIPTIONS: '',
@@ -105,7 +112,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
             TOTAL_HT: 0,
             TOTAL_TVA: 0
         };
-        let infoFactures = {
+        let oInfoFactures = {
             LIST_TVA: '',
             LIST_HT: '',
             LIST_TTC: ''
@@ -117,24 +124,25 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
             nbExams += 1;
         })
 
-        const RC = "\n";
-        const RC2 = "\n\n";
-
         const listTva = factures.reduce((prev, curr) => {
-            if(!prev.includes(curr.TVA)) {
+            if (!prev.includes(curr.TVA)) {
                 prev.push(curr.TVA);
             }
             return prev;
         }, []);
 
-        infoFactures.LIST_TVA = listTva.reduce((prev, curr) => {
-            prev += curr + "\n";
-            return prev;
-        }, '');
+        oInfoFactures.LIST_TVA = listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", '');
 
         listTva.forEach((tva) => {
-            infoFactures.LIST_HT += linesFactures.filter((fact) => fact.TVA === tva).reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY),0) + "\n";
-            infoFactures.LIST_TTC += linesFactures.filter((fact) => fact.TVA === tva).reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY) * (1+(tva/100)),0) + "\n";
+            oInfoFactures.LIST_HT += linesFactures
+                .filter((fact) => fact.TVA === tva)
+                .reduce((prev, curr) => prev + ((curr.PU * curr.QUANTITY) / (1 + (tva / 100))), 0)
+                .toFixed(2);
+
+            oInfoFactures.LIST_TTC += linesFactures
+                .filter((fact) => fact.TVA === tva)
+                .reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY), 0)
+                .toFixed(2);
         })
 
         linesFactures.forEach((line, index) => {
@@ -143,22 +151,25 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
                 carriage = RC2;
             }
             if (line.DESCRIPTION.length > 80) {
-                oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + carriage;
+                oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + RC;
             } else {
-                oFactures.DESCRIPTIONS += line.DESCRIPTION + carriage;
+                oFactures.DESCRIPTIONS += line.DESCRIPTION + RC;
             }
             oFactures.QUANTITES += line.QUANTITY + carriage;
-            oFactures.ARTICLES_PU += line.PU + carriage;
-            oFactures.ARTICLES_HT += line.QUANTITY * line.PU + carriage;
-            oFactures.ARTICLES_TVA += line.TVA + carriage;
-            oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU) * (1 + (line.TVA / 100)) + carriage;
-            oFactures.TOTAL_HT += line.QUANTITY * line.PU;
-            oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (line.TVA / 100);
-            oFactures.TOTAL_TTC += (line.QUANTITY  * line.PU) * (1 + (line.TVA / 100));
+            oFactures.ARTICLES_PU += ((line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
+            oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU).toFixed(2) + carriage;
+            oFactures.ARTICLES_TVA += line.TVA.toFixed(2) + carriage;
+            oFactures.ARTICLES_HT += ((line.QUANTITY * line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
+            oFactures.TOTAL_HT += (line.QUANTITY * line.PU) / (1 + (line.TVA / 100));
+            oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (1 - 1 / (1 + (line.TVA / 100)));
+            oFactures.TOTAL_TTC += line.QUANTITY * line.PU;
         })
 
-        data = Object.assign(data, oExams, {NB_EXAMS: nbExams}, oFactures, infoFactures);
 
+        // on regroupe toutes les données concernant un USER dans un objet DATA
+        data = Object.assign(sessions[0], instituts[0], user, factInfos[0], examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFactures, oInfoFactures);
+
+        // on l'ajoute dans un tableau
         datasForPdf = [...datasForPdf, {...data}];
     })
 
@@ -298,7 +309,7 @@ const REQ_FACTURE = (sessionId, institutId) => {
     requete += "sessionUsers.user_id as USER_ID, "
     requete += "exams.label as DESCRIPTION, ";
     requete += "1 as QUANTITY, "
-    requete += "20 as TVA, ";
+    requete += "Institut_has_prices.tva as TVA, ";
     requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU ";
     requete += "from session_user_option ";
     requete += "JOIN sessionUsers ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
@@ -330,9 +341,5 @@ const REQ_FACTURE_INFOS = (sessionId) => {
     return requete;
 }
 
-const REQ_FACTURE_TVA = (sessionId) => {
-
-}
-
-module.exports = {Requete, ConstructDatasForPDf}
+module.exports = {ConstructDatasForPDf}
 

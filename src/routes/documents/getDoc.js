@@ -56,8 +56,6 @@ module.exports = (app) => {
         const sessionId = parseInt(req.query.session_id);
         const userId = parseInt(req.query.user_id);
 
-
-
         /**
          * Envoyer le PDF dans la réponse HTTP
          * @param pdfFile
