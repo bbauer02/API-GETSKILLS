@@ -34,12 +34,17 @@ require('./src/routes/login')(app);
 require('./src/routes/country/findAllCountries')(app);
 require('./src/routes/country/findCountryByPk')(app);
 
+// Languages
+require('./src/routes/language/findAllLanguages')(app);
+require('./src/routes/language/findLanguageByPk')(app);
+
 // Roles
 require('./src/routes/role/findAllRoles')(app);
 require('./src/routes/role/findRoleByPk')(app);
 
 // Users
 require('./src/routes/user/findUserByPk')(app);
+require('./src/routes/user/findUserByEmail')(app);
 require('./src/routes/user/findAllUsers')(app);
 require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
@@ -64,7 +69,6 @@ require('./src/routes/institut/findInstitutUsers')(app);
 require('./src/routes/institut/findInstitutExaminators')(app);
 require('./src/routes/institut/updateInstitutUser')(app);
 require('./src/routes/institut/findInstitutUser')(app);
-require('./src/routes/institut/addNewUserInstitut')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
@@ -99,7 +103,6 @@ require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
 require('./src/routes/session/deleteUserSession')(app);
-require('./src/routes/session/addNewUserSession')(app);
 
 // Sessions Archive
 require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);

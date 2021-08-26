@@ -10,7 +10,7 @@ module.exports = (app) => {
                 const message = `Level doesn't exist.Retry with an other level id.`;
                 return res.status(404).json({message});
             }
-            Level.update(req.body,{
+            await Level.update(req.body,{
                 where:{id:req.params.level_id}
             });
             const message = `Level id:${Level.level_id} has been updated `;

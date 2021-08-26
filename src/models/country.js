@@ -47,7 +47,6 @@
         Country.hasMany(models.Institut,{as: 'institutCountry',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
         Country.hasMany(models.User,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false});
         Country.hasMany(models.User,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false});
-        Country.hasMany(models.User,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false});
     }
      return Country;
 }

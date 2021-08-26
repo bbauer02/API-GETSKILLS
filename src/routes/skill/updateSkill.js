@@ -12,7 +12,7 @@ module.exports = (app) => {
                 const message = `Skill doesn't exist. Retry with an other Skill id.`;
                 return res.status(404).json({message});
             }
-            Skill.update(req.body, {
+            await Skill.update(req.body, {
                 where:{skill_id:skillId}
             });
             const message = `Skill id:${Skill.skill_id} has been updated `;

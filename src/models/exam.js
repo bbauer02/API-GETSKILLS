@@ -27,7 +27,7 @@
             type: DataTypes.BOOLEAN
         },
         price : {
-            type: DataTypes.INTEGER
+            type: DataTypes.FLOAT
         },
         coeff : {
             type: DataTypes.INTEGER

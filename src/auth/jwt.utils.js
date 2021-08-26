@@ -48,23 +48,19 @@ module.exports = {
                     reject(new Error('Missing token in cookie'));
                 }
                 const accessToken = cookies.access_token;
-
                 /* On vérifie que le token CSRF est présent dans les en-têtes de la requête */
                 if (!headers || !headers['x-xsrf-token']) {
                     reject(new Error('Missing XSRF token in headers'));
                 }
                 const xsrfToken = headers['x-xsrf-token'];
-
                 // On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer
                 const decodedToken = await jwt.verify(accessToken, config.accessToken.secret, {
                     algorithms: config.accessToken.algorithm
                 });
-
                 /* On vérifie que le token CSRF correspond à celui présent dans le JWT  */
                 if (xsrfToken !== decodedToken.xsrfToken) {
                     reject(new Error('Bad xsrf token'));
                 }
-
                 resolve(decodedToken);
             }
             catch (error) {
@@ -95,63 +91,52 @@ module.exports = {
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized: async (req, res, next) => {
         try {
-            const decodedToken = req.accessToken;
-
-            // points d'entrées : sans les id
-            const entriesPoints = req.url.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
-            const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
-
-            // Lecture du fichier de configuration des pouvoirs dynamiquement.
+            // On obtient la METHODE HTTP utilisé par la requête
             const httpMethod = req.method.toUpperCase();
-            let powerNeed = power[httpMethod];
-            for (const entry of entriesPoints) {
-                // Il y a toujours un point d'entrée au minimum. Donc si il n'y a que un seul point d'entrée, on se branche sur le "default"
-                if (entriesPoints.length === 1) {
-                    powerNeed = powerNeed[entry.split('?')[0]]["default"];
-                }
-                else {
-                    powerNeed = powerNeed[entry.split('?')[0]];
-                }
-
-                console.log("\n\n\n entry=", entry, "\n\nentrypoints = ", entriesPoints, "\n\n");
-            }
-
-            // On vérifie les droits de l'utilisateur
-            let userMemberOfInstitut = null;
+            // A partit de la method HTTP nous faisons un premier filtre sur l'objet POWER
+            // quine retournera que les pouvoir de la méthode HTTP voulue.
+            let powerNeedByHttpMethod = power[httpMethod];
+            // On récupére également le TOKEN.
+            const decodedToken = req.accessToken;
+            // On détermine maintenant le pouvoir nécéssaire à la lecture de cette route : 
+            // On récupére un tableau des différents points d'entrées qui composent l'URL.
+            const filteredURL = req.url.split('?')[0];
+            const entriesPoints = filteredURL.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
+            // moduleName ici avant qu'il ne devienne un tableau vide ? (voir console.log plus bas avant le moduleName === 'institut')
             const moduleName = entriesPoints[0];
+            // On récupére les 'ids' de l'URL si il y en a. 
+            const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
+            // on fixe un pouvoir par default à 0 en cas d'oublie de définition des pouvoirs d'une route. 
+            // en fixant à 10 , la route est protégée. 
+            // Toutefois, la valeur 'default' d'un noeud parent écrasera toujours 'defaultPowerNeeded'
+            const defaultPowerNeeded = 10;
+            // On obtient le pouvoir nécessaire à la lecture de cette route.
+            const powerNeed = module.exports.getPowerNeed(powerNeedByHttpMethod, entriesPoints, defaultPowerNeeded);
+            // On vérifie les droits de l'utilisateur
+            // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
+            // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
+            let userMemberOfInstitut = null;
+            
             let userPower = 0;
-
+            // console.log("\n\nentriesPoints==", entriesPoints,"\n\n");
             if (moduleName === 'instituts') {
+                // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
                 const reqInstitut_id = req.params.institut_id || req.body.institut_id || null;
-
                 if (reqInstitut_id) {
+                    // on cherche dans le token de connexion l'objet relatif à l'identifiant de l'institut concerné. 
                     userMemberOfInstitut = decodedToken.instituts.find(({ institut_id }) => institut_id === parseInt(reqInstitut_id));
+                    // on récupére le userPower
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
                 }
             }
 
-            // Si admin institut peut voir tout les users -> changer son roleSystem en manageor (power 3)
-
-            if (
-                moduleName === 'skills' ||
-                moduleName === 'roles' ||
-                moduleName === 'exams' ||
-                moduleName === 'skills' ||
-                moduleName === 'sessions' ||
-                moduleName === 'test' ||
-                moduleName.split('?')[0] === 'users'
-            ) {
-                userPower = decodedToken.systemRole.power;
-            }
-
-            console.log("\n\n\n user power =", userPower, "\n power needed =", powerNeed, "\n module name =", moduleName.split('?')[0], "\n\n");
-
             if (userPower >= powerNeed) {
                 return next();
             }
-            else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= 10) {
+            else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
                 return next();
             }
+            console.log(userPower, powerNeed);
             throw new Error(`You have no power here !`);
         }
         catch (error) {
@@ -168,4 +153,43 @@ module.exports = {
             return false;
         }
     },
+    getPowerNeed(objPower, entries, defaultPowerNeeded) {
+        // On extrait le premier élément de la route et on le retire.
+        const firstEntry = entries.shift();
+        // Object.keys to list all properties in raw (the original data), then
+        // Array.prototype.filter to select keys that are present in the allowed list, using
+        // Array.prototype.includes to make sure they are present
+        // Array.prototype.reduce to build a new object with only the allowed properties.
+        const filtered = Object.keys(objPower)
+        .filter(key => key === firstEntry)
+        .reduce((obj, key) => {
+            obj[key] = objPower[key];
+            if(objPower[key].default) {
+                defaultPowerNeeded = objPower[key].default;
+            }
+            return obj;
+        }, {})[firstEntry];
+
+        if(!entries.length) {
+            if(typeof filtered === 'object') {
+            if(filtered.default) {
+                return filtered.default;
+            }
+            else {
+            return defaultPowerNeeded;
+            }
+        }
+        else return filtered;
+        }
+        return module.exports.getPowerNeed(filtered,entries, defaultPowerNeeded);
+
+
+        /*/// SOLUTION 2
+            const getPath = ([p, ...ps]) => (o) =>
+            p == undefined ? o : getPath (ps) (o && o[p])
+            const getPower_version2 = (path, obj, node = getPath (path) (obj)) =>
+            Object (node) === node && 'default' in node ? node .default : node
+        */
+    }
+
 }

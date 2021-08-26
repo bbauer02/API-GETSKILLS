@@ -2,13 +2,28 @@ module.exports = (env) => ({
     GET: {
         instituts: {
             default: env.INSTITUTS_GET,
-            users: env.INSTITUTS_USERS_GET,
+            users: {
+                default: env.INSTITUTS_USERS_GET,
+                email: {
+                    default: env.INSTITUTS_USERS_MAIL_GET
+                }
+            },
+            sessions: {
+                default: env.SESSION_GET,
+                users: env.SESSIONS_USER_GET
+            },
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
             },
-            empowermentTests: env.EMPOWERMENT_GET,
-            sessionsHist: env.INSTITUTS_SESSION_HIST_GET
+            empowermenttests: env.EMPOWERMENT_GET,
+            sessionshist: env.INSTITUTS_SESSION_HIST_GET,
+            sessions: {
+                default: env.SESSION_GET,
+                users: {
+                    default: env.SESSIONS_USER_GET
+                }
+            }
         },
         exams: {
             default: env.EXAMS_GET
@@ -36,8 +51,12 @@ module.exports = (env) => ({
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
-            empowermentTests: env.EMPOWERMENT_POST,
-            newUser: env.INSTITUTS_NEW_USER_POST
+            empowermenttests: env.EMPOWERMENT_POST,
+            newuser: env.INSTITUTS_NEW_USER_POST,
+            sessions: {
+                default: env.SESSIONS_POST,
+                users: env.INSTITUTS_NEW_USER_POST
+            }
         },
         exams: env.EXAMS_POST,
         countries: env.COUNTRIES_POST,
@@ -55,6 +74,18 @@ module.exports = (env) => ({
             default: env.INSTITUTS_PUT,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_PUT
+            },
+            empowermenttests: {
+                default: env.EMPOWERMENT_PUT
+            },
+            users: {
+                default: env.INSTITUTS_USERS_PUT
+            },
+            sessions: {
+                default: env.SESSIONS_PUT,
+                admin: {
+                    default: env.SESSIONS_ADMIN_PUT
+                }
             }
         },
         exams: env.EXAMS_PUT,
@@ -77,8 +108,11 @@ module.exports = (env) => ({
                 price: env.INSTITUTS_EXAMS_PRICE_DELETE
             },
             users: env.INSTITUTS_USERS_DELETE,
-            empowermentTests: env.EMPOWERMENT_DELETE
-
+            empowermenttests: env.EMPOWERMENT_DELETE,
+            sessions: {
+                default: env.SESSIONS_DELETE,
+                users: env.SESSIONS_USER_DELETE
+            }
         },
         exams: env.EXAMS_DELETE,
         countries: env.COUNTRIES_DELETE,
