@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        price_ttc: {
+        price_pu_ttc: {
             type: DataTypes.FLOAT,
             allowNull: false,
         },
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
     InvoiceLines.associate = models => {
-        InvoiceLines.belongsTo(models['invoice'], {foreignKey: 'invoice_id'});
+        InvoiceLines.belongsTo(models['invoice'], {as: 'lines', foreignKey: 'invoice_id'});
     }
     return InvoiceLines;
 }

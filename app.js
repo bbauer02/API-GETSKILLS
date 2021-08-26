@@ -139,6 +139,10 @@ require('./src/routes/documents/deleteDoc')(app);
 require('./src/routes/documents/getDocsTypes')(app);
 require('./src/routes/documents/getDocsDatas')(app);
 require('./src/routes/documents/getDocById')(app);
-require('./src/routes/documents/getDocFacture')(app);
+require('./src/routes/documents/getDoc')(app);
+require('./src/routes/documents/getFacture')(app);
+
+// INVOICES
+require('./src/routes/invoice/createInvoiceByInstitut')(app);
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

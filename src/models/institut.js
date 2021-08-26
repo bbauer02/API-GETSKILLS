@@ -107,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
         Institut.hasMany(models.Session, {foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete: 'CASCADE'})
         Institut.hasMany(models.InstitutHasPrices, {foreignKey: 'institut_id', sourceKey: 'institut_id'})
         Institut.hasMany(models.empowermentTests, {foreignKey: 'institut_id', sourceKey: 'institut_id'});
-        Institut.hasMany(models.invoice, {as: 'invoices', foreignKey: 'institut_id'});
+        Institut.hasMany(models.invoice, {as: 'invoices', foreignKey: 'institut_id', sourceKey: 'institut_id'});
     }
     return Institut;
 }

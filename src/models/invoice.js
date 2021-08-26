@@ -18,11 +18,19 @@ module.exports = (sequelize, DataTypes) => {
         ref_client: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        nature: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        price_total_TTC: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
         }
     },
         {
             tableName: 'invoice',
-            timestamps: false
+            timestamps: true
         }
     );
     Invoice.associate = models => {
