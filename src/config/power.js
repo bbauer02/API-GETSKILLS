@@ -8,6 +8,10 @@ module.exports = (env) => ({
                     default: env.INSTITUTS_USERS_MAIL_GET
                 }
             },
+            sessions: {
+                default: env.SESSION_GET,
+                users: env.SESSIONS_USER_GET
+            },
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
