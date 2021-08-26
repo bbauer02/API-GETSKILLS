@@ -59,7 +59,8 @@ const initDB = async (sequelize) => {
         // FILL TABLE 'language'
         for (const language of languages) {
             const Language = await models['Language'].create({
-                label: language.label
+                nativeName: language.nativeName,
+                name: language.name
             });
         }
 

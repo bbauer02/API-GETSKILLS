@@ -11,11 +11,6 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             }
 
-            // Si on essyae de mettre un superAdmin (role 10)
-            if (req.body.role_id === 10) {
-                    throw new Error("You can't do that");
-            }
-
             await User.update(req.body,{
                 where:{user_id:req.params.user_id}
             });

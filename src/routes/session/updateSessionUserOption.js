@@ -60,7 +60,7 @@ module.exports = (app) => {
             delete req.body.option_id;
             delete req.body.exam_id;
 
-            sessionUserOption.update(req.body, {
+            await sessionUserOption.update(req.body, {
                 where: {
                     sessionUser_id: req.params.sessionUser_id,
                     exam_id: req.params.exam_id,

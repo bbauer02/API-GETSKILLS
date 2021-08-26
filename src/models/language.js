@@ -5,12 +5,20 @@
             primaryKey: true,
             autoIncrement: true
         },
-        label: {
+        nativeName: {
             type:DataTypes.STRING,
             allowNull: false,
             validate : {
-                notEmpty:{msg: `Language:Label cannot be empty !`},
-                notNull: {msg: `Language:Label cannot be NULL!`}
+                notEmpty:{msg: `Language:nativeName cannot be empty !`},
+                notNull: {msg: `Language:nativeName cannot be NULL!`}
+            }
+        },
+        name: {
+            type:DataTypes.STRING,
+            allowNull: false,
+            validate : {
+                notEmpty:{msg: `Language:name cannot be empty !`},
+                notNull: {msg: `Language:name cannot be NULL!`}
             }
         }
     },

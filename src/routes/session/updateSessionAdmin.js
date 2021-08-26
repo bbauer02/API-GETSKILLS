@@ -24,7 +24,7 @@ module.exports = (app) => {
                 return res.status(404).json({ message });
             }
             delete req.body.institut_id;
-            Session.update(req.body, {
+            await Session.update(req.body, {
                 where: { session_id: req.params.session_id }
             });
             const message = `Session id:${Session.session_id} has been updated `;

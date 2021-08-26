@@ -10,7 +10,7 @@ module.exports = (app) => {
                 const message = `Exam doesn't exist.Retry with an other Exam id.`;
                 return res.status(404).json({message});
             }
-            Exam.update(req.body,{
+            await Exam.update(req.body,{
                 where:{exam_id:req.params.id}
             });
             const message = `Exam id:${Exam.exam_id} has been updated `;

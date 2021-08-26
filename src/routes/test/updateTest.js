@@ -9,7 +9,7 @@ module.exports = (app) => {
                 const message = `Test doesn't exist.Retry with an other Test id.`;
                 return res.status(404).json({message});
             }
-            Test.update(req.body,{
+            await Test.update(req.body,{
                 where:{test_id:req.params.id}
             });
             const message = `Test id:${Test.test_id} has been updated `;

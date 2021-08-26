@@ -17,7 +17,7 @@ module.exports = (app) => {
             delete req.body.institut_id;
             if (req.body.validation === false) delete req.body.validation;
 
-            Session.update(req.body,{
+            await Session.update(req.body,{
                 where:{session_id:req.params.session_id} 
             });
             const message = `Session id:${Session.session_id} has been updated `;
