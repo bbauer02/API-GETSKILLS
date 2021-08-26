@@ -182,3 +182,4 @@
     }
 
 ];
+module.exports = exams;
