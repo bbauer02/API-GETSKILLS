@@ -51,7 +51,7 @@ module.exports = (env) => ({
             newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
                 default: env.SESSIONS_POST,
-                newuser: env.INSTITUTS_NEW_USER_POST
+                users: env.INSTITUTS_NEW_USER_POST
             }
         },
         exams: env.EXAMS_POST,

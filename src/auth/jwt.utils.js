@@ -102,6 +102,8 @@ module.exports = {
             // On récupére un tableau des différents points d'entrées qui composent l'URL.
             const filteredURL = req.url.split('?')[0];
             const entriesPoints = filteredURL.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
+            // moduleName ici avant qu'il ne devienne un tableau vide ? (voir console.log plus bas avant le moduleName === 'institut')
+            const moduleName = entriesPoints[0];
             // On récupére les 'ids' de l'URL si il y en a. 
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
             // on fixe un pouvoir par default à 0 en cas d'oublie de définition des pouvoirs d'une route. 
@@ -114,8 +116,9 @@ module.exports = {
             // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
             // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
             let userMemberOfInstitut = null;
-            const moduleName = entriesPoints[0];
+            
             let userPower = 0;
+            // console.log("\n\nentriesPoints==", entriesPoints,"\n\n");
             if (moduleName === 'instituts') {
                 // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
                 const reqInstitut_id = req.params.institut_id || req.body.institut_id || null;
@@ -133,6 +136,7 @@ module.exports = {
             else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
                 return next();
             }
+            console.log(userPower, powerNeed);
             throw new Error(`You have no power here !`);
         }
         catch (error) {

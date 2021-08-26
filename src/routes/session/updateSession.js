@@ -15,7 +15,14 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             }
             delete req.body.institut_id;
-            if (req.body.validation === false) delete req.body.validation;
+
+
+            // Si la session est validée, on ne peut changer que les dates
+            if (Session.dataValues.validation === true) {
+                delete req.body.validation;
+                delete req.body.test_id;
+                delete req.body.level_id;
+            }
 
             await Session.update(req.body,{
                 where:{session_id:req.params.session_id} 
