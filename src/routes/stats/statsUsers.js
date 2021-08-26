@@ -17,7 +17,7 @@ module.exports =  (app) => {
                 {
                     model: models['Language'],
                     as:'firstlanguage',
-                    attributes : ['label']
+                    attributes : ['nativeName']
                 }
             ];
             parameters.attributes = ['country_id','birthday', 'nationality_id', 'firstlanguage_id', 'createdAt'];

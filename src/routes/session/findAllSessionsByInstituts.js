@@ -107,7 +107,7 @@ module.exports = (app) => {
                             {
                                 model: models['Language'],
                                 as: "firstlanguage",
-                                attributes: ["label"]
+                                attributes: ["nativeName"]
                             }]
                         }]
                 };
