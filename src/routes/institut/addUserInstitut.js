@@ -37,7 +37,7 @@ module.exports = (app) => {
                 }
 
                 // Pioche l'id du user créer, sinon l'id du user existant (ajout d'un user déjà existant)
-                valuesForPostInstitutHasUser.user_id = _userCreated?.dataValues?.user_id || _userCreated.user_id;
+                valuesForPostInstitutHasUser.user_id = _userCreated.dataValues.user_id || _userCreated.user_id;
                 valuesForPostInstitutHasUser.institut_id = Number(req.params.institut_id);
 
                 const institutHasUserCreated = await models['institutHasUser'].create(valuesForPostInstitutHasUser);

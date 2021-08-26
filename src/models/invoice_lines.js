@@ -1,4 +1,3 @@
-const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
     const InvoiceLines = sequelize.define('InvoiceLines', {
         line_id: {
@@ -37,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
     InvoiceLines.associate = models => {
-        InvoiceLines.belongsTo(models['invoice'], {as: 'lines', foreignKey: 'invoice_id'});
+        InvoiceLines.belongsTo(models['Invoice'], {as: 'lines', foreignKey: 'invoice_id', sourceKey: 'invoice_id'});
     }
     return InvoiceLines;
 }
