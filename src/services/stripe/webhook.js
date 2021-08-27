@@ -1,6 +1,6 @@
 ﻿const stripeAPI  = require('../../../stripe');
 
-function webhook(req, res) {
+async function  webhook(req, res) {
   const sig = req.headers['stripe-signature'];
   let event;
   try {
@@ -15,8 +15,18 @@ function webhook(req, res) {
 
   if(event.type ==='checkout.session.completed') {
     const session = event.data.object;
-    console.log(event.data);
-    console.log('Event data', session);
+    // On récupére l'identifiant de l'intention de payment
+    const payment_intent = session.payment_intent;
+    // On créé un objet contenant les informations de l'intention de payment.
+    const paymentIntent = await stripeAPI.paymentIntents.retrieve(
+      payment_intent,
+      {
+        expand: ['charges.data.balance_transaction'],
+      }
+    );
+    // On récupére les détails de la transaction pour obtenir le charges prisent par STRIPE
+    const feeDetails = paymentIntent.charges.data[0].balance_transaction.fee_details;
+
   }
   if( event.type == 'application_fee.created') {
     console.log("application_fee.created")
