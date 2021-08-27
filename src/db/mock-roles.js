@@ -16,6 +16,7 @@
         power: 4
     },
     {
+        role_id: 10,
         label:"System Administrator",
         power: 10
     }

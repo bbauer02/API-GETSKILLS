@@ -1,4 +1,4 @@
-﻿﻿module.exports = (sequelize, DataTypes) => {
+﻿module.exports = (sequelize, DataTypes) => {
     const Exam =  sequelize.define('Exam', {
         exam_id: {
             type: DataTypes.INTEGER,
@@ -27,7 +27,7 @@
             type: DataTypes.BOOLEAN
         },
         price : {
-            type: DataTypes.INTEGER
+            type: DataTypes.FLOAT
         },
         coeff : {
             type: DataTypes.INTEGER

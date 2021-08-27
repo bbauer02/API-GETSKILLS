@@ -7,6 +7,7 @@ const models = {};
 
 // Jeux de données
 const countries = require('../db/mock-countries');
+const languages = require('../db/mock-languages');
 const roles = require('../db/mock-roles');
 const levels = require('../db/mock-levels');
 const tests = require('../db/mock-tests');
@@ -45,13 +46,21 @@ const initDB = async (sequelize) => {
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
 
-        // FILL TABLE 'countries' / 'languages' / 'nationality'
+        // FILL TABLE 'countries' / 'nationality'
         for (const country of countries) {
             const Country = await models['Country'].create({
                 label: country.en_short_name,
                 countryNationality: country.nationality,
                 countryLanguage: country.nationality,
                 code: country.alpha_2_code
+            });
+        }
+
+        // FILL TABLE 'language'
+        for (const language of languages) {
+            const Language = await models['Language'].create({
+                nativeName: language.nativeName,
+                name: language.name
             });
         }
 
@@ -208,7 +217,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 8,
                 'user_price': null,
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
-                "DateTime": new Date(2021, 5, 2, 9, 00),
+                "DateTime": new Date(2021, 5, 2, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
@@ -245,7 +254,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 12,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -253,7 +262,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 13,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -261,7 +270,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 14,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -271,7 +280,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 12,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
@@ -279,7 +288,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 13,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
@@ -287,7 +296,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 14,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             }
@@ -299,6 +308,3 @@ const initDB = async (sequelize) => {
 }
 
 module.exports = { initDB, models }
-
-
-

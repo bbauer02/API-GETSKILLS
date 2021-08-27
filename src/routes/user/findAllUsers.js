@@ -43,6 +43,8 @@ module.exports =  (app) => {
             if(req.query.email) {
                 parameters.where.email = {[Op.like] : `%${req.query.email}%`}
             }
+
+            // Unused
             // recherche par Email stricte
             if(req.query.emailstrict) {
                 parameters.where.email = {[Op.eq] : `${req.query.emailstrict}`}
@@ -121,9 +123,9 @@ module.exports =  (app) => {
                 attributes : [["countryNationality",'label']]
             },
             {
-                model: models['Country'],
+                model: models['Language'],
                 as:'firstlanguage',
-                attributes : [["countryLanguage",'label']]
+                attributes : ['nativeName']
             },
             {
                 model: models['Role'],

@@ -3,7 +3,7 @@ const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/sessions/', isAuthenticated,isAuthorized, async (req,res) => {
+    app.post('/api/instituts/:institut_id/sessions', isAuthenticated,isAuthorized, async (req,res) => {
         try{
             const Session = await models['Session'].create(req.body);
             const message = `Session id : ${Session.session_id} has been created.`;

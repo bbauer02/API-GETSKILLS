@@ -10,7 +10,8 @@ module.exports = (app) => {
                 const message = `User doesn't exist.Retry with an other user id.`;
                 return res.status(404).json({message});
             }
-            User.update(req.body,{
+
+            await User.update(req.body,{
                 where:{user_id:req.params.user_id}
             });
             const message = `User id:${User.user_id} has been updated `;

@@ -46,9 +46,9 @@ module.exports =  (app) => {
                         attributes : [["countryNationality",'label']]
                     },
                     {
-                        model: models['Country'],
+                        model: models['Language'],
                         as:'firstlanguage',
-                        attributes : [["countryLanguage",'label']]
+                        attributes : ['nativeName']
                     },
                     {
                         model: models['Role'],
