@@ -1,4 +1,4 @@
-﻿﻿const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const DataTypes = require('sequelize');
 const bcrypt = require('bcrypt');
@@ -217,7 +217,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 8,
                 'user_price': null,
                 'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
-                "DateTime": new Date(2021, 5, 2, 9, 00),
+                "DateTime": new Date(2021, 5, 2, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
@@ -254,7 +254,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 12,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -262,7 +262,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 13,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -270,7 +270,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 14,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -280,7 +280,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 12,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
@@ -288,7 +288,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 13,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
@@ -296,7 +296,7 @@ const initDB = async (sequelize) => {
                 'exam_id': 14,
                 'user_price': null,
                 'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                "DateTime": new Date(2021, 6, 3, 9, 0),
                 "isCandidate": true,
                 "sessionUser_id": 3
             }
