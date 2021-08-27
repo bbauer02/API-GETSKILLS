@@ -26,7 +26,11 @@ async function  webhook(req, res) {
     );
     // On récupére les détails de la transaction pour obtenir le charges prisent par STRIPE
     const feeDetails = paymentIntent.charges.data[0].balance_transaction.fee_details;
+    // On ajoute l'utilisateur créé dans la table USER. 
 
+
+
+    
   }
   if( event.type == 'application_fee.created') {
     console.log("application_fee.created")
