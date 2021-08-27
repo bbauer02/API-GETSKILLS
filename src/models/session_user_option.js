@@ -8,24 +8,26 @@ module.exports = (sequelize, DataTypes) => {
         },
         user_price: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: true
         },
         addressExam: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
+            allowNull: true
         },
         isCandidate: {
             type: DataTypes.BOOLEAN
         },
         DateTime: {
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            allowNull: true
         },
         sessionUser_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
         exam_id: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: true
         }
     },
     {

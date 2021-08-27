@@ -55,6 +55,24 @@
         nationality_id: 76,
         firstlanguage_id: 3,
         systemRole_id: 1
+    },
+    {
+        login: "didierM",
+        password: "Didi--51",
+        email: "didierMoulard@gmail.com",
+        phone: '1234567899',
+        gender: 1,
+        civility: 1,
+        firstname: "Didier",
+        lastname: "Moulard",
+        adress1: "2 rue du Louvres",
+        zipcode: "51100",
+        city: "Reims",
+        country_id: 76,
+        birthday: new Date(1987, 10, 14),
+        nationality_id: 76,
+        firstlanguage_id: 3,
+        systemRole_id: 1
     }
 ];
 module.exports = users;
