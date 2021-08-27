@@ -103,6 +103,7 @@ require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
 require('./src/routes/session/deleteUserSession')(app);
+require('./src/routes/session/findSessionUsers')(app);
 
 // Sessions Archive
 require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);
