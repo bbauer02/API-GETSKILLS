@@ -10,7 +10,7 @@ module.exports = (app) => {
                 const message = `Institut doesn't exist.Retry with an other institut id.`;
                 return res.status(404).json({message});
             }
-            Institut.update(req.body,{
+            await Institut.update(req.body,{
                 where:{institut_id:req.params.id}
             });
             const message = `Institut id:${Institut.institut_id} has been updated `;

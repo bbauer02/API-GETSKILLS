@@ -2,12 +2,12 @@
 const { ValidationError,UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.put('/api/instituts/:instituts_id/sessions/:session_id', isAuthenticated,isAuthorized, async (req, res) => {
+    app.put('/api/instituts/:institut_id/sessions/:session_id', isAuthenticated,isAuthorized, async (req, res) => {
         try {
             const Session = await models['Session'].findOne({
                 where: {
                     session_id: req.params.session_id,
-                    institut_id: req.params.instituts_id
+                    institut_id: req.params.institut_id
                 }
             });
             if(Session === null) {
@@ -15,9 +15,16 @@ module.exports = (app) => {
                 return res.status(404).json({message});
             }
             delete req.body.institut_id;
-            if (req.body.validation === false) delete req.body.validation;
 
-            Session.update(req.body,{
+
+            // Si la session est validée, on ne peut changer que les dates
+            if (Session.dataValues.validation === true) {
+                delete req.body.validation;
+                delete req.body.test_id;
+                delete req.body.level_id;
+            }
+
+            await Session.update(req.body,{
                 where:{session_id:req.params.session_id} 
             });
             const message = `Session id:${Session.session_id} has been updated `;

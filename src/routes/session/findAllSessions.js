@@ -128,6 +128,9 @@ module.exports = (app) => {
                 model: models['sessionUser'],
             };
 
+            // TODO REMOVE ? Tout le monde peut voir les sessions
+            // donc ici tout le monde aurais accès a tout les users de toutes
+            // les sessions
             // Add Users
             if (req.query.users === "true") {
                 const addUsers = {
@@ -147,9 +150,9 @@ module.exports = (app) => {
                                 attributes: ["countryNationality"]
                             },
                             {
-                                model: models['Country'],
+                                model: models['Language'],
                                 as: "firstlanguage",
-                                attributes: ["countryLanguage"]
+                                attributes: ["nativeName"]
                             }]
                         }]
                 };

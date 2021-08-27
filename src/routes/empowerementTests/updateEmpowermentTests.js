@@ -1,9 +1,10 @@
 ﻿const { models } = require('../../models');
 const { Op } = require('sequelize');
+const { ValidationError, UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/empowermentTests/:id', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/instituts/:institut_id/empowermenttests/:empowermentTest_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         const institutId = req.body.institut_id;
@@ -78,29 +79,49 @@ module.exports = (app) => {
 
 
 
+        async function updateUser(User) {
+            try {
+                await User.update(req.body, {
+                    where: { user_id: User.dataValues.user_id }
+                });
+
+            } catch (error) {
+                if(error instanceof UniqueConstraintError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
+                if(error instanceof ValidationError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
+                const message = `An error has occured while updating the User`;
+                return res.status(500).json({ message, data: error.message })
+            }
+
+        }
+
 
         async function updateEmpowerment() {
             try {
                 const checkEmpowerment = await models['empowermentTests'].findOne({
-                    where: { institut_id: institutId, user_id: userId, test_id: testId }
+                    where: { empowermentTest_id: req.params.empowermentTest_id }
                 });
 
-                if (empowermentTestsFound) {
-                    empowermentTestsFound.update(
-                        { code: code },
-                        {
-                            where: {
-                                institut_id: institutId,
-                                user_id: userId,
-                                exam_id: examId
-                            }
-                        }
+                if (checkEmpowerment) {
+                    await checkEmpowerment.update(
+                        req.body, {
+                        where: { empowermentTest_id: req.params.empowermentTest_id }
+                    }
                     )
 
-                    return empowermentTestsFound;
+                    return checkEmpowerment;
                 }
 
             } catch (error) {
+                if(error instanceof UniqueConstraintError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
+                if(error instanceof ValidationError) {
+                    return res.status(400).json({message: error.message, data:error})
+                }
                 const message = `An error has occured while update the Empowerment`;
                 return res.status(500).json({ message, data: error.message })
             }
@@ -110,17 +131,18 @@ module.exports = (app) => {
 
         try {
             await checkInstitut();
-            await checkUser();
+            const userFound = await checkUser();
             await checkTest();
+            await updateUser(userFound);
             const empowermentTestsFound = await updateEmpowerment();
 
-            const message = `Empowerment has been updated`;
+            const message = `Empowerment and User has been updated`;
             res.json({ message, data: empowermentTestsFound });
 
-        } catch(error) {
+        } catch (error) {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({ message, data: error.message })
         }
 
-})
+    })
 }

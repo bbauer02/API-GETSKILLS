@@ -18,7 +18,7 @@ module.exports = (app) => {
             delete req.body.session_id;
             delete req.body.user_id;
 
-            sessionUser.update(req.body,{
+            await sessionUser.update(req.body,{
                 where: {
                     session_id: req.params.session_id,
                     user_id: req.params.user_id

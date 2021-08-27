@@ -5,9 +5,9 @@ var CronJob = require('cron').CronJob;
 // Cron executer tout les mois
 const job = new CronJob('0 0 1 * *', async function () {
 
-    // delete les archives UserHist qui ont plus de 6 mois
+    // delete les archives UserHist qui ont plus de 3 ans
     try {
-        await sequelize.query("DELETE FROM User_hist WHERE createdAt <=DATE_SUB(NOW(), INTERVAL 6 MONTH)",
+        await sequelize.query("DELETE FROM User_hist WHERE createdAt <=DATE_SUB(NOW(), INTERVAL 3 YEAR)",
             {
                 type: QueryTypes.DELETE
             });

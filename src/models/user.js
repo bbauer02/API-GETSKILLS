@@ -163,7 +163,7 @@ module.exports = (sequelize, DataTypes) => {
 
         User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
-        User.belongsTo(models.Country,{as: 'firstlanguage',foreignKey:'firstlanguage_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        User.belongsTo(models.Language,{as: 'firstlanguage',foreignKey:'firstlanguage_id',timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Role,{as:'systemRole',foreignKey:'systemRole_id',sourceKey: 'role_id'});
 
         User.hasMany(models.institutHasUser,{as:'instituts',foreignKey:'user_id', sourceKey:'user_id'});
