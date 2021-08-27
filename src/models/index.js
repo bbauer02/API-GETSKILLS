@@ -20,6 +20,8 @@ const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
 const prices_exams = require("../db/mock-instituts_has_prices");
 const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
+const sessionHasExams = require('../db/mock-session_has_exam');
+const empowerments = require('../db/mock-empowerment');
 
 const initDB = async (sequelize) => {
     fs
@@ -113,7 +115,9 @@ const initDB = async (sequelize) => {
         await models['institutHasUser'].bulkCreate([
             { 'user_id': 1, 'institut_id': 2, 'role_id': 1 },
             { 'user_id': 1, 'institut_id': 1, 'role_id': 1 },
-            { 'user_id': 2, 'institut_id': 1, 'role_id': 4 }
+            { 'user_id': 2, 'institut_id': 1, 'role_id': 4 },
+            { 'user_id': 3, 'institut_id': 2, 'role_id': 1 },
+            { 'user_id': 4, 'institut_id': 2, 'role_id': 2 }
         ]);
 
         // TABLE 'tests'
@@ -202,6 +206,27 @@ const initDB = async (sequelize) => {
             });
         }
 
+        // TABLE 'sessionHasExam'
+        for (const sessionHasExam of sessionHasExams) {
+            await models['sessionHasExam'].create({
+                adressExam: sessionHasExam.adressExam,
+                DateTime: sessionHasExam.DateTime,
+                session_id: sessionHasExam.session_id,
+                exam_id: sessionHasExam.exam_id,
+                user_id: sessionHasExam.user_id,
+            });
+        }
+
+        // TABLE 'empowermentTests'
+        for (const empowerment of empowerments) {
+            await models['empowermentTests'].create({
+                institut_id: empowerment.institut_id,
+                user_id: empowerment.user_id,
+                test_id: empowerment.test_id,
+                code: empowerment.code
+            });
+        }
+
         // TABLE 'Institut_has_prices'
         for (const price of INSTITUT_HAS_PRICES) {
             await models['InstitutHasPrices'].create({
@@ -216,8 +241,8 @@ const initDB = async (sequelize) => {
             {
                 'exam_id': 8,
                 'user_price': null,
-                'addressExam': "Centre d'examen de LAON - Boulodrome 02000 LAON",
-                "DateTime": new Date(2021, 5, 2, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 1
             },
@@ -253,24 +278,24 @@ const initDB = async (sequelize) => {
             {
                 'exam_id': 12,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
             {
                 'exam_id': 13,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
             {
                 'exam_id': 14,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 2
             },
@@ -279,24 +304,24 @@ const initDB = async (sequelize) => {
             {
                 'exam_id': 12,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
             {
                 'exam_id': 13,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 3
             },
             {
                 'exam_id': 14,
                 'user_price': null,
-                'addressExam': "Reims",
-                "DateTime": new Date(2021, 6, 3, 9, 00),
+                'addressExam': null,
+                "DateTime": null,
                 "isCandidate": true,
                 "sessionUser_id": 3
             }

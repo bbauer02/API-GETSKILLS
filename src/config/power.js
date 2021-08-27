@@ -21,7 +21,8 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSION_GET,
                 users: {
-                    default: env.SESSIONS_USER_GET
+                    default: env.SESSIONS_USER_GET,
+                    exams: env.SESSIONS_EXAM_GET
                 }
             }
         },
@@ -55,7 +56,8 @@ module.exports = (env) => ({
             newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
                 default: env.SESSIONS_POST,
-                users: env.INSTITUTS_NEW_USER_POST
+                users: env.INSTITUTS_NEW_USER_POST,
+                exams: env.SESSIONS_EXAM_POST
             }
         },
         exams: env.EXAMS_POST,
@@ -85,7 +87,8 @@ module.exports = (env) => ({
                 default: env.SESSIONS_PUT,
                 admin: {
                     default: env.SESSIONS_ADMIN_PUT
-                }
+                },
+                exams: env.SESSIONS_EXAM_PUT
             }
         },
         exams: env.EXAMS_PUT,
@@ -111,7 +114,8 @@ module.exports = (env) => ({
             empowermenttests: env.EMPOWERMENT_DELETE,
             sessions: {
                 default: env.SESSIONS_DELETE,
-                users: env.SESSIONS_USER_DELETE
+                users: env.SESSIONS_USER_DELETE,
+                exams: env.SESSIONS_EXAM_DELETE
             }
         },
         exams: env.EXAMS_DELETE,
