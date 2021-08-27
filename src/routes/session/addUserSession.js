@@ -21,6 +21,12 @@ module.exports = (app) => {
                 return userCreated;
 
             } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
                 const message = `An error has occured creating the User.`;
                 return res.status(500).json({ message, data: error.message })
             }
@@ -60,6 +66,12 @@ module.exports = (app) => {
                 return institutHasUserCreated;
 
             } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
                 const message = `An error has occured creating the institutUser.`;
                 return res.status(500).json({ message, data: error.message })
             }
@@ -139,6 +151,12 @@ module.exports = (app) => {
                 return sessionUserCreated
 
             } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
                 const message = `An error has occured creating the sessionUser.`;
                 return res.status(500).json({ message, data: error.message })
             }
@@ -163,6 +181,12 @@ module.exports = (app) => {
                 return allUserOptionsCreated;
 
             } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
                 const message = `An error has occured creating the options.`;
                 return res.status(500).json({ message, data: error.message })
             }

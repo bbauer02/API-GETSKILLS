@@ -103,6 +103,14 @@ require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);
 require('./src/routes/session/addSessionUserOption')(app);
 require('./src/routes/session/deleteUserSession')(app);
+require('./src/routes/session/findSessionUsers')(app);
+
+// SessionHasExams
+require('./src/routes/sessionHasExam/createSessionHasExam')(app);
+require('./src/routes/sessionHasExam/deleteSessionHasExam')(app);
+require('./src/routes/sessionHasExam/findAllSessionHasExams')(app);
+require('./src/routes/sessionHasExam/findSessionHasExamByPk')(app);
+require('./src/routes/sessionHasExam/updateSessionHasExam')(app);
 
 // Sessions Archive
 require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);
