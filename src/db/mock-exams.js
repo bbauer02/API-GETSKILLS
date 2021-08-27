@@ -180,6 +180,6 @@
         duration: 60,
         successScore: 100
     }
-];
 
+];
 module.exports = exams;
