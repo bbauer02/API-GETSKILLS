@@ -30,12 +30,12 @@ module.exports = (app) => {
 
                 // Si la session est validée, on ne peut changer que les dates
                 if (isValidate) {
-                    delete req.body.session.validation;
-                    delete req.body.session.test_id;
-                    delete req.body.session.level_id;
+                    delete req.body.session[0].validation;
+                    delete req.body.session[0].test_id;
+                    delete req.body.session[0].level_id;
                 }
 
-                await Session.update(req.body.session, {
+                await Session.update(req.body.session[0], {
                     where: { session_id: req.params.session_id }
                 });
 

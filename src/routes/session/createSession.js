@@ -11,7 +11,7 @@ module.exports = (app) => {
                 // Ici le req.body contient deux objects, un avec les infos de la session
                 // et un autre contenant toutes les info des sessionHasUser (adresse et heure épreuves)
                 // req.body.session et req.body.sessionHasExams
-                const SessionCreated = await models['Session'].create(req.body.session);
+                const SessionCreated = await models['Session'].create(req.body.session[0]);
                 return SessionCreated;
 
             } catch (error) {
@@ -26,22 +26,93 @@ module.exports = (app) => {
             }
         }
 
+        async function findAllSessionExams() {
+            try {
+
+                const parameters = {};
+                parameters.where = {};
+
+                const test = parseInt(req.body.session[0].test_id);
+                parameters.where.test_id = test;
+
+                if (req.body.level_id !== null) {
+                    const level = parseInt(req.body.session[0].level_id);
+                    parameters.where.level_id = level;
+                }
+                const allExamsFromSession = await models['Exam'].findAndCountAll(parameters);
+                return allExamsFromSession;
+
+            } catch (error) {
+                const message = `An error has occured finding the exams.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+        // Unused et pas fonctionnel
+        // Check le role des users_id si > 1 pour être examinateur
+        /*
+        async function checkAllExaminatorForEachExam() {
+            try {
+
+                const parameters = {};
+
+                req.body.sessionHasExams.forEach((sessionHasExam) => {
+
+                    parameters.where = {
+                        user_id: sessionHasExam.user_id
+                    };
+
+                    parameters.include = [{
+                        model: models['institutHasUser'],
+                        where: {
+                            institut_id: req.params.institut_id,
+                            user_id: sessionHasExam.user_id
+                        },
+                        include: [
+                            {
+                                model: models['Role']
+                            }
+                        ]
+                    }];
+
+                    const examinatorFound = await models['User'].findOne(parameters);
+
+                    if (examinatorFound === null) {
+                        const message = `One of the examinator doesn't exist. Retry with another user_id.`;
+                        return res.status(404).json({ message });
+                    }
+
+                    // On vérifie si le user trouvé est bien au moins professeur
+                    if (examinatorFound.dataValues.institutHasUser.Role.power < 2) {
+                        const message = `One of the examinator has not enought power. Retry with another user_id.`;
+                        return res.status(404).json({ message });
+                    }
+                });
+
+            } catch (error) {
+                const message = `An error has occured finding the exams.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+        */
+
         async function postAllSessionHasExam() {
             try {
 
                 let sessionHasExamsForCreate = [];
+
                 req.body.sessionHasExams.forEach((exam, index) => {
                     sessionHasExamsForCreate[index] = {};
                     // exam_id
-                    sessionHasExamsForCreate[index].exam_id = exam.exam_id;
+                    sessionHasExamsForCreate[index].exam_id = req.body.sessionHasExams[index].exam_id;
                     // user_id pour examinateur
-                    sessionHasExamsForCreate[index].user_id = exam.user_id;
+                    sessionHasExamsForCreate[index].user_id = req.body.sessionHasExams[index].user_id;
                     // session_id
-                    sessionHasExamsForCreate[index].session_id = exam.session_id;
+                    sessionHasExamsForCreate[index].session_id = req.body.sessionHasExams[index].session_id;
                     // adresse de l'épreuve
-                    sessionHasExamsForCreate[index].adressExam = exam.adressExam;
+                    sessionHasExamsForCreate[index].adressExam = req.body.sessionHasExams[index].adressExam;
                     // date et heure de l'épreuve
-                    sessionHasExamsForCreate[index].DateTime = exam.DateTime;
+                    sessionHasExamsForCreate[index].DateTime = req.body.sessionHasExams[index].DateTime;
                 });
 
                 await models['sessionHasExam'].bulkCreate(sessionHasExamsForCreate);
@@ -58,14 +129,15 @@ module.exports = (app) => {
             }
         }
 
-
         try {
 
             const sessionCreated = await createSession();
+            const allExamsFromSession = await findAllSessionExams();
+            // await checkAllExaminatorForEachExam();
             await postAllSessionHasExam();
 
-            const message = `Session id : ${Session.session_id} and all the sessionHasExam have been created.`;
-            res.json({ message, data: Session })
+            const message = `Session id : ${sessionCreated.dataValues.session_id} and all the sessionHasExam have been created.`;
+            res.json({ message, data: sessionCreated })
 
         } catch (error) {
             const message = `Service not available. Please retry later.`;
