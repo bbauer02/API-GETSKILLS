@@ -1,4 +1,4 @@
-﻿﻿const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const DataTypes = require('sequelize');
 const bcrypt = require('bcrypt');

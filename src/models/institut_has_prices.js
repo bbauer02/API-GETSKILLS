@@ -1,4 +1,4 @@
-﻿﻿﻿const {models} = require("./index");
+﻿const {models} = require("./index");
 module.exports = (sequelize, DataTypes) => {
     const InstitutHasPrices = sequelize.define('InstitutHasPrices', {
         price_id: {
@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
         price: {
             type: DataTypes.FLOAT,
             defaultValue: 0.
+        },
+        tva: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 20.
         }
     }, {
         tableName: 'Institut_has_prices',
