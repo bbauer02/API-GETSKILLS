@@ -18,12 +18,7 @@ module.exports = (app) => {
                 invoice.isPaid = isPaid;
                 await invoice.save();
 
-                const invoiceFound = await models['Invoice'].findAll(
-                    {
-                        where: {invoice_id: orderId},
-                        include: { as: 'lines', model: models.InvoiceLines}
-                    });
-                return res.status(200).json({message: `invoice ${invoiceFound.invoice_id} has been updated`, data: invoiceFound})
+                return res.status(200).json({message: `invoice ${invoice.invoice_id} has been updated`, data: invoice})
             }
 
         } catch (e) {

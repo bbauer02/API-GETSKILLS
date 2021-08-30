@@ -52,6 +52,85 @@ async function Requete (reqString, name) {
     }
 }
 
+/**
+ * Construction des données pour les factures du CIFLE vers les écoles
+ * @param institutId
+ * @param sessionId
+ * @returns {Promise<{oInfoFactures: {LIST_TVA: string, LIST_HT: string, LIST_TTC: string}, oFactures: {QUANTITES: string, ARTICLES_PU: string, ARTICLES_TVA: string, TOTAL_TVA: number, ARTICLES_HT: string, TOTAL_HT: number, TOTAL_TTC: number, ARTICLES_TTC: string, DESCRIPTIONS: string}, instituts: void}>}
+ * @constructor
+ */
+async function ConstructDatasForInvoice (institutId, sessionId) {
+
+    // requetes
+    const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
+    const factures = await Requete(REQ_FACTURE(sessionId, null), 'facture');
+
+    // retours chariots
+    const RC = "\n";
+    const RC2 = "\n\n";
+
+    // datas
+    let oFactures = {
+        DESCRIPTIONS: '',
+        QUANTITES: '',
+        ARTICLES_PU: '',
+        ARTICLES_HT: '',
+        ARTICLES_TVA: '',
+        ARTICLES_TTC: '',
+        TOTAL_TTC: 0,
+        TOTAL_HT: 0,
+        TOTAL_TVA: 0
+    };
+    let oInfoFactures = {
+        LIST_TVA: '',
+        LIST_HT: '',
+        LIST_TTC: ''
+    };
+
+    const listTva = factures.reduce((prev, curr) => {
+        if (!prev.includes(curr.TVA)) {
+            prev.push(curr.TVA);
+        }
+        return prev;
+    }, []);
+
+    oInfoFactures.LIST_TVA = listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", '');
+
+    listTva.forEach((tva) => {
+        oInfoFactures.LIST_HT += factures
+            .filter((fact) => fact.TVA === tva)
+            .reduce((prev, curr) => prev + ((curr.PU * curr.QUANTITY) / (1 + (tva / 100))), 0)
+            .toFixed(2);
+
+        oInfoFactures.LIST_TTC += factures
+            .filter((fact) => fact.TVA === tva)
+            .reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY), 0)
+            .toFixed(2);
+    })
+
+    factures.forEach((line, index) => {
+        let carriage = RC;
+        if (line.DESCRIPTION.length > 40 && line.DESCRIPTION.length <= 80) {
+            carriage = RC2;
+        }
+        if (line.DESCRIPTION.length > 80) {
+            oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + RC;
+        } else {
+            oFactures.DESCRIPTIONS += line.DESCRIPTION + RC;
+        }
+        oFactures.QUANTITES += line.QUANTITY + carriage;
+        oFactures.ARTICLES_PU += ((line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
+        oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU).toFixed(2) + carriage;
+        oFactures.ARTICLES_TVA += line.TVA.toFixed(2) + carriage;
+        oFactures.ARTICLES_HT += ((line.QUANTITY * line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
+        oFactures.TOTAL_HT += (line.QUANTITY * line.PU) / (1 + (line.TVA / 100));
+        oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (1 - 1 / (1 + (line.TVA / 100)));
+        oFactures.TOTAL_TTC += line.QUANTITY * line.PU;
+    })
+
+    return Object.assign(instituts[0], oFactures, oInfoFactures );
+
+}
 
 /**
  * Construction d'un répertoire de données à partir des requête
@@ -70,7 +149,6 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
     const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
     const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'factures');
-    const facturesInfo = await Requete(REQ_FACTURE_INFOS(sessionId), 'factures infos');
 
     // console.log('institut->', instituts);
     // console.log('session->', sessions);
@@ -299,6 +377,7 @@ const REQ_EXAMS_INFOS = (sessionId) => {
 
 /**
  * Récupérer les prix des examens par utilisateur.
+ * Générer une facture du CIFLE vers une école.
  * @param sessionId
  * @param institutId
  * @returns {string}
@@ -306,9 +385,10 @@ const REQ_EXAMS_INFOS = (sessionId) => {
  */
 const REQ_FACTURE = (sessionId, institutId) => {
     let requete = "SELECT ";
-    requete += "sessionUsers.user_id        as USER_ID, "
+    if(institutId) requete += "sessionUsers.user_id        as USER_ID, "
     requete += "exams.label                 as DESCRIPTION, ";
-    requete += "COUNT(exams.label)          as QUANTITY, "
+    requete += "COUNT(session_user_option.sessionUser_id) as NB_CANDIDATS, "
+    requete += "COUNT(exams.exam_id)          as QUANTITY, "
     requete += "Institut_has_prices.tva     as TVA, ";
     requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU, ";
     requete += "SUM(exams.price)            as TOTAL_TTC ";
@@ -320,38 +400,20 @@ const REQ_FACTURE = (sessionId, institutId) => {
     requete += "JOIN tests                  ON exams.test_id = tests.test_id ";
     requete += "JOIN sessions               ON sessions.test_id = tests.test_id ";
     requete += "WHERE sessions.session_id = " + sessionId + " ";
-    requete += "AND instituts.institut_id = " + institutId + " ";
+    if(institutId) requete += "AND instituts.institut_id = " + institutId + " ";
     requete += "GROUP BY sessionUsers.user_id, exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price "
     requete += "ORDER BY user_id";
     return requete
 }
 
-/**
- * Récupérer les données pour générer les factures pour Get-skills
- * @param sessionId
- * @param institutId
- * @returns {string}
- * @constructor
- */
-const REQ_FACTURE_PAR_SESSION = (sessionId, institutId) => {
-    let requete = "SELECT ";
-    requete += "exams.label                 as DESCRIPTION, ";
-    requete += "COUNT(exams.label)          as QUANTITY, "
-    requete += "Institut_has_prices.tva     as TVA, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU, ";
-    requete += "SUM(exams.price)            as TOTAL_TTC ";
-    requete += "from session_user_option ";
-    requete += "JOIN sessionUsers           ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
-    requete += "JOIN exams                  ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id ";
-    requete += "JOIN instituts              ON instituts.institut_id = Institut_has_prices.institut_id "
-    requete += "JOIN tests                  ON exams.test_id = tests.test_id ";
-    requete += "JOIN sessions               ON sessions.test_id = tests.test_id ";
-    requete += "WHERE sessions.session_id = " + sessionId + " ";
-    requete += "GROUP BY sessionUsers.user_id, exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price "
-    requete += "ORDER BY exams.label";
-    return requete
+module.exports = {
+    ConstructDatasForPDf,
+    ConstructDatasForInvoice,
+    REQ_INSTITUT,
+    REQ_EXAMS,
+    REQ_FACTURE,
+    REQ_SESSION,
+    REQ_USERS,
+    REQ_EXAMS_INFOS,
 }
-
-module.exports = {ConstructDatasForPDf}
 

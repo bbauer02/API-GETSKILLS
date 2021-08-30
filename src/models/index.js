@@ -20,6 +20,7 @@ const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
 const prices_exams = require("../db/mock-instituts_has_prices");
 const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
+const invoices = require("../db/mock-invoices");
 
 const initDB = async (sequelize) => {
     fs
@@ -302,6 +303,12 @@ const initDB = async (sequelize) => {
             }
 
         ]);
+
+        // mocks invoices
+        for(const invoice of invoices) {
+            await models['Invoice'].create(invoice)
+        }
+
     } catch (error) {
         throw error;
     }
