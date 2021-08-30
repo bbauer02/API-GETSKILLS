@@ -18,6 +18,9 @@ module.exports = (app) => {
                     }],
                 },
                 {
+                    model: models['sessionHasExam']
+                },
+                {
                     model: models['Test']
                 },
                 {

@@ -25,21 +25,21 @@ module.exports = (app) => {
             }
         }
 
-        async function updateSession(isValidate) {
+        async function updateSession(isValidate, session) {
             try {
 
                 // Si la session est validée, on ne peut changer que les dates
                 if (isValidate) {
-                    delete req.body.session[0].validation;
-                    delete req.body.session[0].test_id;
-                    delete req.body.session[0].level_id;
+                    delete req.body.session.validation;
+                    delete req.body.session.test_id;
+                    delete req.body.session.level_id;
                 }
 
-                await Session.update(req.body.session[0], {
+                await session.update(req.body.session, {
                     where: { session_id: req.params.session_id }
                 });
 
-                return Session;
+                return session;
 
             } catch (error) {
                 if (error instanceof ValidationError) {
@@ -57,23 +57,30 @@ module.exports = (app) => {
             try {
 
                 let sessionHasExamsForCreate = [];
-                req.body.sessionHasExams.forEach((exam, index) => {
+
+                Object.values(req.body.examsForSessionCreate).map((exam, index) => {
                     sessionHasExamsForCreate[index] = {};
-                    // sessionHasExam_id
+                    // exam_id
                     sessionHasExamsForCreate[index].sessionHasExam_id = exam.sessionHasExam_id;
                     // exam_id
                     sessionHasExamsForCreate[index].exam_id = exam.exam_id;
-                    // user_id pour examinateur
-                    sessionHasExamsForCreate[index].user_id = exam.user_id;
                     // session_id
                     sessionHasExamsForCreate[index].session_id = exam.session_id;
+                    // user_id pour examinateur
+                    sessionHasExamsForCreate[index].user_id = exam.user_id;
                     // adresse de l'épreuve
                     sessionHasExamsForCreate[index].adressExam = exam.adressExam;
                     // date et heure de l'épreuve
                     sessionHasExamsForCreate[index].DateTime = exam.DateTime;
                 });
 
-                await models['sessionHasExam'].bulkUpdate(sessionHasExamsForCreate);
+                await models['sessionHasExam'].bulkCreate(sessionHasExamsForCreate, { 
+                    updateOnDuplicate: [
+                        "user_id",
+                        "adressExam",
+                        "DateTime"
+                    ] 
+                });
 
             } catch (error) {
                 if (error instanceof ValidationError) {
@@ -91,7 +98,7 @@ module.exports = (app) => {
         try {
 
             const sessionFound = await findSession();
-            const updatedSession = await updateSession(sessionFound.dataValues.validation);
+            const updatedSession = await updateSession(sessionFound.dataValues.validation, sessionFound);
             await updateAllSessionHasExam();
 
 

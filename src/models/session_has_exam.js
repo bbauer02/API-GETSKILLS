@@ -8,15 +8,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         adressExam: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             validate: {
-                notEmpty: { msg: `sessionHasExam : adressExam cannot be empty !` },
-                notNull: { msg: `sessionHasExam : adressExam cannot be NULL!` }
+                notEmpty: { msg: `sessionHasExam : adressExam cannot be empty !` }
             }
         },
         DateTime: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
         session_id: {
             type: DataTypes.INTEGER,
@@ -24,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: true
         },
         exam_id: {
             type: DataTypes.INTEGER,
