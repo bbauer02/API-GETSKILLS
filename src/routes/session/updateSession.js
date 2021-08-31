@@ -70,6 +70,8 @@ module.exports = (app) => {
                     sessionHasExamsForCreate[index].user_id = exam.user_id;
                     // adresse de l'épreuve
                     sessionHasExamsForCreate[index].adressExam = exam.adressExam;
+                    // salle de l'épreuve
+                    sessionHasExamsForCreate[index].room = exam.room;
                     // date et heure de l'épreuve
                     sessionHasExamsForCreate[index].DateTime = exam.DateTime;
                 });
