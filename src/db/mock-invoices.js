@@ -4,7 +4,7 @@ const invoices = [
         "isPaid": false,
         "ref_client": "Session du 01/01/1999",
         "test": "DELF NATURALISATION",
-        "price_total_TTC": 70,
+        "price_total_TTC": 75,
         "lines": [
             {
                 "label": "Epreuve 1",

@@ -15,12 +15,15 @@ module.exports = (app) => {
             for(const line of lines) {
                 await models['InvoiceLines'].create({...line, num_line: ++index, invoice_id: orderCreated.invoice_id});
             }
-            return res.status(200).json({message: `invoice for session ${orderCreated.nature} has been created.`, data: orderCreated});
-
-            if(order) {
+            if(!orderCreated) {
                 return res.status(400).json({message: 'Error: no invoice created', data: null})
             }
-
+            const invoice = await models['Invoice'].findOne(
+                {
+                    where: {invoice_id: orderCreated.invoice_id},
+                    include: { as: 'lines', model: models.InvoiceLines}
+                });
+            return res.status(200).json({message: `invoice for session ${orderCreated.ref_client} has been created.`, data: invoice});
         } catch (e) {
             return res.status(500).json({message: e.message, data: null})
         }

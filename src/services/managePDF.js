@@ -1,6 +1,7 @@
 const unoconv = require('unoconv-promise');
 const PDFMerger = require('pdf-merger-js');
 const path = require("path");
+const fs = require("fs");
 
 
 /**
@@ -50,4 +51,16 @@ async function mergePdf (files) {
     }
 }
 
-module.exports = {createPdfWithTemplate, mergePdf}
+/**
+ * Envoyer le PDF dans la réponse HTTP
+ * @param pdfFile
+ */
+function reponseHTTPWithPdf (pdfFile, responseHttp) {
+    const s = fs.createReadStream(path.join(__dirname, 'temporary', pdfFile));
+    const myFilename = encodeURIComponent("invoice.pdf");
+    responseHttp.setHeader('Content-disposition', 'attachment; filename="' + myFilename + '"');
+    responseHttp.setHeader('Content-Type', "application/pdf");
+    s.pipe(responseHttp);
+}
+
+module.exports = {createPdfWithTemplate, mergePdf, reponseHTTPWithPdf}

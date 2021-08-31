@@ -1,4 +1,4 @@
-const {ConstructDatasForPDf} = require("./manageQueryDocs");
+const {ConstructDatasForPDf} = require("../../services/manageQueryDocs");
 
 module.exports = (app) => {
     app.get("/api/instituts/:institut_id/facture", async (req, res) => {

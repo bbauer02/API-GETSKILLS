@@ -1,4 +1,4 @@
-const sequelize = require("../../db/sequelize");
+const sequelize = require("../db/sequelize");
 const {QueryTypes} = require("sequelize");
 const paymentList = {
     1: {
@@ -40,7 +40,7 @@ const civilityList =
 async function Requete (reqString, name) {
     let items = [];
     try {
-        items = await sequelize.query(reqString, {type: QueryTypes.SELECT});
+        items = await sequelize.query(reqString, {nest: true, type: QueryTypes.SELECT});
     } catch (err) {
         throw new Error("An error occurred. Try to another id or POST one " + name + " - " + err.message)
     }
@@ -52,6 +52,7 @@ async function Requete (reqString, name) {
     }
 }
 
+
 /**
  * Construction des données pour les factures du CIFLE vers les écoles
  * @param institutId
@@ -59,11 +60,11 @@ async function Requete (reqString, name) {
  * @returns {Promise<{oInfoFactures: {LIST_TVA: string, LIST_HT: string, LIST_TTC: string}, oFactures: {QUANTITES: string, ARTICLES_PU: string, ARTICLES_TVA: string, TOTAL_TVA: number, ARTICLES_HT: string, TOTAL_HT: number, TOTAL_TTC: number, ARTICLES_TTC: string, DESCRIPTIONS: string}, instituts: void}>}
  * @constructor
  */
-async function ConstructDatasForInvoice (institutId, sessionId) {
+async function ConstructDatasForInvoiceInPDF (institutId, sessionId) {
 
     // requetes
     const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
-    const factures = await Requete(REQ_FACTURE(sessionId, null), 'facture');
+    const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'facture');
 
     // retours chariots
     const RC = "\n";
@@ -82,10 +83,15 @@ async function ConstructDatasForInvoice (institutId, sessionId) {
         TOTAL_TVA: 0
     };
     let oInfoFactures = {
+        TEST: '',
+        LEVEL: '',
         LIST_TVA: '',
         LIST_HT: '',
         LIST_TTC: ''
     };
+
+    oInfoFactures.TEST = factures[0].TEST;
+    oInfoFactures.LEVEL = factures[0].LEVEL;
 
     const listTva = factures.reduce((prev, curr) => {
         if (!prev.includes(curr.TVA)) {
@@ -128,7 +134,7 @@ async function ConstructDatasForInvoice (institutId, sessionId) {
         oFactures.TOTAL_TTC += line.QUANTITY * line.PU;
     })
 
-    return Object.assign(instituts[0], oFactures, oInfoFactures );
+    return [Object.assign(instituts[0], oFactures, oInfoFactures )];
 
 }
 
@@ -148,7 +154,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
     const users = await Requete(REQ_USERS(sessionId, userId), 'users');
     const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
     const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
-    const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'factures');
+    const factures = await Requete(REQ_FACTURE_STUDENT(sessionId, institutId, userId), 'factures');
 
     // console.log('institut->', instituts);
     // console.log('session->', sessions);
@@ -380,40 +386,71 @@ const REQ_EXAMS_INFOS = (sessionId) => {
  * Générer une facture du CIFLE vers une école.
  * @param sessionId
  * @param institutId
+ * @param userId
  * @returns {string}
  * @constructor
  */
-const REQ_FACTURE = (sessionId, institutId) => {
+const REQ_FACTURE_STUDENT = (sessionId, institutId, userId) => {
     let requete = "SELECT ";
-    if(institutId) requete += "sessionUsers.user_id        as USER_ID, "
+    requete += "users.user_id        as USER_ID, "
     requete += "exams.label                 as DESCRIPTION, ";
-    requete += "COUNT(session_user_option.sessionUser_id) as NB_CANDIDATS, "
-    requete += "COUNT(exams.exam_id)          as QUANTITY, "
     requete += "Institut_has_prices.tva     as TVA, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as PU, ";
-    requete += "SUM(exams.price)            as TOTAL_TTC ";
-    requete += "from session_user_option ";
-    requete += "JOIN sessionUsers           ON session_user_option.sessionUser_id = sessionUsers.sessionUser_id ";
-    requete += "JOIN exams                  ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id ";
-    requete += "JOIN instituts              ON instituts.institut_id = Institut_has_prices.institut_id "
-    requete += "JOIN tests                  ON exams.test_id = tests.test_id ";
-    requete += "JOIN sessions               ON sessions.test_id = tests.test_id ";
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)       as PU, ";
+    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price))  as TOTAL_TTC, ";
+    requete += "COUNT(sessionUsers.user_id) as QUANTITY "
+    requete += "from exams ";
+    requete += "JOIN session_user_option    ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN sessionUsers           ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
+    requete += "JOIN sessions               ON sessions.session_id = sessionUsers.session_id ";
+    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id "
+    requete += "JOIN users                  ON users.user_id = sessionUsers.user_id ";
+    requete += "JOIN tests                  ON exams.test_id = tests.test_id  ";
+    requete += "JOIN levels                 ON levels.level_id = exams.level_id ";
     requete += "WHERE sessions.session_id = " + sessionId + " ";
-    if(institutId) requete += "AND instituts.institut_id = " + institutId + " ";
-    requete += "GROUP BY sessionUsers.user_id, exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price "
+    requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
+    requete += "AND session_user_option.isCandidate = true ";
+    if(userId) requete += requete += "AND users.user_id = " + userId + " ";
+    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price, sessionUsers.user_id, users.user_id "
     requete += "ORDER BY user_id";
     return requete
 }
 
+const REQ_FACTURE = (sessionId, institutId) => {
+    let requete = "SELECT ";
+    requete += "exams.label                 as DESCRIPTION, ";
+    requete += "tests.label                 as TEST, ";
+    requete += "levels.label                as LEVEL, ";
+    requete += "sessions.start              as DATE_START, ";
+    requete += "Institut_has_prices.tva     as TVA, ";
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)       as PU, ";
+    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price))  as TOTAL_TTC, ";
+    requete += "COUNT(sessionUsers.user_id) as QUANTITY "
+    requete += "from exams ";
+    requete += "JOIN session_user_option    ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN sessionUsers           ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
+    requete += "JOIN sessions               ON sessions.session_id = sessionUsers.session_id ";
+    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id "
+    requete += "JOIN users                  ON users.user_id = sessionUsers.user_id ";
+    requete += "JOIN tests                  ON exams.test_id = tests.test_id  ";
+    requete += "JOIN levels                 ON levels.level_id = exams.level_id ";
+    requete += "WHERE sessions.session_id = " + sessionId + " ";
+    requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
+    requete += "AND session_user_option.isCandidate = true ";
+    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price,tests.label,levels.label "
+    return requete
+}
+
+
 module.exports = {
+    Requete,
     ConstructDatasForPDf,
-    ConstructDatasForInvoice,
+    ConstructDatasForInvoiceInPDF,
     REQ_INSTITUT,
     REQ_EXAMS,
-    REQ_FACTURE,
+    REQ_FACTURE_STUDENT,
     REQ_SESSION,
     REQ_USERS,
     REQ_EXAMS_INFOS,
+    REQ_FACTURE,
 }
 

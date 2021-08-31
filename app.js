@@ -151,6 +151,7 @@ require('./src/routes/invoice/createInvoiceByInstitut')(app);
 require('./src/routes/invoice/updateInvoiceByInstitut')(app);
 require('./src/routes/invoice/deleteInvoiceByInstitut')(app);
 require('./src/routes/invoice/newInvoice')(app);
+require('./src/routes/invoice/getInvoicePdf')(app);
 
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

@@ -1,12 +1,12 @@
-const {ConstructDatasForPDf} = require("./manageQueryDocs");
-const {createRepository, destroyTemporaryFolders, getFilesIn} = require("./manageFileSystem");
-const {createPdf, mergePdf} = require("./managePDF");
+const {ConstructDatasForPDf} = require("../../services/manageQueryDocs");
+const {createRepository, destroyTemporaryFolders, getFilesIn} = require("../../services/manageFileSystem");
+const {createPdf, mergePdf} = require("../../services/managePDF");
 const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
 const DOC_TYPES = require("./index");
-const {createPdfWithTemplate} = require("./managePDF");
+const {createPdfWithTemplate} = require("../../services/managePDF");
 
 
 /**
@@ -54,7 +54,7 @@ module.exports = (app) => {
         const docTypeId = parseInt(req.params.doc);
         const institutId = parseInt(req.params.institut_id);
         const sessionId = parseInt(req.query.session_id);
-        const userId = parseInt(req.query.user_id);
+        const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
 
         /**
          * Envoyer le PDF dans la réponse HTTP
