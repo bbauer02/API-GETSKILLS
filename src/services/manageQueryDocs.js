@@ -263,21 +263,56 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 /**
  * obtenir un institut avec son id
  * @param institutId
+ * @param alias
  * @returns {string}
  * @constructor
  */
-const REQ_INSTITUT = (institutId) => {
-    let requete = "SELECT ";
-    requete += "instituts.label as SCHOOL_NAME, instituts.label as SCHOOL_NAME_PIED, ";
-    requete += "IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,'\r\n',instituts.adress2)) as SCHOOL_ADDRESS1, IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,' - ',instituts.adress2)) as SCHOOL_ADDRESS1_PIED, ";
-    requete += "instituts.adress1 as SCHOOL_ADDRESS2, instituts.adress1 as SCHOOL_ADDRESS2_PIED, ";
-    requete += "instituts.zipcode as SCHOOL_ZIPCODE, instituts.zipcode as SCHOOL_ZIPCODE_PIED, ";
-    requete += "instituts.city as SCHOOL_CITY, instituts.city as SCHOOL_CITY_PIED, ";
-    requete += "instituts.phone as SCHOOL_PHONE, instituts.phone as SCHOOL_PHONE_PIED, ";
-    requete += "instituts.email as SCHOOL_EMAIL, instituts.email as SCHOOL_EMAIL_PIED ";
-    requete += "FROM instituts ";
-    requete += "WHERE instituts.institut_id = " + institutId;
-    return requete;
+const REQ_INSTITUT = async (institutId, alias) => {
+
+    try {
+        const institut = await models['Institut'].findOne({
+            where: {institut_id: institutId},
+            attributes: alias,
+        })
+
+        if(!institut) {
+            throw new Error('no institut found')
+        }
+
+        if(institut.SCHOOL_ADDRESS2 && institut.SCHOOL_ADDRESS2 !== '') {
+            institut.SCHOOL_ADRESS_FULL = institut.SCHOOL_ADDRESS1 + "\n" + institut.SCHOOL_ADDRESS2;
+            institut.SCHOOL_ADRESS_FULL_INLINE = institut.SCHOOL_ADDRESS1 + " - " + institut.SCHOOL_ADDRESS2;
+        } else {
+            institut.SCHOOL_ADRESS_FULL = institut.SCHOOL_ADDRESS1;
+            institut.SCHOOL_ADRESS_FULL_INLINE = institut.SCHOOL_ADDRESS1;
+        }
+
+        return institut
+
+    } catch (e) {
+        console.log(e.message);
+    }
+}
+
+const ALIAS = {
+    INSTITUT: [
+        ['label', 'SCHOOL_NAME'],
+        ['adress1', 'SCHOOL_ADDRESS1'],
+        ['adress2', 'SCHOOL_ADDRESS2'],
+        ['zipcode', 'SCHOOL_ZIPCODE'],
+        ['city', 'SCHOOL_CITY'],
+        ['phone', 'SCHOOL_PHONE'],
+        ['email', 'SCHOOL_EMAIL'],
+    ],
+    INSTITUT_PIED: [
+        ['label', 'SCHOOL_NAME_PIED'],
+        ['adress1', 'SCHOOL_ADDRESS1_PIED'],
+        ['adress2', 'SCHOOL_ADDRESS2_PIED'],
+        ['zipcode', 'SCHOOL_ZIPCODE_PIED'],
+        ['city', 'SCHOOL_CITY_PIED'],
+        ['phone', 'SCHOOL_PHONE_PIED'],
+        ['email', 'SCHOOL_EMAIL_PIED'],
+    ]
 }
 
 /**
@@ -286,7 +321,14 @@ const REQ_INSTITUT = (institutId) => {
  * @returns {string}
  * @constructor
  */
-const REQ_SESSION = (sessionId) => {
+const REQ_SESSION = async (sessionId) => {
+
+    const session = await models['Session'].findOne({
+        where: {session_id: sessionId},
+
+    })
+
+
     let requete = "SELECT ";
     requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
     requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
