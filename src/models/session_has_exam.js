@@ -13,6 +13,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: { msg: `sessionHasExam : adressExam cannot be empty !` }
             }
         },
+        room: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            validate: {
+                notEmpty: { msg: `sessionHasExam : room cannot be empty !` }
+            }
+        },
         DateTime: {
             type: DataTypes.DATE,
             allowNull: true
@@ -21,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        user_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true
-        },
         exam_id: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -32,13 +35,17 @@ module.exports = (sequelize, DataTypes) => {
     },
         {
             tableName: 'session_has_exam',
-            timestamps: false
+            timestamps: false,
+            uniqueKeys: {
+                compositeKey: {
+                    fields: ['session_id', 'exam_id']
+                }
+            },
         });
 
     sessionHasExam.associate = models => {
         sessionHasExam.belongsTo(models.Session, { foreignKey: 'session_id', sourceKey: 'session_id', onDelete: 'CASCADE' });
         sessionHasExam.belongsTo(models.Exam, { foreignKey: 'exam_id', sourceKey: 'exam_id' });
-        sessionHasExam.belongsTo(models.institutHasUser, { foreignKey: 'user_id', sourceKey: 'user_id' });
     };
 
     return sessionHasExam;

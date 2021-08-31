@@ -51,7 +51,7 @@
         Exam.belongsTo(models.Level,{foreignKey:'level_id',onDelete:'SET NULL'});
         Exam.hasMany(models.sessionUserOption, {foreignKey:'exam_id',sourceKey: 'exam_id'});
         Exam.hasMany(models.InstitutHasPrices, {foreignKey:'exam_id',sourceKey: 'exam_id'});
-        Exam.hasMany(models.sessionHasExam,{foreignKey:'sessionHasExam_id'});
+        Exam.hasMany(models.sessionHasExam,{foreignKey:'exam_id', sourceKey: 'exam_id'});
     };
   
     return Exam; 
