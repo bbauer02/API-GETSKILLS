@@ -213,7 +213,7 @@ const initDB = async (sequelize) => {
                 DateTime: sessionHasExam.DateTime,
                 session_id: sessionHasExam.session_id,
                 exam_id: sessionHasExam.exam_id,
-                user_id: sessionHasExam.user_id,
+                room: sessionHasExam.room,
             });
         }
 
