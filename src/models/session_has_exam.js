@@ -46,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     sessionHasExam.associate = models => {
         sessionHasExam.belongsTo(models.Session, { foreignKey: 'session_id', sourceKey: 'session_id', onDelete: 'CASCADE' });
         sessionHasExam.belongsTo(models.Exam, { foreignKey: 'exam_id', sourceKey: 'exam_id' });
+        sessionHasExam.hasMany(models.sessionExamHasExaminator, { foreignKey: 'sessionHasExam_id', sourceKey: 'sessionHasExam_id' });
     };
 
     return sessionHasExam;
