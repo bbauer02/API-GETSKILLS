@@ -66,8 +66,6 @@ module.exports = (app) => {
                     sessionHasExamsForCreate[index].exam_id = exam.exam_id;
                     // session_id
                     sessionHasExamsForCreate[index].session_id = exam.session_id;
-                    // user_id pour examinateur
-                    sessionHasExamsForCreate[index].user_id = exam.user_id;
                     // adresse de l'épreuve
                     sessionHasExamsForCreate[index].adressExam = exam.adressExam;
                     // salle de l'épreuve
@@ -78,9 +76,9 @@ module.exports = (app) => {
 
                 await models['sessionHasExam'].bulkCreate(sessionHasExamsForCreate, { 
                     updateOnDuplicate: [
-                        "user_id",
                         "adressExam",
-                        "DateTime"
+                        "DateTime",
+                        "room"
                     ] 
                 });
 

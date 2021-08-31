@@ -108,8 +108,6 @@ module.exports = (app) => {
                     sessionHasExamsForCreate[index] = {};
                     // exam_id
                     sessionHasExamsForCreate[index].exam_id = exam.exam_id;
-                    // user_id pour examinateur
-                    sessionHasExamsForCreate[index].user_id = exam.user_id;
                     // session_id
                     sessionHasExamsForCreate[index].session_id = _sessionCreated.dataValues.session_id;
                     // adresse de l'épreuve
