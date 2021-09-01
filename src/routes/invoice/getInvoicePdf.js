@@ -26,7 +26,7 @@ module.exports = (app) => {
             const invoice = await models['Invoice'].findOne({
                 where: {invoice_id: invoiceId, institut_id: institutId},
                 attributes: [
-                    ['invoice_id', 'invoiceId']
+                    ['invoice_id', 'invoiceId'],
                     ['reference', 'ref'],
                     ['ref_client', 'REFERENCE'],
                     ['createdAt', 'DATE_FACTURE'],
