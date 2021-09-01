@@ -18,17 +18,16 @@ const paymentList = {
         label: 'Chèque'
     }
 };
-const civilityList =
-    {
-        1: {
-            civility_id: 1,
-            label: 'Mr.'
-        },
-        2: {
-            civility_id: 2,
-            label: 'Mme.'
-        }
-    };
+const civilityList = {
+    1: {
+        civility_id: 1,
+        label: 'Mr.'
+    },
+    2: {
+        civility_id: 2,
+        label: 'Mme.'
+    }
+};
 
 /**
  * Permet de lancer une requete
@@ -51,7 +50,6 @@ async function Requete (reqString, name) {
         return items;
     }
 }
-
 
 /**
  * Construction des données pour les factures du CIFLE vers les écoles
@@ -87,7 +85,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 
     // requetes
     const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
-    const sessions = await Requete(REQ_SESSION(sessionId), 'session');
+    // const sessions = await Requete(REQ_SESSION(sessionId), 'session');
     const users = await Requete(REQ_USERS(sessionId, userId), 'users');
     const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
     const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
@@ -129,7 +127,7 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
         }
 
         // on regroupe toutes les données concernant un USER dans un objet DATA
-        data = Object.assign(sessions[0], instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFacture);
+        data = Object.assign(instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFacture);
 
         // on l'ajoute dans un tableau
         datasForPdf = [...datasForPdf, {...data}];
@@ -160,25 +158,6 @@ const REQ_INSTITUT = (institutId) => {
 }
 
 
-/**
- * obtenir une session par son id
- * @returns {string}
- * @constructor
- */
-const REQ_SESSION = (sessionId) => {
-
-    let requete = "SELECT DISTINCT ";
-    requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
-    requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
-    requete += "IFNULL(levels.label, '') as LEVEL, ";
-    requete += "tests.label as TEST ";
-    requete += "FROM sessions "
-    requete += "join tests on tests.test_id = sessions.test_id ";
-    requete += "left join exams on tests.test_id = exams.test_id ";
-    requete += "left join levels on exams.level_id = levels.level_id ";
-    requete += "where sessions.session_id = " + sessionId;
-    return requete
-}
 
 /**
  * Obtenir la liste des candidats pour la session
@@ -188,7 +167,7 @@ const REQ_SESSION = (sessionId) => {
  * @constructor
  */
 const REQ_USERS = (sessionId, userId) => {
-    let requete = "SELECT ";
+    let requete = "SELECT DISTINCT ";
     requete += "users.civility as USER_GENDER, ";
     requete += "users.user_id as USER_ID, ";
     requete += "users.lastname as USER_LASTNAME, ";
@@ -199,6 +178,10 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "users.city as USER_CITY, ";
     requete += "users.phone as USER_PHONE, ";
     requete += "users.email as USER_MAIL, ";
+    requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
+    requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
+    requete += "IFNULL(levels.label, '') as LEVEL, ";
+    requete += "tests.label as TEST, ";
     requete += "sessionUsers.paymentMode as PAIEMENT_INSCRIPTION, "
     requete += "DATEDIFF(IFNULL(sessionUsers.inscription, '1899-12-30'), '1899-12-30') as USER_DATE_INSCR, ";
     requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
@@ -211,8 +194,13 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "join sessionUsers on sessionUsers.user_id = users.user_id ";
     requete += "join sessions on sessions.session_id = sessionUsers.session_id ";
     requete += "join countries on countries.country_id = users.country_id ";
+    requete += "join session_user_option on sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
+    requete += "join exams on session_user_option.exam_id = exams.exam_id ";
+    requete += "join tests on tests.test_id = exams.test_id ";
+    requete += "join levels on exams.level_id = levels.level_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
     if (userId) requete += "AND users.user_id = " + userId + " ";
+    requete += "AND session_user_option.isCandidate = true "
     requete += "order by user_id";
     return requete;
 }
@@ -235,6 +223,7 @@ const REQ_EXAMS = (sessionId) => {
     requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
     requete += "join users on sessionUsers.user_id = users.user_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
+    requete += "AND session_user_option.isCandidate = true "
     requete += "GROUP BY users.user_id, exams.label, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
     requete += "order by user_id";
     return requete
@@ -406,7 +395,6 @@ module.exports = {
     REQ_INSTITUT,
     REQ_EXAMS,
     REQ_FACTURE_STUDENT,
-    REQ_SESSION,
     REQ_USERS,
     REQ_EXAMS_INFOS,
     REQ_FACTURE,
