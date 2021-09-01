@@ -12,7 +12,7 @@ module.exports = (app) => {
 
         try {
             const orderDatas = await Requete(REQ_FACTURE(institutId, sessionId), 'facture');
-
+            console.log(orderDatas);
             if (orderDatas.length === 0) {
                 return res.status(200).json({message: 'no facture generated', data: null});
             }

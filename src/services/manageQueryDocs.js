@@ -197,7 +197,7 @@ const REQ_USERS = (sessionId, userId) => {
     requete += "join session_user_option on sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
     requete += "join exams on session_user_option.exam_id = exams.exam_id ";
     requete += "join tests on tests.test_id = exams.test_id ";
-    requete += "join levels on exams.level_id = levels.level_id ";
+    requete += "left join levels on exams.level_id = levels.level_id ";
     requete += "where sessions.session_id = " + sessionId + " ";
     if (userId) requete += "AND users.user_id = " + userId + " ";
     requete += "AND session_user_option.isCandidate = true "
@@ -277,7 +277,7 @@ const REQ_FACTURE_STUDENT = (sessionId, institutId, userId) => {
     requete += "JOIN Institut_has_prices ON Institut_has_prices.exam_id = exams.exam_id "
     requete += "JOIN users ON users.user_id = sessionUsers.user_id ";
     requete += "JOIN tests ON exams.test_id = tests.test_id  ";
-    requete += "JOIN levels ON levels.level_id = exams.level_id ";
+    requete += "right JOIN levels ON levels.level_id = exams.level_id ";
     requete += "WHERE sessions.session_id = " + sessionId + " ";
     requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
     requete += "AND session_user_option.isCandidate = true ";
@@ -304,7 +304,7 @@ const REQ_FACTURE = (sessionId, institutId) => {
     requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id "
     requete += "JOIN users                  ON users.user_id = sessionUsers.user_id ";
     requete += "JOIN tests                  ON exams.test_id = tests.test_id  ";
-    requete += "JOIN levels                 ON levels.level_id = exams.level_id ";
+    requete += "left JOIN levels                 ON levels.level_id = exams.level_id ";
     requete += "WHERE sessions.session_id = " + sessionId + " ";
     requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
     requete += "AND session_user_option.isCandidate = true ";

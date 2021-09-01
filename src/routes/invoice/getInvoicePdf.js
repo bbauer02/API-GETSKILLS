@@ -86,7 +86,7 @@ module.exports = (app) => {
 
             // 1 fichier PDF généré
             if (files.length === 1) {
-                reponseHTTPWithPdf(files[0], res)
+                reponseHTTPWithPdf(files[0], res, true)
             }
 
 
