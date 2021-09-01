@@ -7,7 +7,6 @@ const {
 } = require("../../services/manageFileSystem");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
-const path = require("path");
 const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
 
 const STANDARD_INVOICE = process.cwd() + '/public/templates/Standard_facture_cifle.odt';
@@ -27,7 +26,8 @@ module.exports = (app) => {
             const invoice = await models['Invoice'].findOne({
                 where: {invoice_id: invoiceId, institut_id: institutId},
                 attributes: [
-                    ['invoice_id', 'NUM_FACTURE'],
+                    ['invoice_id', 'invoiceId']
+                    ['reference', 'ref'],
                     ['ref_client', 'REFERENCE'],
                     ['createdAt', 'DATE_FACTURE'],
                 ],
@@ -54,10 +54,7 @@ module.exports = (app) => {
             })
 
             let datasForPdf = {
-                NUM_FACTURE: new Date(invoice.dataValues.DATE_FACTURE).toLocaleString([], {
-                    year: 'numeric',
-                    month: 'numeric',
-                }) + "-" + invoice.dataValues.NUM_FACTURE.toString().padStart(6, "0"),
+                NUM_FACTURE: invoice.dataValues.ref + "-" + invoice.dataValues.invoiceId.toString().padStart(6, "0"),
                 REFERENCE: invoice.dataValues.REFERENCE,
                 DATE_FACTURE: Math.ceil(Math.abs(invoice.dataValues.DATE_FACTURE - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24)),
                 SCHOOL_NAME: invoice.dataValues.Institut.dataValues.SCHOOL_NAME,

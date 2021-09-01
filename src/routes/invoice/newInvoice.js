@@ -1,5 +1,4 @@
-const {ConstructDatasForInvoiceInPDF, REQ_FACTURE, Requete} = require("../../services/manageQueryDocs");
-const {models} = require("../../models");
+const { REQ_FACTURE, Requete} = require("../../services/manageQueryDocs");
 
 /**
  * Obtenir les données pour valider la commande avant la facture
