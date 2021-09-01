@@ -1,17 +1,14 @@
-const {ConstructDatasForPDf} = require("../../services/manageQueryDocs");
+
+const {formaterLaFacture} = require("../../services/manageQueryDocs");
 const {
     createRepository,
     destroyTemporaryFolders,
     getFilesInTemporaryFolder
 } = require("../../services/manageFileSystem");
-const {createPdf, mergePdf} = require("../../services/managePDF");
-const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
-const DOC_TYPES = require("../documents/index");
 const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
-const {ConstructDatasForInvoiceInPDF} = require("../../services/manageQueryDocs");
 
 const STANDARD_INVOICE = process.cwd() + '/public/templates/Standard_facture_cifle.odt';
 
@@ -56,51 +53,7 @@ module.exports = (app) => {
                 ]
             })
 
-            let articleLine = {
-                DESCRIPTIONS: '',
-                QUANTITES: '',
-                ARTICLES_PU: '',
-                ARTICLES_HT: '',
-                ARTICLES_TVA: '',
-                ARTICLES_TTC: '',
-                TOTAL_HT: 0,
-                TOTAL_TVA: 0,
-                TOTAL_TTC: 0,
-                LIST_TVA: '',
-                LIST_HT: '',
-                LIST_TTC: ''
-            }
-
-            let datasForPdf = invoice.dataValues.lines.reduce((prev, curr) => {
-                // retours chariots
-                const RC = "\n";
-                const RC2 = "\n\n";
-                let carriage = RC;
-
-                if (curr.label.length < 40) {
-                    prev.DESCRIPTIONS += curr.label + RC;
-                } else if (curr.label.length >= 40 && curr.label.length < 80) {
-                    carriage = RC2;
-                    prev.DESCRIPTIONS += curr.label.substr(0, 79) + RC;
-                } else {
-                    carriage = RC2;
-                    prev.DESCRIPTIONS += curr.label.substr(0, 79) + '...' + RC;
-                }
-
-                prev.QUANTITES += curr.quantity + carriage;
-                prev.ARTICLES_PU += curr.price_pu_ttc + carriage;
-                prev.ARTICLES_TVA += curr.tva + carriage;
-                prev.ARTICLES_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100))).toFixed(2) + carriage;
-                prev.ARTICLES_TTC += (curr.price_pu_ttc * curr.quantity) + carriage;
-                prev.TOTAL_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100)));
-                prev.TOTAL_TVA += (curr.quantity * curr.price_pu_ttc) * (1 - (1 / (1 + (curr.tva / 100))));
-                prev.TOTAL_TTC += curr.quantity * curr.price_pu_ttc;
-
-                return prev;
-            }, articleLine)
-
-            datasForPdf = {
-                ...datasForPdf,
+            let datasForPdf = {
                 NUM_FACTURE: new Date(invoice.dataValues.DATE_FACTURE).toLocaleString([], {
                     year: 'numeric',
                     month: 'numeric',
@@ -115,32 +68,10 @@ module.exports = (app) => {
                 SCHOOL_EMAIL: invoice.dataValues.Institut.dataValues.SCHOOL_EMAIL,
             }
 
-            const listTva = invoice.dataValues.lines.reduce((prev, curr) => {
-                if (!prev.includes(curr.tva)) {
-                    prev.push(curr.tva);
-                }
-                return prev;
-            }, []);
+            const invoiceDatas = formaterLaFacture(invoice.dataValues.lines);
 
-            datasForPdf = {
-                ...datasForPdf,
-                LIST_TVA: listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", ''),
-            }
+            datasForPdf = Object.assign(datasForPdf, invoiceDatas);
 
-            datasForPdf = {...datasForPdf, LIST_TTC: '', LIST_HT: ''};
-            listTva.forEach((tva) => {
-                datasForPdf.LIST_HT += invoice.dataValues.lines
-                        .filter((line) => line.tva === tva)
-                        .reduce((prev, curr) => prev + ((curr.price_pu_ttc * curr.quantity) / (1 + (tva / 100))), 0)
-                        .toFixed(2)
-                    + "\n"
-
-                datasForPdf.LIST_TTC += invoice.dataValues.lines
-                        .filter((fact) => fact.tva === tva)
-                        .reduce((prev, curr) => prev + (curr.price_pu_ttc * curr.quantity), 0)
-                        .toFixed(2)
-                    + "\n"
-            })
 
             // création du dossier temporaire dans lequel on met les PDF générés
             const folder = createRepository();
@@ -158,7 +89,7 @@ module.exports = (app) => {
 
             // 1 fichier PDF généré
             if (files.length === 1) {
-                reponseHTTPWithPdf(path.join(files[0]), res)
+                reponseHTTPWithPdf(files[0], res)
             }
 
 

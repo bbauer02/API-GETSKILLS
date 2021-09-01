@@ -58,7 +58,7 @@ async function mergePdf (files) {
 function reponseHTTPWithPdf (pdfFile, responseHttp) {
     const s = fs.createReadStream(path.join(__dirname, 'temporary', pdfFile));
     const myFilename = encodeURIComponent("invoice.pdf");
-    responseHttp.setHeader('Content-disposition', 'attachment; filename="' + myFilename + '"');
+    responseHttp.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
     responseHttp.setHeader('Content-Type', "application/pdf");
     s.pipe(responseHttp);
 }

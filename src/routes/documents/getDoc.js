@@ -6,7 +6,8 @@ const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
 const DOC_TYPES = require("./index");
-const {createPdfWithTemplate} = require("../../services/managePDF");
+const {getFilesInTemporaryFolder} = require("../../services/manageFileSystem");
+const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
 
 
 /**
@@ -56,17 +57,6 @@ module.exports = (app) => {
         const sessionId = parseInt(req.query.session_id);
         const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
 
-        /**
-         * Envoyer le PDF dans la réponse HTTP
-         * @param pdfFile
-         */
-        function reponseHTTPWithPdf (pdfFile) {
-            const s = fs.createReadStream(pdfFile);
-            const myFilename = encodeURIComponent(DOC_TYPES[docTypeId] + ".pdf");
-            res.setHeader('Content-disposition', 'inline; filename="' + myFilename + '"');
-            res.setHeader('Content-Type', "application/pdf");
-            s.pipe(res);
-        }
 
         try {
 
@@ -86,7 +76,7 @@ module.exports = (app) => {
             await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
 
             // récupération des fichiers PDF qui ont été générés
-            const files = getFilesIn(path.join(__dirname, 'temporary'))
+            const files = getFilesInTemporaryFolder();
 
             // pas de fichier PDF trouvés
             if (files.length === 0) {
@@ -95,13 +85,14 @@ module.exports = (app) => {
 
             // 1 fichier PDF généré
             if (files.length === 1) {
-                reponseHTTPWithPdf(path.join(__dirname, 'temporary', files[0]))
+                reponseHTTPWithPdf(path.join(files[0]), res)
             }
 
             // plusieurs fichiers PDF à fusionner ensemble
             if (files.length > 1) {
                 const pdfFileNameMerged = await mergePdf(files);
-                reponseHTTPWithPdf(path.join(__dirname, 'temporary', pdfFileNameMerged))
+                reponseHTTPWithPdf(files[0], res)
+                reponseHTTPWithPdf(pdfFileNameMerged)
             }
 
 

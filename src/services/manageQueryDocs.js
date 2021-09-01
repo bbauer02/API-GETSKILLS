@@ -66,75 +66,12 @@ async function ConstructDatasForInvoiceInPDF (institutId, sessionId) {
     const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
     const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'facture');
 
-    // retours chariots
-    const RC = "\n";
-    const RC2 = "\n\n";
+    let oFacture = formaterLaFacture(factures);
+    oFacture = {
+        ...oFacture, TEST: oFacture[0].TEST, LEVEL: oFacture[0].LEVEL, DATE_START: oFacture[0].DATE_START
+    }
 
-    // datas
-    let oFactures = {
-        DESCRIPTIONS: '',
-        QUANTITES: '',
-        ARTICLES_PU: '',
-        ARTICLES_HT: '',
-        ARTICLES_TVA: '',
-        ARTICLES_TTC: '',
-        TOTAL_TTC: 0,
-        TOTAL_HT: 0,
-        TOTAL_TVA: 0
-    };
-    let oInfoFactures = {
-        TEST: '',
-        LEVEL: '',
-        LIST_TVA: '',
-        LIST_HT: '',
-        LIST_TTC: ''
-    };
-
-    oInfoFactures.TEST = factures[0].TEST;
-    oInfoFactures.LEVEL = factures[0].LEVEL;
-
-    const listTva = factures.reduce((prev, curr) => {
-        if (!prev.includes(curr.TVA)) {
-            prev.push(curr.TVA);
-        }
-        return prev;
-    }, []);
-
-    oInfoFactures.LIST_TVA = listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", '');
-
-    listTva.forEach((tva) => {
-        oInfoFactures.LIST_HT += factures
-            .filter((fact) => fact.TVA === tva)
-            .reduce((prev, curr) => prev + ((curr.PU * curr.QUANTITY) / (1 + (tva / 100))), 0)
-            .toFixed(2);
-
-        oInfoFactures.LIST_TTC += factures
-            .filter((fact) => fact.TVA === tva)
-            .reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY), 0)
-            .toFixed(2);
-    })
-
-    factures.forEach((line, index) => {
-        let carriage = RC;
-        if (line.DESCRIPTION.length > 40 && line.DESCRIPTION.length <= 80) {
-            carriage = RC2;
-        }
-        if (line.DESCRIPTION.length > 80) {
-            oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + RC;
-        } else {
-            oFactures.DESCRIPTIONS += line.DESCRIPTION + RC;
-        }
-        oFactures.QUANTITES += line.QUANTITY + carriage;
-        oFactures.ARTICLES_PU += ((line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
-        oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU).toFixed(2) + carriage;
-        oFactures.ARTICLES_TVA += line.TVA.toFixed(2) + carriage;
-        oFactures.ARTICLES_HT += ((line.QUANTITY * line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
-        oFactures.TOTAL_HT += (line.QUANTITY * line.PU) / (1 + (line.TVA / 100));
-        oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (1 - 1 / (1 + (line.TVA / 100)));
-        oFactures.TOTAL_TTC += line.QUANTITY * line.PU;
-    })
-
-    return [Object.assign(instituts[0], oFactures, oInfoFactures )];
+    return [Object.assign(instituts[0], oFacture)];
 
 }
 
@@ -174,32 +111,11 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
         const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID); // liste des articles de la facture
         const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID); // informations sur les examens
 
-        // retours chariots
-        const RC = "\n";
-        const RC2 = "\n\n";
-
         // construction de l'utilisateur
         user.PAIEMENT_INSCRIPTION = paymentList[user.PAIEMENT_INSCRIPTION].label;
         user.USER_GENDER = civilityList[user.USER_GENDER].label;
 
-
         let oExams = {};
-        let oFactures = {
-            DESCRIPTIONS: '',
-            QUANTITES: '',
-            ARTICLES_PU: '',
-            ARTICLES_HT: '',
-            ARTICLES_TVA: '',
-            ARTICLES_TTC: '',
-            TOTAL_TTC: 0,
-            TOTAL_HT: 0,
-            TOTAL_TVA: 0
-        };
-        let oInfoFactures = {
-            LIST_TVA: '',
-            LIST_HT: '',
-            LIST_TTC: ''
-        };
 
         let nbExams = 0;
         examens.forEach((exam, index) => {
@@ -207,50 +123,13 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
             nbExams += 1;
         })
 
-        const listTva = factures.reduce((prev, curr) => {
-            if (!prev.includes(curr.TVA)) {
-                prev.push(curr.TVA);
-            }
-            return prev;
-        }, []);
-
-        oInfoFactures.LIST_TVA = listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", '');
-
-        listTva.forEach((tva) => {
-            oInfoFactures.LIST_HT += linesFactures
-                .filter((fact) => fact.TVA === tva)
-                .reduce((prev, curr) => prev + ((curr.PU * curr.QUANTITY) / (1 + (tva / 100))), 0)
-                .toFixed(2);
-
-            oInfoFactures.LIST_TTC += linesFactures
-                .filter((fact) => fact.TVA === tva)
-                .reduce((prev, curr) => prev + (curr.PU * curr.QUANTITY), 0)
-                .toFixed(2);
-        })
-
-        linesFactures.forEach((line, index) => {
-            let carriage = RC;
-            if (line.DESCRIPTION.length > 40 && line.DESCRIPTION.length <= 80) {
-                carriage = RC2;
-            }
-            if (line.DESCRIPTION.length > 80) {
-                oFactures.DESCRIPTIONS += line.DESCRIPTION.substr(0, 80) + '...' + RC;
-            } else {
-                oFactures.DESCRIPTIONS += line.DESCRIPTION + RC;
-            }
-            oFactures.QUANTITES += line.QUANTITY + carriage;
-            oFactures.ARTICLES_PU += ((line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
-            oFactures.ARTICLES_TTC += (line.QUANTITY * line.PU).toFixed(2) + carriage;
-            oFactures.ARTICLES_TVA += line.TVA.toFixed(2) + carriage;
-            oFactures.ARTICLES_HT += ((line.QUANTITY * line.PU) / (1 + (line.TVA / 100))).toFixed(2) + carriage;
-            oFactures.TOTAL_HT += (line.QUANTITY * line.PU) / (1 + (line.TVA / 100));
-            oFactures.TOTAL_TVA += (line.QUANTITY * line.PU) * (1 - 1 / (1 + (line.TVA / 100)));
-            oFactures.TOTAL_TTC += line.QUANTITY * line.PU;
-        })
-
+        let oFacture = formaterLaFacture(linesFactures);
+        oFacture = {
+            ...oFacture, TEST: factures[0].TEST, LEVEL: factures[0].LEVEL, DATE_START: factures[0].DATE_START
+        }
 
         // on regroupe toutes les données concernant un USER dans un objet DATA
-        data = Object.assign(sessions[0], instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFactures, oInfoFactures);
+        data = Object.assign(sessions[0], instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFacture);
 
         // on l'ajoute dans un tableau
         datasForPdf = [...datasForPdf, {...data}];
@@ -263,73 +142,32 @@ async function ConstructDatasForPDf (institutId, sessionId, userId) {
 /**
  * obtenir un institut avec son id
  * @param institutId
- * @param alias
  * @returns {string}
  * @constructor
  */
-const REQ_INSTITUT = async (institutId, alias) => {
-
-    try {
-        const institut = await models['Institut'].findOne({
-            where: {institut_id: institutId},
-            attributes: alias,
-        })
-
-        if(!institut) {
-            throw new Error('no institut found')
-        }
-
-        if(institut.SCHOOL_ADDRESS2 && institut.SCHOOL_ADDRESS2 !== '') {
-            institut.SCHOOL_ADRESS_FULL = institut.SCHOOL_ADDRESS1 + "\n" + institut.SCHOOL_ADDRESS2;
-            institut.SCHOOL_ADRESS_FULL_INLINE = institut.SCHOOL_ADDRESS1 + " - " + institut.SCHOOL_ADDRESS2;
-        } else {
-            institut.SCHOOL_ADRESS_FULL = institut.SCHOOL_ADDRESS1;
-            institut.SCHOOL_ADRESS_FULL_INLINE = institut.SCHOOL_ADDRESS1;
-        }
-
-        return institut
-
-    } catch (e) {
-        console.log(e.message);
-    }
+const REQ_INSTITUT = (institutId) => {
+    let requete = "SELECT ";
+    requete += "instituts.label as SCHOOL_NAME, instituts.label as SCHOOL_NAME_PIED, ";
+    requete += "IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,'\r\n',instituts.adress2)) as SCHOOL_ADDRESS1, IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,' - ',instituts.adress2)) as SCHOOL_ADDRESS1_PIED, ";
+    requete += "instituts.adress1 as SCHOOL_ADDRESS2, instituts.adress1 as SCHOOL_ADDRESS2_PIED, ";
+    requete += "instituts.zipcode as SCHOOL_ZIPCODE, instituts.zipcode as SCHOOL_ZIPCODE_PIED, ";
+    requete += "instituts.city as SCHOOL_CITY, instituts.city as SCHOOL_CITY_PIED, ";
+    requete += "instituts.phone as SCHOOL_PHONE, instituts.phone as SCHOOL_PHONE_PIED, ";
+    requete += "instituts.email as SCHOOL_EMAIL, instituts.email as SCHOOL_EMAIL_PIED ";
+    requete += "FROM instituts ";
+    requete += "WHERE instituts.institut_id = " + institutId;
+    return requete;
 }
 
-const ALIAS = {
-    INSTITUT: [
-        ['label', 'SCHOOL_NAME'],
-        ['adress1', 'SCHOOL_ADDRESS1'],
-        ['adress2', 'SCHOOL_ADDRESS2'],
-        ['zipcode', 'SCHOOL_ZIPCODE'],
-        ['city', 'SCHOOL_CITY'],
-        ['phone', 'SCHOOL_PHONE'],
-        ['email', 'SCHOOL_EMAIL'],
-    ],
-    INSTITUT_PIED: [
-        ['label', 'SCHOOL_NAME_PIED'],
-        ['adress1', 'SCHOOL_ADDRESS1_PIED'],
-        ['adress2', 'SCHOOL_ADDRESS2_PIED'],
-        ['zipcode', 'SCHOOL_ZIPCODE_PIED'],
-        ['city', 'SCHOOL_CITY_PIED'],
-        ['phone', 'SCHOOL_PHONE_PIED'],
-        ['email', 'SCHOOL_EMAIL_PIED'],
-    ]
-}
 
 /**
  * obtenir une session par son id
- * @param sessionId
  * @returns {string}
  * @constructor
  */
-const REQ_SESSION = async (sessionId) => {
+const REQ_SESSION = (sessionId) => {
 
-    const session = await models['Session'].findOne({
-        where: {session_id: sessionId},
-
-    })
-
-
-    let requete = "SELECT ";
+    let requete = "SELECT DISTINCT ";
     requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
     requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
     requete += "IFNULL(levels.label, '') as LEVEL, ";
@@ -434,25 +272,28 @@ const REQ_EXAMS_INFOS = (sessionId) => {
  */
 const REQ_FACTURE_STUDENT = (sessionId, institutId, userId) => {
     let requete = "SELECT ";
-    requete += "users.user_id        as USER_ID, "
-    requete += "exams.label                 as DESCRIPTION, ";
-    requete += "Institut_has_prices.tva     as TVA, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)       as PU, ";
-    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price))  as TOTAL_TTC, ";
-    requete += "COUNT(sessionUsers.user_id) as QUANTITY "
+    requete += "users.user_id as USER_ID, "
+    requete += "exams.label as label, ";
+    requete += "tests.label as TEST, "
+    requete += "levels.label as LEVEL, ";
+    requete += "sessions.start as DATE_START, ";
+    requete += "Institut_has_prices.tva as tva, ";
+    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as price_pu_ttc, ";
+    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)) as TOTAL_TTC, ";
+    requete += "COUNT(sessionUsers.user_id) as quantity "
     requete += "from exams ";
-    requete += "JOIN session_user_option    ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN sessionUsers           ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
-    requete += "JOIN sessions               ON sessions.session_id = sessionUsers.session_id ";
-    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id "
-    requete += "JOIN users                  ON users.user_id = sessionUsers.user_id ";
-    requete += "JOIN tests                  ON exams.test_id = tests.test_id  ";
-    requete += "JOIN levels                 ON levels.level_id = exams.level_id ";
+    requete += "JOIN session_user_option ON session_user_option.exam_id = exams.exam_id ";
+    requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
+    requete += "JOIN sessions ON sessions.session_id = sessionUsers.session_id ";
+    requete += "JOIN Institut_has_prices ON Institut_has_prices.exam_id = exams.exam_id "
+    requete += "JOIN users ON users.user_id = sessionUsers.user_id ";
+    requete += "JOIN tests ON exams.test_id = tests.test_id  ";
+    requete += "JOIN levels ON levels.level_id = exams.level_id ";
     requete += "WHERE sessions.session_id = " + sessionId + " ";
     requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
     requete += "AND session_user_option.isCandidate = true ";
-    if(userId) requete += requete += "AND users.user_id = " + userId + " ";
-    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price, sessionUsers.user_id, users.user_id "
+    if (userId) requete += "AND users.user_id = " + userId + " ";
+    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price, sessionUsers.user_id, users.user_id, tests.label, levels.label, sessions.start "
     requete += "ORDER BY user_id";
     return requete
 }
@@ -482,6 +323,81 @@ const REQ_FACTURE = (sessionId, institutId) => {
     return requete
 }
 
+function formaterLaFacture (lines) {
+
+    let articleLine = {
+        DESCRIPTIONS: '',
+        QUANTITES: '',
+        ARTICLES_PU: '',
+        ARTICLES_HT: '',
+        ARTICLES_TVA: '',
+        ARTICLES_TTC: '',
+        TOTAL_HT: 0,
+        TOTAL_TVA: 0,
+        TOTAL_TTC: 0,
+        LIST_TVA: ''
+    }
+
+    let datasForPdf = lines.reduce((prev, curr) => {
+        // retours chariots
+        const RC = "\n";
+        const RC2 = "\n\n";
+        let carriage = RC;
+
+        if (curr.label.length < 40) {
+            prev.DESCRIPTIONS += curr.label + RC;
+        } else if (curr.label.length >= 40 && curr.label.length < 80) {
+            carriage = RC2;
+            prev.DESCRIPTIONS += curr.label.substr(0, 79) + RC;
+        } else {
+            carriage = RC2;
+            prev.DESCRIPTIONS += curr.label.substr(0, 79) + '...' + RC;
+        }
+
+        prev.QUANTITES += curr.quantity + carriage;
+        prev.ARTICLES_PU += curr.price_pu_ttc + carriage;
+        prev.ARTICLES_TVA += curr.tva + carriage;
+        prev.ARTICLES_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100))).toFixed(2) + carriage;
+        prev.ARTICLES_TTC += (curr.price_pu_ttc * curr.quantity) + carriage;
+        prev.TOTAL_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100)));
+        prev.TOTAL_TVA += (curr.quantity * curr.price_pu_ttc) * (1 - (1 / (1 + (curr.tva / 100))));
+        prev.TOTAL_TTC += curr.quantity * curr.price_pu_ttc;
+
+        return prev;
+    }, articleLine)
+
+    const listTva = lines.reduce((prev, curr) => {
+        if (!prev.includes(curr.tva)) {
+            prev.push(curr.tva);
+        }
+        return prev;
+    }, []);
+
+    datasForPdf = {
+        ...datasForPdf,
+        LIST_TVA: listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", ''),
+    }
+
+    datasForPdf = {...datasForPdf, LIST_TTC: '', LIST_HT: ''};
+
+    listTva.forEach((tva) => {
+        datasForPdf.LIST_HT += lines
+                .filter((line) => line.tva === tva)
+                .reduce((prev, curr) => prev + ((curr.price_pu_ttc * curr.quantity) / (1 + (tva / 100))), 0)
+                .toFixed(2)
+            + "\n"
+
+        datasForPdf.LIST_TTC += lines
+                .filter((fact) => fact.tva === tva)
+                .reduce((prev, curr) => prev + (curr.price_pu_ttc * curr.quantity), 0)
+                .toFixed(2)
+            + "\n"
+    })
+
+    return datasForPdf;
+
+}
+
 
 module.exports = {
     Requete,
@@ -494,5 +410,6 @@ module.exports = {
     REQ_USERS,
     REQ_EXAMS_INFOS,
     REQ_FACTURE,
+    formaterLaFacture
 }
 
