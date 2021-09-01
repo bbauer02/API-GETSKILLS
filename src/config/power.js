@@ -11,7 +11,8 @@ module.exports = (env) => ({
             },
             sessions: {
                 default: env.SESSION_GET,
-                users: env.SESSIONS_USER_GET
+                users: env.SESSIONS_USER_GET,
+                exams: env.SESSIONS_USER_GET
             },
             docs: env.SKILLS_GET,
             exams: {
@@ -24,7 +25,8 @@ module.exports = (env) => ({
                 users: {
                     default: env.SESSIONS_USER_GET,
                     exams: env.SESSIONS_EXAM_GET
-                }
+                },
+                exams: env.SESSIONS_EXAM_GET
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_GET,

@@ -68,7 +68,7 @@ module.exports = (app) => {
             });
 
             const message = `sessionHasExam id:${SessionHasExamFound.sessionHasExam_id} has been updated `;
-            res.json({ message, data: Session });
+            res.json({ message, data: SessionHasExamFound });
         }
 
         catch (error) {

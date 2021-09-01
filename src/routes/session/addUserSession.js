@@ -252,7 +252,7 @@ module.exports = (app) => {
             await postAllUserOptions(sessionUserCreated, allExamsFromSession);
 
             // On créer tout les sessionExamHasExaminator (par users)
-            await postAllSessionExamHasExaminators();
+            await postAllSessionExamHasExaminators(sessionUserCreated, allExamsFromSession);
 
             const message = isAlreadyInInstitut === true ?
             `User has been created, added the session, and UserHasOptions has been created successfuly`
