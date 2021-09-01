@@ -6,8 +6,11 @@ module.exports = (app) => {
     app.get('/api/instituts/:institut_id/sessions/:session_id/exams', async (req, res) => {
 
         try {
+
             const parameters = {};
-            parameters.where = {};
+            parameters.where = {
+                session_id: req.params.session_id
+            };
 
             // Parameter : LIMIT
             if (req.query.limit) {
@@ -33,8 +36,13 @@ module.exports = (app) => {
                 include: [{
                     model: models['Institut']
                 }]
+            },
+            {
+                model: models['sessionExamHasExaminator']
+            },
+            {
+                model: models['Exam']
             }];
-
 
             // Add Users
             if (req.query.users === "true") {

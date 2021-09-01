@@ -15,8 +15,10 @@ module.exports = (app) => {
                 where: {},
                 include: [{
                     model: models['sessionUserOption']
-                }
-                ]
+                },
+                {
+                    model: models['User']
+                }]
             }];
 
             const session = await models['Session'].findOne(parameters);

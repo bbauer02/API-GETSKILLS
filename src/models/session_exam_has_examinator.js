@@ -22,10 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         empowermentTest_id: {
             type: DataTypes.INTEGER,
-            allowNull: true,
-            validate: {
-                notEmpty: { msg: `sessionHasExam : empowermentTest_id cannot be empty !` }
-            }
+            allowNull: true
         },
     },
         {

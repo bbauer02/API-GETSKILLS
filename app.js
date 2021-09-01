@@ -112,6 +112,12 @@ require('./src/routes/sessionHasExam/findAllSessionHasExams')(app);
 require('./src/routes/sessionHasExam/findSessionHasExamByPk')(app);
 require('./src/routes/sessionHasExam/updateSessionHasExam')(app);
 
+// SessionExamHasExaminators
+require('./src/routes/sessionExamHasExaminator/createSessionExamHasExaminator')(app);
+require('./src/routes/sessionExamHasExaminator/deleteSessionExamHasExaminator')(app);
+require('./src/routes/sessionExamHasExaminator/findSessionExamHasExaminatorsBySessionExam')(app);
+require('./src/routes/sessionExamHasExaminator/updateSessionExamHasExaminator')(app);
+
 // Sessions Archive
 require('./src/routes/sessionHist/findAllSessionsHistByInstituts')(app);
 

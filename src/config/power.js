@@ -6,7 +6,8 @@ module.exports = (env) => ({
                 default: env.INSTITUTS_USERS_GET,
                 email: {
                     default: env.INSTITUTS_USERS_MAIL_GET
-                }
+                },
+                empowermentTests: env.INSTITUTS_EXAMINATORS_GET
             },
             sessions: {
                 default: env.SESSION_GET,
@@ -24,6 +25,10 @@ module.exports = (env) => ({
                     default: env.SESSIONS_USER_GET,
                     exams: env.SESSIONS_EXAM_GET
                 }
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_GET,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_GET
             }
         },
         exams: {
@@ -58,6 +63,10 @@ module.exports = (env) => ({
                 default: env.SESSIONS_POST,
                 users: env.INSTITUTS_NEW_USER_POST,
                 exams: env.SESSIONS_EXAM_POST
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_POST,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_POST
             }
         },
         exams: env.EXAMS_POST,
@@ -89,6 +98,10 @@ module.exports = (env) => ({
                     default: env.SESSIONS_ADMIN_PUT
                 },
                 exams: env.SESSIONS_EXAM_PUT
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_PUT,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_PUT
             }
         },
         exams: env.EXAMS_PUT,
@@ -116,6 +129,10 @@ module.exports = (env) => ({
                 default: env.SESSIONS_DELETE,
                 users: env.SESSIONS_USER_DELETE,
                 exams: env.SESSIONS_EXAM_DELETE
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_DELETE,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_DELETE
             }
         },
         exams: env.EXAMS_DELETE,
