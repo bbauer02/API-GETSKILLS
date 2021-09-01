@@ -307,6 +307,9 @@ const initDB = async (sequelize) => {
         // mocks invoices
         for(const invoice of invoices) {
             await models['Invoice'].create(invoice)
+            for(const line of invoice.lines) {
+                await models['InvoiceLines'].create(line)
+            }
         }
 
     } catch (error) {
