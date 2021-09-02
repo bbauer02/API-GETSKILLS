@@ -120,6 +120,12 @@ module.exports = (app) => {
                     session_id: req.params.session_id
                 };
 
+                parameters.include = [
+                    {
+                        model: models['Exam']
+                    }
+                ];
+
                 // 5 - chercher les sessionExams de la session
                 const allExamsFromSession = await models['sessionHasExam'].findAndCountAll(parameters);
                 return allExamsFromSession;
@@ -164,9 +170,11 @@ module.exports = (app) => {
                 _allExamsFromSession.rows.forEach((exam, index) => {
                     sessionUsersOptionsForCreate[index] = {};
                     sessionUsersOptionsForCreate[index].exam_id = exam.dataValues.exam_id;
-                    sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.isOption === true ? false : true;
+                    sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.Exam.isOption === true ? false : true;
                     sessionUsersOptionsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
-                })
+                    console.log('\n\nexam=', exam, "\n\n");
+
+                });
 
 
                 // 8 - post les sessionsUserOptions en bulk
@@ -191,7 +199,7 @@ module.exports = (app) => {
                 // 9 - créer l'object pour le bulk
                 let sessionExamHasExaminatorsForCreate = [];
                 _allExamsFromSession.rows.forEach((exam, index) => {
-                    if (exam.isOption === false) {
+                    if (exam.dataValues.Exam.isOption === false) {
                         sessionExamHasExaminatorsForCreate[index] = {};
                         sessionExamHasExaminatorsForCreate[index].sessionHasExam_id = exam.dataValues.sessionHasExam_id;
                         sessionExamHasExaminatorsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
@@ -257,9 +265,9 @@ module.exports = (app) => {
             await postAllSessionExamHasExaminators(sessionUserCreated, allExamsFromSession);
 
             const message = isAlreadyInInstitut === true ?
-                `User has been created, added the session, and UserHasOptions has been created successfuly`
+                `User has been created, added the session, all UserHasOptions and all sessionExamHasExaminators has been created successfuly`
                 :
-                `User has been created, added to the institut, added the session, and UserHasOptions has been created successfuly`
+                `User has been created, added to the institut, added the session, all UserHasOptions and all sessionExamHasExaminators has been created successfuly`
                 ;
             res.json({ message, data: sessionUserCreated });
 
