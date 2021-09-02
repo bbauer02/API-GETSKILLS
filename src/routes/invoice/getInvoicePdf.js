@@ -12,10 +12,12 @@ const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/mana
 const STANDARD_INVOICE = process.cwd() + '/public/templates/Standard_facture_cifle.odt';
 
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/invoice/:invoice_id/download', async (req, res) => {
+    /**
+     * Génération du PDF de la facture des sessions pour les écoles.
+     */
+    app.get('/api/invoices/:invoice_id/download', async (req, res) => {
 
         const invoiceId = parseInt(req.params.invoice_id);
-        const institutId = parseInt(req.params.institut_id);
 
         try {
 
@@ -24,7 +26,7 @@ module.exports = (app) => {
 
             // création d'un tableau d'objets contenant toutes les infos
             const invoice = await models['Invoice'].findOne({
-                where: {invoice_id: invoiceId, institut_id: institutId},
+                where: {invoice_id: invoiceId},
                 attributes: [
                     ['invoice_id', 'invoiceId'],
                     ['reference', 'ref'],

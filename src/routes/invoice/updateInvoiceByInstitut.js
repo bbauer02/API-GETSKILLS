@@ -1,16 +1,21 @@
 const {models} = require("../../models");
+const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
+
 
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id/order/:order_id', async (req, res) => {
+    /**
+     * Mise à jour de la facture PAYEE ou IMPAYEE. Possible par les Super Admins Get-Skills uniquement.
+     */
+    app.put('/api/invoices/:invoice_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // constantes
-        const institutId = req.params.institut_id;
-        const orderId = req.params.order_id;
+        const invoiceId = req.params.invoice_id;
         const isPaid = req.body.isPaid;
 
         try {
 
-            const invoice = await models['Invoice'].findByPk(orderId)
+            const invoice = await models['Invoice']
+                .findByPk(invoiceId, {include: {as: 'lines', model: models.InvoiceLines}})
 
             if(!invoice) {
                 return res.status(500).json({message: "no invoice found", data: null})
@@ -18,7 +23,7 @@ module.exports = (app) => {
                 invoice.isPaid = isPaid;
                 await invoice.save();
 
-                return res.status(200).json({message: `invoice ${invoice.invoice_id} has been updated`, data: invoice})
+                return res.status(200).json({message: `invoice numero ${invoice.invoice_id} has been updated`, data: invoice})
             }
 
         } catch (e) {

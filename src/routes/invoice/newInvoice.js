@@ -1,18 +1,23 @@
 const { REQ_FACTURE, Requete} = require("../../services/manageQueryDocs");
+const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
-/**
- * Obtenir les données pour valider la commande avant la facture
- * @param app
- */
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/session/:session_id/orders', async (req, res) => {
+
+    /**
+     * Obtenir les données de facturation d'une session pour une école.
+     * Opération de validation de la commande par l'école avant la facturation de la session.
+     * OPération effectuée par l'administrateur de l'école en charge de valider les sessions.
+     * @param app
+     */
+    app.get('/api/instituts/:institut_id/sessions/:session_id/orders', isAuthenticated, isAuthorized, async (req, res) => {
 
         const institutId = req.params.institut_id;
         const sessionId = req.params.session_id;
 
         try {
+
             const orderDatas = await Requete(REQ_FACTURE(institutId, sessionId), 'facture');
-            console.log(orderDatas);
+
             if (orderDatas.length === 0) {
                 return res.status(200).json({message: 'no facture generated', data: null});
             }

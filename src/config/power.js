@@ -8,10 +8,6 @@ module.exports = (env) => ({
                     default: env.INSTITUTS_USERS_MAIL_GET
                 }
             },
-            sessions: {
-                default: env.SESSION_GET,
-                users: env.SESSIONS_USER_GET
-            },
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
@@ -22,6 +18,9 @@ module.exports = (env) => ({
                 default: env.SESSION_GET,
                 users: {
                     default: env.SESSIONS_USER_GET
+                },
+                orders: {
+                    default: env.INVOICES_GET
                 }
             },
             invoices: {
@@ -47,6 +46,7 @@ module.exports = (env) => ({
         },
         invoices: {
             default: env.INVOICES_GET,
+            download: env.INVOICES_GET,
         }
     },
     POST: {
@@ -95,6 +95,9 @@ module.exports = (env) => ({
                 admin: {
                     default: env.SESSIONS_ADMIN_PUT
                 }
+            },
+            invoices: {
+                default: env.INVOICES_PUT,
             }
         },
         exams: env.EXAMS_PUT,
@@ -107,6 +110,9 @@ module.exports = (env) => ({
         options: env.OPTIONS_PUT,
         skills: {
             default: env.SKILLS_PUT
+        },
+        invoices: {
+            default: env.INVOICES_PUT,
         }
     },
     DELETE: {
@@ -132,6 +138,9 @@ module.exports = (env) => ({
         users: env.USERS_DELETE,
         skills: {
             default: env.SKILLS_DELETE
+        },
+        invoices: {
+            default: env.INVOICES_PUT,
         }
     }
 });

@@ -5,6 +5,10 @@ const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
 
+    /**
+     * Création d'une facture lors de la validation de la session.
+     * Elle est effectuée par les administrateurs des instituts et les super admin.
+     */
     app.post('/api/instituts/:institut_id/invoices', isAuthenticated, isAuthorized, async (req, res) => {
 
         let index = 0;
