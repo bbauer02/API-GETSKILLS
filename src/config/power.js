@@ -9,11 +9,6 @@ module.exports = (env) => ({
                 },
                 empowermentTests: env.INSTITUTS_EXAMINATORS_GET
             },
-            sessions: {
-                default: env.SESSION_GET,
-                users: env.SESSIONS_USER_GET,
-                exams: env.SESSIONS_USER_GET
-            },
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET
@@ -104,6 +99,13 @@ module.exports = (env) => ({
             sessionexams: {
                 default: env.SESSIONS_EXAM_PUT,
                 sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_PUT
+            },
+            sessionUsers: {
+                default: env.SESSIONS_USER_OPTION_PUT,
+                exams: {
+                    default: env.SESSIONS_USER_OPTION_PUT,
+                    options: env.SESSIONS_USER_OPTION_PUT,
+                }
             }
         },
         exams: env.EXAMS_PUT,

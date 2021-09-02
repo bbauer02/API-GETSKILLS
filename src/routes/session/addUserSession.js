@@ -191,10 +191,12 @@ module.exports = (app) => {
                 // 9 - créer l'object pour le bulk
                 let sessionExamHasExaminatorsForCreate = [];
                 _allExamsFromSession.rows.forEach((exam, index) => {
-                    sessionExamHasExaminatorsForCreate[index] = {};
-                    sessionExamHasExaminatorsForCreate[index].sessionHasExam_id = exam.dataValues.sessionHasExam_id;
-                    sessionExamHasExaminatorsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
-                })
+                    if (exam.isOption === false) {
+                        sessionExamHasExaminatorsForCreate[index] = {};
+                        sessionExamHasExaminatorsForCreate[index].sessionHasExam_id = exam.dataValues.sessionHasExam_id;
+                        sessionExamHasExaminatorsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
+                    }
+                });
 
                 // 10 - post les sessionExamHasExaminators en bulk
                 await models['sessionExamHasExaminator'].bulkCreate(sessionExamHasExaminatorsForCreate);
@@ -255,10 +257,10 @@ module.exports = (app) => {
             await postAllSessionExamHasExaminators(sessionUserCreated, allExamsFromSession);
 
             const message = isAlreadyInInstitut === true ?
-            `User has been created, added the session, and UserHasOptions has been created successfuly`
-            :
-            `User has been created, added to the institut, added the session, and UserHasOptions has been created successfuly`
-            ;
+                `User has been created, added the session, and UserHasOptions has been created successfuly`
+                :
+                `User has been created, added to the institut, added the session, and UserHasOptions has been created successfuly`
+                ;
             res.json({ message, data: sessionUserCreated });
 
         } catch (error) {

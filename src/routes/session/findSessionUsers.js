@@ -10,18 +10,22 @@ module.exports = (app) => {
                 session_id: req.params.session_id
             };
 
-            parameters.include = [{
-                model: models['sessionUser'],
-                where: {},
-                include: [{
+            parameters.include = [
+                {
+                    model: models['Session']
+                },
+                {
                     model: models['sessionUserOption']
                 },
                 {
                     model: models['User']
-                }]
-            }];
+                },
+                {
+                    model: models['sessionExamHasExaminator']
+                }
+            ];
 
-            const session = await models['Session'].findOne(parameters);
+            const session = await models['sessionUser'].findAll(parameters);
             const message = 'session found';
             res.json({ message, data: session });
         }

@@ -10,7 +10,27 @@ module.exports = (app) => {
                     sessionHasExam_id: req.params.session_has_exam_id
                 };
 
-                const SessionExamHasExaminatorBySessionExam = await models['sessionHasUser'].findAll(parameters);
+                parameters.include =
+                    [{
+                        model: models['sessionHasExam'],
+                        include: [{
+                            model: models['Session']
+                        },
+                        {
+                            model: models['Exam']
+                        }]
+                    },
+                    {
+                        model: models['sessionUser'],
+                        include: [{
+                            model: models['sessionUserOption']
+                        },
+                        {
+                            model: models['User']
+                        }]
+                    }];
+
+                const SessionExamHasExaminatorBySessionExam = await models['sessionExamHasExaminator'].findAll(parameters);
                 const message = `${SessionExamHasExaminatorBySessionExam.length} SessionExamHasExaminatorBySessionExams found`;
                 res.json({ message, data: SessionExamHasExaminatorBySessionExam });
             }

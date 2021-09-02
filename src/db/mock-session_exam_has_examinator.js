@@ -21,15 +21,18 @@
     },
     {
         sessionHasExam_id: 2,
-        sessionUser_id: 3
+        sessionUser_id: 3,
+        empowermentTest_id: null
     },
     {
         sessionHasExam_id: 3,
-        sessionUser_id: 3
+        sessionUser_id: 3,
+        empowermentTest_id: null
     },
     {
         sessionHasExam_id: 4,
-        sessionUser_id: 2
+        sessionUser_id: 3,
+        empowermentTest_id: null
     }
 ];
 
