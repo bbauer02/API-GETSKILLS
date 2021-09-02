@@ -172,10 +172,8 @@ module.exports = (app) => {
                     sessionUsersOptionsForCreate[index].exam_id = exam.dataValues.exam_id;
                     sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.Exam.isOption === true ? false : true;
                     sessionUsersOptionsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
-                    console.log('\n\nexam=', exam, "\n\n");
 
                 });
-
 
                 // 8 - post les sessionsUserOptions en bulk
                 const allUserOptionsCreated = await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
