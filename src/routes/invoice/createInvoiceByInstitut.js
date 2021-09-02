@@ -1,8 +1,11 @@
 const sequelize = require("../../db/sequelize");
 const {models} = require("../../models");
+const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
+
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/orders', async (req, res) => {
+
+    app.post('/api/instituts/:institut_id/invoices', isAuthenticated, isAuthorized, async (req, res) => {
 
         let index = 0;
 
@@ -13,29 +16,23 @@ module.exports = (app) => {
 
         try {
 
-            let orderCreated = await models['Invoice'].create({
+            const orderCreated = await models['Invoice'].create({
                 ...order,
-                reference: new Date().getFullYear() + "/" + new Date().getMonth().toString().padStart(2, "0")
+                reference: new Date().getFullYear() + "/" + new Date().getMonth().toString().padStart(2, "0"),
+                lines: lines.reduce((prev, curr, index) => {
+                    return [...prev, {...curr, num_line: ++index}];
+                }, []),
+            }, {
+                include: {as: 'lines', model: models.InvoiceLines}
             });
 
-            for (const line of lines) {
-                await models['InvoiceLines'].create({
-                    ...line,
-                    num_line: ++index,
-                    invoice_id: orderCreated.invoice_id
-                });
-            }
             if (!orderCreated) {
                 return res.status(400).json({message: 'Error: no invoice created', data: null})
             }
-            const invoice = await models['Invoice'].findOne(
-                {
-                    where: {invoice_id: orderCreated.invoice_id},
-                    include: {as: 'lines', model: models.InvoiceLines}
-                });
+
             return res.status(200).json({
-                message: `invoice for session ${orderCreated.ref_client} has been created.`,
-                data: invoice
+                message: `invoice for : ${orderCreated.ref_client} has been created.`,
+                data: orderCreated
             });
         } catch (e) {
             return res.status(500).json({message: e.message, data: null})

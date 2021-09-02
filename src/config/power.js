@@ -23,6 +23,9 @@ module.exports = (env) => ({
                 users: {
                     default: env.SESSIONS_USER_GET
                 }
+            },
+            invoices: {
+                default: env.INVOICES_GET,
             }
         },
         exams: {
@@ -41,6 +44,9 @@ module.exports = (env) => ({
         options: env.OPTIONS_GET,
         skills: {
             default: env.SKILLS_GET
+        },
+        invoices: {
+            default: env.INVOICES_GET,
         }
     },
     POST: {
@@ -56,6 +62,9 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSIONS_POST,
                 users: env.INSTITUTS_NEW_USER_POST
+            },
+            invoices: {
+                default: env.INVOICES_POST,
             }
         },
         exams: env.EXAMS_POST,
