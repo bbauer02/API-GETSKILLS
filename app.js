@@ -165,5 +165,10 @@ require('./src/routes/invoice/createInvoiceByInstitut')(app);
 require('./src/routes/invoice/updateInvoiceByInstitut')(app);
 require('./src/routes/invoice/deleteInvoiceByInstitut')(app);
 
+// csvItems
+require('./src/routes/csvItem/createCsvItem')(app);
+require('./src/routes/csvItem/deleteCsvItem')(app);
+require('./src/routes/csvItem/findCsvItemByTest')(app);
+
 
 app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));

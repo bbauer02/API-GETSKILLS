@@ -23,6 +23,7 @@ const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
 const sessionHasExams = require('../db/mock-session_has_exam');
 const empowerments = require('../db/mock-empowerment');
 const sessionExamHasExaminators = require('../db/mock-session_exam_has_examinator');
+const csvItems = require('../db/mock-items_csv');
 
 const initDB = async (sequelize) => {
     fs
@@ -244,6 +245,16 @@ const initDB = async (sequelize) => {
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
                 price: price.price
+            });
+        }
+
+        // TABLE 'itemCsv'
+        for (const csvItem of csvItems) {
+            await models['csvItem'].create({
+                label: csvItem.label,
+                field: csvItem.field,
+                order: csvItem.order,
+                test_id: csvItem.test_id
             });
         }
 

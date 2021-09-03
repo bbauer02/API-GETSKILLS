@@ -37,7 +37,10 @@ module.exports = (env) => ({
             default: env.ROLES_GET
         },
         sessions: env.SESSIONS_GET,
-        tests: env.TESTS_GET,
+        tests: {
+            default: env.TESTS_GET,
+            csvitems: env.TESTS_CSV_GET
+        },
         users: {
             default: env.USERS_GET
         },
@@ -71,7 +74,10 @@ module.exports = (env) => ({
         levels: env.LEVELS_POST,
         roles: env.ROLES_POST,
         sessions: env.SESSIONS_POST,
-        tests: env.TESTS_POST,
+        tests: {
+            default: env.TESTS_POST,
+            csvitems: env.TESTS_CSV_POST
+        },
         users: env.USERS_POST,
         skills: {
             default: env.SKILLS_POST
@@ -144,7 +150,10 @@ module.exports = (env) => ({
         levels: env.LEVELS_DELETE,
         roles: env.ROLES_DELETE,
         sessions: env.SESSIONS_DELETE,
-        tests: env.TESTS_DELETE,
+        tests: {
+            default: env.TESTS_DELETE,
+            csvitems: env.TESTS_CSV_DELETE
+        },
         users: env.USERS_DELETE,
         skills: {
             default: env.SKILLS_DELETE
