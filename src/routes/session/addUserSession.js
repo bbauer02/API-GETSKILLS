@@ -116,18 +116,18 @@ module.exports = (app) => {
 
                 // 4 - initialiser les parameters pour trouver les exams
                 const parameters = {};
-                parameters.where = {};
+                parameters.where = {
+                    session_id: req.params.session_id
+                };
 
+                parameters.include = [
+                    {
+                        model: models['Exam']
+                    }
+                ];
 
-                // 5 - trouver les exams depuis test id et level id(si pas null) depuis le req.body
-                const test = parseInt(req.body.test_id);
-                parameters.where.test_id = test;
-
-                if (req.body.level_id !== null) {
-                    const level = parseInt(req.body.level_id);
-                    parameters.where.level_id = level;
-                }
-                const allExamsFromSession = await models['Exam'].findAndCountAll(parameters);
+                // 5 - chercher les sessionExams de la session
+                const allExamsFromSession = await models['sessionHasExam'].findAndCountAll(parameters);
                 return allExamsFromSession;
 
             } catch (error) {
@@ -135,7 +135,6 @@ module.exports = (app) => {
                 return res.status(500).json({ message, data: error.message })
             }
         }
-
 
         async function postSessionUser(_user) {
             try {
@@ -171,10 +170,10 @@ module.exports = (app) => {
                 _allExamsFromSession.rows.forEach((exam, index) => {
                     sessionUsersOptionsForCreate[index] = {};
                     sessionUsersOptionsForCreate[index].exam_id = exam.dataValues.exam_id;
-                    sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.isOption === true ? false : true;
+                    sessionUsersOptionsForCreate[index].isCandidate = exam.dataValues.Exam.isOption === true ? false : true;
                     sessionUsersOptionsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
-                })
 
+                });
 
                 // 8 - post les sessionsUserOptions en bulk
                 const allUserOptionsCreated = await models['sessionUserOption'].bulkCreate(sessionUsersOptionsForCreate);
@@ -188,6 +187,34 @@ module.exports = (app) => {
                     return res.status(400).json({ message: error.message, data: error })
                 }
                 const message = `An error has occured creating the options.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+        async function postAllSessionExamHasExaminators(_sessionUserCreated, _allExamsFromSession) {
+            try {
+
+                // 9 - créer l'object pour le bulk
+                let sessionExamHasExaminatorsForCreate = [];
+                _allExamsFromSession.rows.forEach((exam, index) => {
+                    if (exam.dataValues.Exam.isOption === false) {
+                        sessionExamHasExaminatorsForCreate[index] = {};
+                        sessionExamHasExaminatorsForCreate[index].sessionHasExam_id = exam.dataValues.sessionHasExam_id;
+                        sessionExamHasExaminatorsForCreate[index].sessionUser_id = _sessionUserCreated.dataValues.sessionUser_id;
+                    }
+                });
+
+                // 10 - post les sessionExamHasExaminators en bulk
+                await models['sessionExamHasExaminator'].bulkCreate(sessionExamHasExaminatorsForCreate);
+
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                const message = `An error has occured creating the sessionExamHasExaminator.`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -232,11 +259,14 @@ module.exports = (app) => {
             // On créer tout les sessionUserOptions
             await postAllUserOptions(sessionUserCreated, allExamsFromSession);
 
+            // On créer tout les sessionExamHasExaminator (par users)
+            await postAllSessionExamHasExaminators(sessionUserCreated, allExamsFromSession);
+
             const message = isAlreadyInInstitut === true ?
-            `User has been created, added the session, and UserHasOptions has been created successfuly`
-            :
-            `User has been created, added to the institut, added the session, and UserHasOptions has been created successfuly`
-            ;
+                `User has been created, added the session, all UserHasOptions and all sessionExamHasExaminators has been created successfuly`
+                :
+                `User has been created, added to the institut, added the session, all UserHasOptions and all sessionExamHasExaminators has been created successfuly`
+                ;
             res.json({ message, data: sessionUserCreated });
 
         } catch (error) {
