@@ -136,7 +136,7 @@ module.exports = {
             else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
                 return next();
             }
-            console.log(userPower, powerNeed);
+            // console.log(userPower, powerNeed);
             throw new Error(`You have no power here !`);
         }
         catch (error) {

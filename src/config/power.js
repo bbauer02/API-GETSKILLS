@@ -6,7 +6,8 @@ module.exports = (env) => ({
                 default: env.INSTITUTS_USERS_GET,
                 email: {
                     default: env.INSTITUTS_USERS_MAIL_GET
-                }
+                },
+                empowermentTests: env.INSTITUTS_EXAMINATORS_GET
             },
             docs: env.SKILLS_GET,
             exams: {
@@ -17,8 +18,10 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSION_GET,
                 users: {
-                    default: env.SESSIONS_USER_GET
+                    default: env.SESSIONS_USER_GET,
+                    exams: env.SESSIONS_EXAM_GET
                 },
+                exams: env.SESSIONS_EXAM_GET,
                 orders: {
                     default: env.INVOICES_GET
                 },
@@ -26,14 +29,9 @@ module.exports = (env) => ({
                     default: env.DOCUMENTS_GET,
                 }
             },
-            invoices: {
-                default: env.INVOICES_GET,
-                download: env.INVOICES_GET,
-            },
-            documents: {
-                default: env.DOCUMENTS_GET,
-                filetypes: env.DOCUMENTS_GET,
-                download: env.DOCUMENTS_GET,
+            sessionexams: {
+                default: env.SESSIONS_EXAM_GET,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_GET
             }
         },
         exams: {
@@ -76,10 +74,15 @@ module.exports = (env) => ({
             newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
                 default: env.SESSIONS_POST,
-                users: env.INSTITUTS_NEW_USER_POST
+                users: env.INSTITUTS_NEW_USER_POST,
+                exams: env.SESSIONS_EXAM_POST
             },
             invoices: {
                 default: env.INVOICES_POST,
+            }
+            sessionexams: {
+                default: env.SESSIONS_EXAM_POST,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_POST
             }
         },
         exams: env.EXAMS_POST,
@@ -95,7 +98,7 @@ module.exports = (env) => ({
         documents: {
             default: env.DOCUMENTS_POST,
             upload: env.DOCUMENTS_POST
-        },
+        }
     },
     PUT: {
         instituts: {
@@ -113,11 +116,23 @@ module.exports = (env) => ({
                 default: env.SESSIONS_PUT,
                 admin: {
                     default: env.SESSIONS_ADMIN_PUT
+                },
+                exams: env.SESSIONS_EXAM_PUT
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_PUT,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_PUT
+            },
+            sessionUsers: {
+                default: env.SESSIONS_USER_OPTION_PUT,
+                exams: {
+                    default: env.SESSIONS_USER_OPTION_PUT,
+                    options: env.SESSIONS_USER_OPTION_PUT,
                 }
             },
-            invoices: {
-                default: env.INVOICES_PUT,
-            }
+        invoices: {
+            default: env.INVOICES_PUT,
+        }
         },
         exams: env.EXAMS_PUT,
         countries: env.COUNTRIES_PUT,
@@ -145,7 +160,12 @@ module.exports = (env) => ({
             empowermenttests: env.EMPOWERMENT_DELETE,
             sessions: {
                 default: env.SESSIONS_DELETE,
-                users: env.SESSIONS_USER_DELETE
+                users: env.SESSIONS_USER_DELETE,
+                exams: env.SESSIONS_EXAM_DELETE
+            },
+            sessionexams: {
+                default: env.SESSIONS_EXAM_DELETE,
+                sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_DELETE
             },
             documents: {
                 default: env.DOCUMENTS_DELETE

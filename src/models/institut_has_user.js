@@ -13,6 +13,7 @@
         institutHasUser.belongsTo(models.User, { foreignKey: 'user_id', sourceKey: 'user_id', onDelete: 'CASCADE' });
         institutHasUser.belongsTo(models.Institut, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete: 'CASCADE' });
         institutHasUser.belongsTo(models.Role,{foreignKey:'role_id'});
+        // institutHasUser.hasMany(models.sessionHasExam,{foreignKey:'user_id', sourceKey:'user_id'});
     }
     return institutHasUser; 
 } 

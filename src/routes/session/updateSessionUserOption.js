@@ -20,7 +20,7 @@ module.exports = (app) => {
                     const message = `session is validate, can't update sessionUserOptions!`;
                     return res.status(500).json({ message });
                 } else {
-                    return true;
+                    return session;
                 }
 
             } catch (error) {
@@ -46,29 +46,146 @@ module.exports = (app) => {
                     return res.status(404).json({ message });
                 }
 
+                return sessionUserOption;
+
             } catch (error) {
                 const message = `An error has occured finding the sessionUserOption.`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
 
+
+        async function findSessionExam(session) {
+            try {
+
+                const sessionExamFound = await models['sessionHasExam'].findOne({
+                    where: {
+                        exam_id: req.params.exam_id,
+                        session_id: session.session_id
+                    }
+                })
+
+                if (sessionExamFound === null) {
+                    const message = `sessionExam doesn't exist.Retry with an other sessionExam id.`;
+                    return res.status(404).json({ message });
+                }
+
+                return sessionExamFound;
+
+            } catch (error) {
+                const message = `An error has occured finding the sessionExam.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+
+        async function createSessionExamHasExaminator(sessionExam) {
+            try {
+
+                const sessionExamHasExaminator = {
+                    sessionUser_id: req.params.sessionUser_id,
+                    sessionHasExam_id: sessionExam.sessionHasExam_id,
+                    empowermentTest_id: null,
+                }
+
+                await models['sessionExamHasExaminator'].create(sessionExamHasExaminator);
+
+            } catch (error) {
+                if (error instanceof ValidationError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                if (error instanceof UniqueConstraintError) {
+                    return res.status(400).json({ message: error.message, data: error })
+                }
+                const message = `An error has occured creating the sessionExamHasExaminator.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+
+        async function findSessionExamHasExaminator(sessionExam) {
+            try {
+
+                const SessionExamHasExaminatorFound = await models['sessionExamHasExaminator'].findOne({
+                    where: {
+                        sessionUser_id: req.params.sessionUser_id,
+                        sessionHasExam_id: sessionExam.dataValues.sessionHasExam_id
+                    }
+                });
+
+                if (SessionExamHasExaminatorFound === null) {
+                    const message = `SessionExamHasExaminator doesn't exist.Retry with an other SessionExamHasExaminatorFound id.`;
+                    return res.status(404).json({ message });
+                }
+
+                return SessionExamHasExaminatorFound;
+
+            } catch (error) {
+                const message = `An error has occured finding the sessionExamHaxExaminator.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+        
+
+        async function deleteSessionExamHasExaminator(sessionExamHasExaminator) {
+            try {
+
+                const SessionExamHasExaminatorFound = await models['sessionExamHasExaminator'].findOne({
+                    where: {
+                        sessionExamHasExaminator_id: sessionExamHasExaminator.dataValues.sessionExamHasExaminator_id
+                    }
+                });
+
+                if (SessionExamHasExaminatorFound === null) {
+                    const message = `SessionExamHasExaminator doesn't exist.Retry with an other SessionExamHasExaminatorFound id.`;
+                    return res.status(404).json({ message });
+                }
+
+                await SessionExamHasExaminatorFound.destroy(
+                    {
+                        where:
+                        {
+                            sessionExamHasExaminator_id: sessionExamHasExaminator.dataValues.sessionExamHasExaminator_id
+                        }
+                    });
+
+            } catch (error) {
+
+                const message = `An error has occured deleting the sessionExamHasExaminator.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
+
         try {
-            await checkSessionValidation();
-            const sessionUserOption = await checkSessionUserOption();
+            const session = await checkSessionValidation();
+            const sessionUserOptionFound = await checkSessionUserOption();
 
-            delete req.body.sessionUser_id;
-            delete req.body.option_id;
-            delete req.body.exam_id;
+            // Si le candidat ne participe plus à une épreuve (isCandidate)
+            // On supprime le sessionExamHasExaminator correspondant
+            if (req.body.isCandidate === false && sessionUserOptionFound.dataValues.isCandidate === true) {
+                const sessionExamFoundForDelete = await findSessionExam(session);
+                const sessionExamHasExaminatorFound = await findSessionExamHasExaminator(sessionExamFoundForDelete)
+                await deleteSessionExamHasExaminator(sessionExamHasExaminatorFound);
+            }
 
-            await sessionUserOption.update(req.body, {
+            // A l'inverse, si un candidat s'inscrit à une épreuve optionnelle
+            // On créer le sessionExamHasExaminator correspondant
+            if (req.body.isCandidate === true && sessionUserOptionFound.dataValues.isCandidate === false) {
+                const sessionExamFoundForCreate = await findSessionExam(session);
+                await createSessionExamHasExaminator(sessionExamFoundForCreate)
+            }
+
+            await sessionUserOptionFound.update(req.body, {
                 where: {
                     sessionUser_id: req.params.sessionUser_id,
                     exam_id: req.params.exam_id,
                     option_id: req.params.option_id
                 }
             });
+
             const message = `The sessionUserOption session has been updated `;
-            res.json({ message, data: sessionUserOption });
+            res.json({ message, data: sessionUserOptionFound });
         }
         catch (error) {
             if (error instanceof UniqueConstraintError) {

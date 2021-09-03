@@ -19,12 +19,14 @@ module.exports = (app) => {
                     institut_id: req.params.institut_id
                 }
             });
+            
             if (Session === null) {
                 const message = `Session doesn't exist.Retry with an other session id.`;
                 return res.status(404).json({ message });
             }
-            delete req.body.institut_id;
-            await Session.update(req.body, {
+
+            
+            await Session.update(req.body.session, {
                 where: { session_id: req.params.session_id }
             });
             const message = `Session id:${Session.session_id} has been updated `;

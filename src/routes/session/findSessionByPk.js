@@ -9,6 +9,12 @@ module.exports = (app) => {
 
             parameters.include = [
                 {
+                    model: models['sessionHasExam'],
+                    include: [{
+                        model: models['Exam']
+                    }]
+                },
+                {
                     model: models['Institut'],
                     attributes: ["label"],
                     include: [{
