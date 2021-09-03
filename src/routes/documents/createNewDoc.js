@@ -64,7 +64,7 @@ module.exports = (app) => {
         const doctype = req.params.doctype;
 
         try {
-            await uploadDocument(doctype, req.files, null)
+            const document = await uploadDocument(doctype, req.files, null)
             return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
         } catch (e) {
             res.status(500).json({message: e.message, data: null})
