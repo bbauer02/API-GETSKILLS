@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
             doctype: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
+            },
+            comments: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {
