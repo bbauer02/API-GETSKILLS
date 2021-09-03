@@ -54,7 +54,10 @@ module.exports = (env) => ({
         instituts: {
             default: env.INSTITUTS_POST,
             users: env.INSTITUTS_USERS_POST,
-            docs: env.DOCS_POST,
+            documents: {
+                default: env.DOCUMENTS_POST,
+                upload: env.DOCUMENTS_POST
+            },
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
@@ -77,7 +80,11 @@ module.exports = (env) => ({
         users: env.USERS_POST,
         skills: {
             default: env.SKILLS_POST
-        }
+        },
+        documents: {
+            default: env.DOCUMENTS_POST,
+            upload: env.DOCUMENTS_POST
+        },
     },
     PUT: {
         instituts: {
