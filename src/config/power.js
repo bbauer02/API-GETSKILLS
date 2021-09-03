@@ -144,6 +144,9 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSIONS_DELETE,
                 users: env.SESSIONS_USER_DELETE
+            },
+            documents: {
+                default: env.DOCUMENTS_DELETE
             }
         },
         exams: env.EXAMS_DELETE,
@@ -158,6 +161,9 @@ module.exports = (env) => ({
         },
         invoices: {
             default: env.INVOICES_PUT,
+        },
+        documents: {
+            default: env.DOCUMENTS_DELETE
         }
     }
 });
