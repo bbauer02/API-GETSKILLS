@@ -21,11 +21,17 @@ module.exports = (env) => ({
                 },
                 orders: {
                     default: env.INVOICES_GET
+                },
+                documents: {
+                    default: env.DOCUMENTS_GET,
                 }
             },
             invoices: {
                 default: env.INVOICES_GET,
                 download: env.INVOICES_GET,
+            },
+            documents: {
+                default: env.DOCUMENTS_GET,
             }
         },
         exams: {
@@ -48,6 +54,9 @@ module.exports = (env) => ({
         invoices: {
             default: env.INVOICES_GET,
             download: env.INVOICES_GET,
+        },
+        documents: {
+            default: env.DOCUMENTS_GET,
         }
     },
     POST: {
