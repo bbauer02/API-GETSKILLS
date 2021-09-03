@@ -33,6 +33,7 @@ module.exports = (env) => ({
             documents: {
                 default: env.DOCUMENTS_GET,
                 filetypes: env.DOCUMENTS_GET,
+                download: env.DOCUMENTS_GET,
             }
         },
         exams: {

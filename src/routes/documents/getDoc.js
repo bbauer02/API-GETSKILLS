@@ -10,73 +10,43 @@ const {getFilesInTemporaryFolder} = require("../../services/manageFileSystem");
 const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
 
 
-/**
- * Récupération du document souhaité
- * @param institutId
- * @param docTypeId
- * @returns {Promise<void>}
- */
-async function getDocument (institutId, docTypeId) {
-    let document = null;
-    const TEMPLATES_FOLDER = process.cwd() + '/public/templates/';
+module.exports = (app) => {
 
-    try {
-        // recherche du template demandé
-        document = await models['Document'].findOne({
-            where: {institut_id: institutId, doctype: docTypeId}
-        })
-        return document.dataValues.filepath;
+    async function getDocumentPDF (documentId, sessionId, userId) {
 
-    } catch (err) {
-        // si le template n'existe pas, on prend ceux par défaut
-        if(!document) {
-            switch (docTypeId) {
-                case 0:
-                    return TEMPLATES_FOLDER + 'Standard_facture.odt';
-                case 1:
-                    return TEMPLATES_FOLDER + 'Standard_dossier.odt';
-                case 2:
-                    return TEMPLATES_FOLDER + 'Standard_inscription.odt';
-                case 3:
-                    return TEMPLATES_FOLDER + 'Standard_convocation.odt';
-                case 4:
-                    return TEMPLATES_FOLDER + 'Standard_presence.odt';
-                default:
-                    throw new Error('no template found')
-            }
-        }
+        // destruction du dossier temporaire si existant
+        await destroyTemporaryFolders();
+
+        // création d'un tableau d'objets contenant toutes les infos
+        const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
+
+        // récupération du template oo
+        let odtTemplate = await models['Document'].findByPk(documentId);
+        if(!odtTemplate)
+            throw new Error('no template found');
+
+        // création du dossier temporaire dans lequel on met les PDF générés
+        const folder = createRepository();
+
+        // création des pdf en boucle sur les données construites
+        await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
+
+        // récupération des fichiers PDF qui ont été générés
+        return getFilesInTemporaryFolder();
+
     }
 
-}
 
-module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/documents/:doc/download/', async (req, res) => {
+    app.get('/api/instituts/:institut_id/documents/:document_id/download', async (req, res) => {
 
-        const docTypeId = parseInt(req.params.doc);
-        const institutId = parseInt(req.params.institut_id);
+        const documentId = parseInt(req.params.document_id);
         const sessionId = parseInt(req.query.session_id);
         const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
 
 
         try {
 
-            // destruction du dossier temporaire si existant
-            await destroyTemporaryFolders();
-
-            // création d'un tableau d'objets contenant toutes les infos
-            const datasForPdf = await ConstructDatasForPDf(institutId, sessionId, userId);
-
-            // récupération du template oo
-            let odtTemplate = await getDocument(institutId, docTypeId);
-
-            // création du dossier temporaire dans lequel on met les PDF générés
-            const folder = createRepository();
-
-            // création des pdf en boucle sur les données construites
-            await createPdfWithTemplate(odtTemplate, folder, datasForPdf);
-
-            // récupération des fichiers PDF qui ont été générés
-            const files = getFilesInTemporaryFolder();
+            const files = await getDocumentPDF(documentId, sessionId, userId);
 
             // pas de fichier PDF trouvés
             if (files.length === 0) {
@@ -94,7 +64,6 @@ module.exports = (app) => {
                 reponseHTTPWithPdf(files[0], res)
                 reponseHTTPWithPdf(pdfFileNameMerged)
             }
-
 
         } catch (e) {
             return res.status(400).json({message: e.message, data: null})

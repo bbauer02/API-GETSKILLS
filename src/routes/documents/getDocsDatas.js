@@ -1,3 +1,4 @@
+const {Op} = require("sequelize");
 const {models} = require("../../models");
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
@@ -5,13 +6,19 @@ module.exports = (app) => {
 
     /**
      * Obtenir les données sur un document uploadé dans la base
+     * Les template de get-skills sont fournis par défaut aux écoles
      * @param institutId
      * @returns {Promise<Model[]>}
      */
     async function getDataOnDocuments (institutId = null) {
+        let queryParameter = {institut_id: institutId}
+
+        if(institutId)
+            queryParameter = {[Op.or]: [{institut_id: institutId}, {institut_id: null}]}
+
         return await models["Document"].findAll({
             order: [['filename', 'ASC']],
-            where: {institut_id: institutId}
+            where: queryParameter
         });
 
     }
