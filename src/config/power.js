@@ -25,6 +25,7 @@ module.exports = (env) => ({
             },
             invoices: {
                 default: env.INVOICES_GET,
+                download: env.INVOICES_GET,
             }
         },
         exams: {
