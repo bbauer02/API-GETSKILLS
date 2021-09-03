@@ -79,7 +79,7 @@ module.exports = (env) => ({
             },
             invoices: {
                 default: env.INVOICES_POST,
-            }
+            },
             sessionexams: {
                 default: env.SESSIONS_EXAM_POST,
                 sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_POST
