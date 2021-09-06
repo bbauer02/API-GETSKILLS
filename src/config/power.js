@@ -39,7 +39,10 @@ module.exports = (env) => ({
         sessions: env.SESSIONS_GET,
         tests: {
             default: env.TESTS_GET,
-            csvitems: env.TESTS_CSV_GET
+            csvitems: {
+                default: env.TESTS_CSV_GET,
+                fields: env.TESTS_CSV_GET,
+            },
         },
         users: {
             default: env.USERS_GET
@@ -62,7 +65,8 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSIONS_POST,
                 users: env.INSTITUTS_NEW_USER_POST,
-                exams: env.SESSIONS_EXAM_POST
+                exams: env.SESSIONS_EXAM_POST,
+                exports: env.SESSIONS_EXPORT
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_POST,

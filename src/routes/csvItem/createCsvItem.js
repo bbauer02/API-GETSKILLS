@@ -6,6 +6,23 @@ module.exports = (app) => {
     app.post('/api/tests/:test_id/csvitems',
         isAuthenticated, isAuthorized, async (req, res) => {
 
+            async function removeAllItemsWithTestId() {
+                try {
+    
+                    await models['csvItem'].destroy({
+                        where : {
+                            test_id: req.params.test_id
+                        }
+                    });
+
+                } catch (error) {
+
+                    const message = `An error has occured removing all the items for this test.`;
+                    return res.status(500).json({ message, data: error.message })
+                }
+            }
+
+
             async function createAndUpdateAllItems() {
                 try {
 
@@ -32,12 +49,12 @@ module.exports = (app) => {
 
                 } catch (error) {
 
-                    const message = `An error has occured creating the template.`;
+                    const message = `An error has occured creating all the items for the template.`;
                     return res.status(500).json({ message, data: error.message })
                 }
             }
 
-
+            // unused
             async function createNewItem() {
                 try {
 
@@ -58,22 +75,14 @@ module.exports = (app) => {
             }
 
             try {
+                // Le formulaire envoyant un série d'items sans pouvoir les supprimer,
+                // il faut donc supprimer tout les items avant des les recréer
+                await removeAllItemsWithTestId();
 
-                // Si on a un body -> bulk
-                const hasBody = req.body !== undefined;
-                if (hasBody) {
-                    const allItemsCreated = await createAndUpdateAllItems();
-                    const messageItems = `Template has been update/created !`;
-                    res.json({ messageItems, data: allItemsCreated });
-                }
-
-                // Sinon on créer un item avec tout à null (sauf test_id)
-                else {
-                    const itemCreated = await createNewItem();
-                    const messageItem = `ItemCsv with id ${itemCreated.csvItem_id} has been created !`;
-                    res.json({ messageItem, data: itemCreated });
-                }
-
+                const allItemsCreated = await createAndUpdateAllItems();
+                
+                const messageItems = `Template has been updated !`;
+                res.json({ messageItems, data: allItemsCreated });
 
             } catch (error) {
                 const message = `An error has occured.`;

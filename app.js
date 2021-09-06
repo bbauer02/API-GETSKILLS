@@ -134,6 +134,9 @@ require('./src/routes/exam/deleteExam')(app);
 require('./src/routes/exam/updateExam')(app);
 require('./src/routes/exam/findExamByPk')(app);
 
+// Export 
+require('./src/routes/csvItem/exportCsv')(app);
+
 // Account
 require('./src/routes/account/myAccount')(app);
 
