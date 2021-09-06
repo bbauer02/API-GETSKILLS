@@ -261,12 +261,30 @@ module.exports = (app) => {
         // exams
         this[ALIAS.sessions.test] = datas.Test.label;
         this[ALIAS.sessions.level] = datas.Level ? datas.Level.level : '';
-        this[ALIAS.sessions.start] = Math.ceil(Math.abs((new Date(datas.start)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
-        this[ALIAS.sessions.hour] = (datas.start.getHours() + (datas.start.getMinutes() / 60)) / 24 ;
+        this[ALIAS.sessions.start] = formaterDate(datas.start);
+        this[ALIAS.sessions.hour] = formaterHour(datas.start);
+
+        sessionUser.sessionUserOptions.forEach((suo, index) => {
+            this[ALIAS.exams.label + '_' + (++index)] = suo.exam.label;
+            this[ALIAS.exams.address + '_' + (++index)] = (suo.addressExam) ? suo.exam.sessionHasExams.adressExam : suo.addressExam;
+            this[ALIAS.exams.room + '_' + (++index)] = suo.exam.sessionHasExams.room ? suo.exam.sessionHasExams.room : '';
+            this[ALIAS.exams.start + '_' + (++index)] = suo.DateTime ? formaterDate(suo.DateTime) : formaterDate(suo.exam.sessionHasExams.DateTime);
+            this[ALIAS.exams.hour + '_' + (++index)] = suo.DateTime ? formaterHour(suo.DateTime) : formaterHour(suo.exam.sessionHasExams.DateTime);
+        })
+
+
 
         function formaterAdress (adress1, adress2, inline = false) {
             if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
             if (!inline) return adress2 ? adress1 + "\n" + adress2 : adress1
+        }
+
+        function formaterDate (myDate) {
+            return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+        }
+
+        function formaterHour (myHour) {
+            return (myHour.getHours() + (myHour.getMinutes() / 60)) / 24 ;
         }
 
     }
