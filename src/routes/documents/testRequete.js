@@ -12,7 +12,7 @@ module.exports = (app) => {
             if (result === {})
                 return res.status(400).json({message: 'no result found', data: {}})
 
-            return res.status(200).json({message: "route ok", data: result});
+            return res.status(200).json({message: "route ok", data: new FieldsForDocuments(result, userId)});
         } catch (e) {
             return res.status(400).json({message: e.message, data: {}})
         }
@@ -124,7 +124,22 @@ module.exports = (app) => {
             email: 'USER_EMAIL',
             language: 'USER_LANGUAGE',
             nationality: 'USER_NATIONALITY',
-            birthday: 'USER_BIRTHDAY'
+            birthday: 'USER_BIRTHDAY',
+            numInscrip: 'USER_NUM_INSCR',
+            payment: 'PAIEMENT_INSCRIPTION'
+        },
+        sessions: {
+            start: 'SESSION_START_DATE',
+            hour: 'SESSION_START_HOUR',
+            test: 'TEST',
+            level: 'LEVEL',
+        },
+        exams: {
+            label: 'EXAM',
+            address: 'EXAM_ADDRESS',
+            room: 'EXAM_LOCATION',
+            start: 'EXAM_START_DATE',
+            hour: 'EXAM_START_HOUR',
         }
 
     }
@@ -240,7 +255,14 @@ module.exports = (app) => {
         this[ALIAS.candidat.language] = sessionUser.User.firstlanguage.label;
         this[ALIAS.candidat.nationality] = sessionUser.User.nationality.label;
         this[ALIAS.candidat.birthday] = Math.ceil(Math.abs((new Date(sessionUser.User.birthday)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+        this[ALIAS.candidat.payment] = sessionUser.paymentMode;
+        this[ALIAS.candidat.numInscrip] = new Date(sessionUser.inscription).getFullYear().toString() + new Date(sessionUser.inscription).getMonth().toString().padStart(2, "0") + sessionUser.sessionUser_id.toString().padStart(6, "0");
 
+        // exams
+        this[ALIAS.sessions.test] = datas.Test.label;
+        this[ALIAS.sessions.level] = datas.Level ? datas.Level.level : '';
+        this[ALIAS.sessions.start] = Math.ceil(Math.abs((new Date(datas.start)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+        this[ALIAS.sessions.hour] = (datas.start.getHours() + (datas.start.getMinutes() / 60)) / 24 ;
 
         function formaterAdress (adress1, adress2, inline = false) {
             if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
@@ -254,6 +276,13 @@ module.exports = (app) => {
         return await models['Session'].findOne({
             where: {session_id: sessionId},
             include: [
+                {
+                    model: models['Test'],
+                },
+                {
+                    model: models['Level'],
+                    required: false,
+                },
                 {
                     model: models['Institut'],
                     include:
@@ -301,13 +330,6 @@ module.exports = (app) => {
                                             model: models['Exam'],
                                             include:
                                                 [
-                                                    {
-                                                        model: models['Test'],
-                                                    },
-                                                    {
-                                                        model: models['Level'],
-                                                        required: false,
-                                                    },
                                                     {
                                                         model: models['InstitutHasPrices'],
                                                         required: false,
