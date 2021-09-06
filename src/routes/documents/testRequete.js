@@ -4,7 +4,7 @@ module.exports = (app) => {
 
         const institutId = req.params.institut_id;
         const sessionId = req.params.session_id;
-        const userId = req.query.user_id ? req.query.user_id : null;
+        const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
 
         try {
             const result = await getAllFieldsForSchoolDocuments(institutId, sessionId, userId);
@@ -60,6 +60,7 @@ module.exports = (app) => {
             city: 'SCHOOL_CITY',
             phone: 'SCHOOL_PHONE',
             email: 'SCHOOL_EMAIL',
+            country: 'SCHOOL_COUNTRY',
             footLabel: 'SCHOOL_NAME_FOOT',
             footAdress1: 'SCHOOL_ADDRESS1_FOOT',
             footAdress2: 'SCHOOL_ADDRESS2_FOOT',
@@ -69,6 +70,7 @@ module.exports = (app) => {
             footCity: 'SCHOOL_CITY_FOOT',
             footPhone: 'SCHOOL_PHONE_FOOT',
             footEmail: 'SCHOOL_EMAIL_FOOT',
+            footCountry: 'SCHOOL_COUNTRY_FOOT',
         },
         expeditor: {
             label: 'EXPEDITOR_NAME',
@@ -80,6 +82,7 @@ module.exports = (app) => {
             city: 'EXPEDITOR_CITY',
             phone: 'EXPEDITOR_PHONE',
             email: 'EXPEDITOR_EMAIL',
+            country: 'EXPEDITOR_COUNTRY',
             footLabel: 'EXPEDITOR_NAME_FOOT',
             footAdress1: 'EXPEDITOR_ADDRESS1_FOOT',
             footAdress2: 'EXPEDITOR_ADDRESS2_FOOT',
@@ -89,6 +92,7 @@ module.exports = (app) => {
             footCity: 'EXPEDITOR_CITY_FOOT',
             footPhone: 'EXPEDITOR_PHONE_FOOT',
             footEmail: 'EXPEDITOR_EMAIL_FOOT',
+            footCountry: 'EXPEDITOR_COUNTRY_FOOT'
         },
         receiver: {
             label: 'RECEIVER_NAME',
@@ -101,6 +105,7 @@ module.exports = (app) => {
             fullInlineAdress: 'RECEIVER_ADRESS_FULL_INLINE',
             zipcode: 'RECEIVER_ZIPCODE',
             city: 'RECEIVER_CITY',
+            country: 'RECEIVER_COUNTRY',
             phone: 'RECEIVER_PHONE',
             email: 'RECEIVER_EMAIL',
         },
@@ -114,9 +119,14 @@ module.exports = (app) => {
             fullInlineAdress: 'USER_ADRESS_FULL_INLINE',
             zipcode: 'USER_ZIPCODE',
             city: 'USER_CITY',
+            country: 'USER_COUNTRY',
             phone: 'USER_PHONE',
             email: 'USER_EMAIL',
+            language: 'USER_LANGUAGE',
+            nationality: 'USER_NATIONALITY',
+            birthday: 'USER_BIRTHDAY'
         }
+
     }
 
     const GETSKILLS = {
@@ -127,9 +137,12 @@ module.exports = (app) => {
         city: 'URCEL',
         phone: '0123456789',
         email: 'getskills@getskills.com',
+        country: 'France'
     }
 
-    function FieldsForDocuments (datas, school = true) {
+    function FieldsForDocuments (datas, userId, school = true) {
+
+        const sessionUser = datas.sessionUsers.filter((sessionUser) => sessionUser.user_id === userId)[0];
 
         // school
         this[ALIAS.institut.label] = datas.Institut.label;
@@ -141,6 +154,7 @@ module.exports = (app) => {
         this[ALIAS.institut.fullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
         this[ALIAS.institut.phone] = datas.Institut.phone;
         this[ALIAS.institut.email] = datas.Institut.email;
+        this[ALIAS.institut.country] = datas.Institut.institutCountry.label;
 
         this[ALIAS.institut.footLabel] = datas.Institut.label;
         this[ALIAS.institut.footAdress1] = datas.Institut.adress1;
@@ -151,6 +165,8 @@ module.exports = (app) => {
         this[ALIAS.institut.footFullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
         this[ALIAS.institut.footPhone] = datas.Institut.phone;
         this[ALIAS.institut.footEmail] = datas.Institut.email;
+        this[ALIAS.institut.footCountry] = datas.Institut.institutCountry.label;
+
 
         // expeditor
         this[ALIAS.expeditor.label] = school ? datas.Institut.label : GETSKILLS.label;
@@ -160,6 +176,7 @@ module.exports = (app) => {
         this[ALIAS.expeditor.city] = school ? datas.Institut.city : GETSKILLS.city;
         this[ALIAS.expeditor.phone] = school ? datas.Institut.phone : GETSKILLS.phone;
         this[ALIAS.expeditor.email] = school ? datas.Institut.email : GETSKILLS.email;
+        this[ALIAS.expeditor.country] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
         this[ALIAS.expeditor.fullAdress] =
             school
                 ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
@@ -176,6 +193,7 @@ module.exports = (app) => {
         this[ALIAS.expeditor.footCity] = school ? datas.Institut.city : GETSKILLS.city;
         this[ALIAS.expeditor.footPhone] = school ? datas.Institut.phone : GETSKILLS.phone;
         this[ALIAS.expeditor.footEmail] = school ? datas.Institut.email : GETSKILLS.email;
+        this[ALIAS.expeditor.footCountry] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
 
         this[ALIAS.expeditor.footFullAdress] =
             school
@@ -187,32 +205,46 @@ module.exports = (app) => {
                 : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
 
 
-        datas.sessionUsers.forEach(sessionUser => {
+        // receiver
+        this[ALIAS.receiver.label] = school ? '' : datas.Institut.label;
+        this[ALIAS.receiver.gender] = school ? GENDERS[sessionUser.User.gender].label : '';
+        this[ALIAS.receiver.firstname] = school ? sessionUser.User.firstname : '';
+        this[ALIAS.receiver.lastname] = school ? sessionUser.User.lastname : '';
+        this[ALIAS.receiver.adress1] = school ? sessionUser.User.adress1 : datas.Institut.adress1;
+        this[ALIAS.receiver.adress2] = school ? sessionUser.User.adress2 : datas.Institut.adress2;
+        this[ALIAS.receiver.zipcode] = school ? sessionUser.User.zipcode : datas.Institut.zipcode;
+        this[ALIAS.receiver.city] = school ? sessionUser.User.city : datas.Institut.city;
+        this[ALIAS.receiver.fullAdress] =
+            school
+                ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2)
+                : formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
+        this[ALIAS.receiver.fullInlineAdress] =
+            school
+                ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true)
+                : formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
+        this[ALIAS.receiver.country] = school ? sessionUser.User.country.label : datas.Institut.institutCountry.label;
 
-            // receiver
-            this[ALIAS.receiver.label] = school ? '' : datas.Institut.label;
-            this[ALIAS.receiver.gender] = school ? GENDERS[sessionUser.User.gender].label : '';
-            this[ALIAS.receiver.firstname] = school ? sessionUser.User.firstname : '';
-            this[ALIAS.receiver.lastname] = school ? sessionUser.User.lastname : '';
-            this[ALIAS.receiver.adress1] = school ? sessionUser.User.adress1 : datas.Institut.adress1;
-            this[ALIAS.receiver.adress2] = school ? sessionUser.User.adress2 : datas.Institut.adress2;
-            this[ALIAS.receiver.zipcode] = school ? sessionUser.User.zipcode : datas.Institut.zipcode;
-            this[ALIAS.receiver.city] = school ? sessionUser.User.city : datas.Institut.city;
-            this[ALIAS.receiver.fullAdress] =
-                school
-                    ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2 )
-                    : formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
-            this[ALIAS.receiver.fullInlineAdress] =
-                school
-                    ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true)
-                    : formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
-        })
-
+        // user
+        this[ALIAS.candidat.gender] = GENDERS[sessionUser.User.gender].label;
+        this[ALIAS.candidat.firstname] = sessionUser.User.firstname;
+        this[ALIAS.candidat.lastname] = sessionUser.User.lastname;
+        this[ALIAS.candidat.adress1] = sessionUser.User.adress1;
+        this[ALIAS.candidat.adress2] = sessionUser.User.adress2;
+        this[ALIAS.candidat.zipcode] = sessionUser.User.zipcode;
+        this[ALIAS.candidat.city] = sessionUser.User.city;
+        this[ALIAS.candidat.fullAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2);
+        this[ALIAS.candidat.fullInlineAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true);
+        this[ALIAS.candidat.phone] = sessionUser.User.phone;
+        this[ALIAS.candidat.email] = sessionUser.User.email;
+        this[ALIAS.candidat.country] = sessionUser.User.country.label;
+        this[ALIAS.candidat.language] = sessionUser.User.firstlanguage.label;
+        this[ALIAS.candidat.nationality] = sessionUser.User.nationality.label;
+        this[ALIAS.candidat.birthday] = Math.ceil(Math.abs((new Date(sessionUser.User.birthday)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
 
 
         function formaterAdress (adress1, adress2, inline = false) {
-            if (inline) return adress2 ? adress1 + "\n" + adress2 : adress1
-            if (!inline) return adress2 ? adress1 + " - " + adress2 : adress1
+            if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
+            if (!inline) return adress2 ? adress1 + "\n" + adress2 : adress1
         }
 
     }
@@ -224,6 +256,14 @@ module.exports = (app) => {
             include: [
                 {
                     model: models['Institut'],
+                    include:
+                        [
+                            {
+                                attributes: [['label', 'label']],
+                                model: models['Country'],
+                                as: 'institutCountry'
+                            },
+                        ]
                 },
                 {
                     model: models['sessionUser'],
@@ -232,6 +272,7 @@ module.exports = (app) => {
                             {
                                 model: models['User'],
                                 where: userId ? {user_id: userId} : {},
+                                attributes: {exclude: ['password']},
                                 include:
                                     [
                                         {
@@ -271,6 +312,10 @@ module.exports = (app) => {
                                                         model: models['InstitutHasPrices'],
                                                         required: false,
                                                         where: {institut_id: institutId},
+                                                    },
+                                                    {
+                                                        model: models['sessionHasExam'],
+                                                        where: {session_id: sessionId}
                                                     }
                                                 ]
                                         }
