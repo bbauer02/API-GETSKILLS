@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
+        table: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         test_id: {
             type: DataTypes.INTEGER,
             allowNull: false

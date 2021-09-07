@@ -24,6 +24,7 @@
     "express-fileupload": "^1.2.1",
     "express-jwt": "^6.0.0",
     "fs": "0.0.1-security",
+    "json2csv": "^5.0.6",
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
