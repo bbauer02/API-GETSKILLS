@@ -1,6 +1,6 @@
-const sequelize = require("../db/sequelize");
-const {QueryTypes} = require("sequelize");
-const paymentList = {
+const {models} = require("../models");
+
+const PAYMENTS = {
     1: {
         payment_id: 1,
         label: 'Carte Bancaire'
@@ -18,7 +18,8 @@ const paymentList = {
         label: 'Chèque'
     }
 };
-const civilityList = {
+
+const GENDERS = {
     1: {
         civility_id: 1,
         label: 'Mr.'
@@ -29,331 +30,396 @@ const civilityList = {
     }
 };
 
-/**
- * Permet de lancer une requete
- * @param reqString
- * @param name
- * @returns {Promise<void>}
- * @constructor
- */
-async function Requete (reqString, name) {
-    let items = [];
-    try {
-        items = await sequelize.query(reqString, {nest: true, type: QueryTypes.SELECT});
-    } catch (err) {
-        throw new Error("An error occurred. Try to another id or POST one " + name + " - " + err.message)
+const ALIAS = {
+    institut: {
+        label: 'SCHOOL_NAME',
+        adress1: 'SCHOOL_ADDRESS1',
+        adress2: 'SCHOOL_ADDRESS2',
+        fullAdress: 'SCHOOL_ADRESS_FULL',
+        fullInlineAdress: 'SCHOOL_ADRESS_FULL_INLINE',
+        zipcode: 'SCHOOL_ZIPCODE',
+        city: 'SCHOOL_CITY',
+        phone: 'SCHOOL_PHONE',
+        email: 'SCHOOL_EMAIL',
+        country: 'SCHOOL_COUNTRY',
+        footLabel: 'SCHOOL_NAME_FOOT',
+        footAdress1: 'SCHOOL_ADDRESS1_FOOT',
+        footAdress2: 'SCHOOL_ADDRESS2_FOOT',
+        footFullAdress: 'SCHOOL_ADRESS_FULL',
+        footFullInlineAdress: 'SCHOOL_ADRESS_FULL_INLINE',
+        footZipcode: 'SCHOOL_ZIPCODE_FOOT',
+        footCity: 'SCHOOL_CITY_FOOT',
+        footPhone: 'SCHOOL_PHONE_FOOT',
+        footEmail: 'SCHOOL_EMAIL_FOOT',
+        footCountry: 'SCHOOL_COUNTRY_FOOT',
+    },
+    expeditor: {
+        label: 'EXPEDITOR_NAME',
+        adress1: 'EXPEDITOR_ADDRESS1',
+        adress2: 'EXPEDITOR_ADDRESS2',
+        fullAdress: 'EXPEDITOR_ADDRESS_FULL',
+        fullInlineAdress: 'EXPEDITOR_ADDRESS_FULL_INLINE',
+        zipcode: 'EXPEDITOR_ZIPCODE',
+        city: 'EXPEDITOR_CITY',
+        phone: 'EXPEDITOR_PHONE',
+        email: 'EXPEDITOR_EMAIL',
+        country: 'EXPEDITOR_COUNTRY',
+        footLabel: 'EXPEDITOR_NAME_FOOT',
+        footAdress1: 'EXPEDITOR_ADDRESS1_FOOT',
+        footAdress2: 'EXPEDITOR_ADDRESS2_FOOT',
+        footFullAdress: 'EXPEDITOR_ADDRESS_FULL_FOOT',
+        footFullInlineAdress: 'EXPEDITOR_ADDRESS_FULL_INLINE_FOOT',
+        footZipcode: 'EXPEDITOR_ZIPCODE_FOOT',
+        footCity: 'EXPEDITOR_CITY_FOOT',
+        footPhone: 'EXPEDITOR_PHONE_FOOT',
+        footEmail: 'EXPEDITOR_EMAIL_FOOT',
+        footCountry: 'EXPEDITOR_COUNTRY_FOOT'
+    },
+    receiver: {
+        label: 'RECEIVER_NAME',
+        gender: 'RECEIVER_GENDER',
+        firstname: 'RECEIVER_FIRSTNAME',
+        lastname: 'RECEIVER_LASTNAME',
+        adress1: 'RECEIVER_ADDRESS1',
+        adress2: 'RECEIVER_ADDRESS2',
+        fullAdress: 'RECEIVER_ADDRESS_FULL',
+        fullInlineAdress: 'RECEIVER_ADDRESS_FULL_INLINE',
+        zipcode: 'RECEIVER_ZIPCODE',
+        city: 'RECEIVER_CITY',
+        country: 'RECEIVER_COUNTRY',
+        phone: 'RECEIVER_PHONE',
+        email: 'RECEIVER_EMAIL',
+    },
+    candidat: {
+        gender: 'USER_GENDER',
+        firstname: 'USER_FIRSTNAME',
+        lastname: 'USER_LASTNAME',
+        adress1: 'USER_ADDRESS1',
+        adress2: 'USER_ADDRESS2',
+        fullAdress: 'USER_ADRESS_FULL',
+        fullInlineAdress: 'USER_ADRESS_FULL_INLINE',
+        zipcode: 'USER_ZIPCODE',
+        city: 'USER_CITY',
+        country: 'USER_COUNTRY',
+        phone: 'USER_PHONE',
+        email: 'USER_EMAIL',
+        language: 'USER_LANGUAGE',
+        nationality: 'USER_NATIONALITY',
+        birthday: 'USER_BIRTHDAY',
+        numInscrip: 'USER_NUM_INSCR',
+        payment: 'PAIEMENT_INSCRIPTION'
+    },
+    sessions: {
+        start: 'SESSION_START_DATE',
+        hour: 'SESSION_START_HOUR',
+        test: 'TEST',
+        level: 'LEVEL',
+    },
+    exams: {
+        label: 'EXAM',
+        address: 'EXAM_ADDRESS',
+        room: 'EXAM_LOCATION',
+        start: 'EXAM_START_DATE',
+        hour: 'EXAM_START_HOUR',
+        nb: 'EXAMS_NB',
+    },
+    invoice: {
+        labels: 'DESCRIPTIONS',
+        quantities: 'QUANTITES',
+        articles_pu: 'ARTICLES_PU',
+        articles_tva: 'ARTICLES_TVA',
+        articles_ht: 'ARTICLES_HT',
+        articles_ttc: 'ARTICLES_TTC',
+        total_ht: 'TOTAL_HT',
+        total_tva: 'TOTAL_TVA',
+        total_ttc: 'TOTAL_TTC',
+        tvas: 'LIST_TVA',
+        total_ht_par_tva: 'LIST_HT',
+        total_ttc_par_tva: 'LIST_TTC',
     }
 
-    if (!items) {
-        throw new Error(name + " not found");
-    } else {
-        return items;
-    }
+}
+
+const GETSKILLS = {
+    label: 'Get-Skills',
+    adress1: '10 rue de l\'Eglise',
+    adress2: '',
+    zipcode: '02000',
+    city: 'URCEL',
+    phone: '0123456789',
+    email: 'getskills@getskills.com',
+    country: 'France'
 }
 
 /**
- * Construction des données pour les factures du CIFLE vers les écoles
+ * Retourne toutes les données pour les docuements de Getskills
  * @param institutId
  * @param sessionId
- * @returns {Promise<{oInfoFactures: {LIST_TVA: string, LIST_HT: string, LIST_TTC: string}, oFactures: {QUANTITES: string, ARTICLES_PU: string, ARTICLES_TVA: string, TOTAL_TVA: number, ARTICLES_HT: string, TOTAL_HT: number, TOTAL_TTC: number, ARTICLES_TTC: string, DESCRIPTIONS: string}, instituts: void}>}
- * @constructor
+ * @returns {Promise<*[]>}
  */
-async function ConstructDatasForInvoiceInPDF (institutId, sessionId) {
+async function getAllFieldsForGetSkillsDocuments (institutId, sessionId) {
 
-    // requetes
-    const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
-    const factures = await Requete(REQ_FACTURE(sessionId, institutId), 'facture');
+    const result = await getAllFields(institutId, sessionId);
 
-    let oFacture = formaterLaFacture(factures);
-    oFacture = {
-        ...oFacture, TEST: oFacture[0].TEST, LEVEL: oFacture[0].LEVEL, DATE_START: oFacture[0].DATE_START
-    }
+    let fields = [];
 
-    return [Object.assign(instituts[0], oFacture)];
+    if (result === {})
+        return fields;
 
+    fields.push(new FieldsForDocuments(result));
+
+    return fields;
 }
 
 /**
- * Construction d'un répertoire de données à partir des requête
+ * Retourne toutes les données pour la session recherchée.
+ * Si userid != null, recherche toutes les données pour la session et l'utilisateur souhaités.
  * @param institutId
  * @param sessionId
  * @param userId
- * @returns {Promise<*[]>} renvoie un tableau de données triées par utilisateur
+ * @returns {Promise<*[]>}
+ */
+async function getAllFieldsForSchoolDocuments (institutId, sessionId, userId = null) {
+
+    const result = await getAllFields(institutId, sessionId, userId);
+
+    let fields = [];
+
+    if (result.length === 0)
+        return fields;
+
+    if (userId) {
+        fields.push(new FieldsForDocuments(result, userId, true))
+
+    } else {
+
+        const users = result.sessionUsers.reduce((prev, curr) => {
+            prev.push(curr.user_id);
+            return prev
+        }, [])
+
+        users.forEach((user) => {
+            fields.push(new FieldsForDocuments(result, user, true));
+        })
+    }
+
+    return fields;
+}
+
+/**
+ * Un objet contenant tous les champs des documents
+ * Génerer les champs pour les documents de Getskills aux écoles :      userId = -1
+ * Générer les champs pour les  d'une école pour 1 candidat :           userId >= 0
+ * @param datas
+ * @param userId
  * @constructor
  */
-async function ConstructDatasForPDf (institutId, sessionId, userId) {
+function FieldsForDocuments (datas, userId = -1) {
 
-    // requetes
-    const instituts = await Requete(REQ_INSTITUT(institutId), 'institut');
-    // const sessions = await Requete(REQ_SESSION(sessionId), 'session');
-    const users = await Requete(REQ_USERS(sessionId, userId), 'users');
-    const exams = await Requete(REQ_EXAMS(sessionId), 'exams');
-    const examsInfos = await Requete(REQ_EXAMS_INFOS(sessionId), 'exams infos');
-    const factures = await Requete(REQ_FACTURE_STUDENT(sessionId, institutId, userId), 'factures');
+    let sessionUser = null
+    let school = false;
 
-    // console.log('institut->', instituts);
-    // console.log('session->', sessions);
-    // console.log('users->', users);
-    // console.log('exams->', exams);
-    // console.log('exams infos ->', examsInfos);
-    // console.log('factures->', factures);
-    // console.log('factures info->', facturesInfo);
+    if (userId >= 0) {
+        sessionUser = datas.sessionUsers.filter((su) => su.user_id === userId)[0];
+        school = true
+    }
 
-    let datasForPdf = [];
+    // school
+    this[ALIAS.institut.label] = datas.Institut.label;
+    this[ALIAS.institut.adress1] = datas.Institut.adress1;
+    this[ALIAS.institut.adress2] = datas.Institut.adress2;
+    this[ALIAS.institut.zipcode] = datas.Institut.zipcode;
+    this[ALIAS.institut.city] = datas.Institut.city;
+    this[ALIAS.institut.fullAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
+    this[ALIAS.institut.fullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
+    this[ALIAS.institut.phone] = datas.Institut.phone;
+    this[ALIAS.institut.email] = datas.Institut.email;
+    this[ALIAS.institut.country] = datas.Institut.institutCountry.label;
 
-    users.forEach((user) => {
+    this[ALIAS.institut.footLabel] = datas.Institut.label;
+    this[ALIAS.institut.footAdress1] = datas.Institut.adress1;
+    this[ALIAS.institut.footAdress2] = datas.Institut.adress2;
+    this[ALIAS.institut.footZipcode] = datas.Institut.zipcode;
+    this[ALIAS.institut.footCity] = datas.Institut.city;
+    this[ALIAS.institut.footFullAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
+    this[ALIAS.institut.footFullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
+    this[ALIAS.institut.footPhone] = datas.Institut.phone;
+    this[ALIAS.institut.footEmail] = datas.Institut.email;
+    this[ALIAS.institut.footCountry] = datas.Institut.institutCountry.label;
 
-        // on construit les données pour chaque utilisateur
 
-        const examens = exams.filter((exam) => exam.USER_ID === user.USER_ID); // épreuves demandées par l'utilisateur
-        const linesFactures = factures.filter((fact) => fact.USER_ID === user.USER_ID); // liste des articles de la facture
-        const examenInfos = examsInfos.filter((exam) => exam.USER_ID === user.USER_ID); // informations sur les examens
+    // expeditor
+    this[ALIAS.expeditor.label] = school ? datas.Institut.label : GETSKILLS.label;
+    this[ALIAS.expeditor.adress1] = school ? datas.Institut.adress1 : GETSKILLS.adress1;
+    this[ALIAS.expeditor.adress2] = school ? datas.Institut.adress2 : GETSKILLS.adress2;
+    this[ALIAS.expeditor.zipcode] = school ? datas.Institut.zipcode : GETSKILLS.zipcode;
+    this[ALIAS.expeditor.city] = school ? datas.Institut.city : GETSKILLS.city;
+    this[ALIAS.expeditor.phone] = school ? datas.Institut.phone : GETSKILLS.phone;
+    this[ALIAS.expeditor.email] = school ? datas.Institut.email : GETSKILLS.email;
+    this[ALIAS.expeditor.country] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
+    this[ALIAS.expeditor.fullAdress] =
+        school
+            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
+            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
+    this[ALIAS.expeditor.fullInlineAdress] =
+        school
+            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
+            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2, true)
 
-        // construction de l'utilisateur
-        user.PAIEMENT_INSCRIPTION = paymentList[user.PAIEMENT_INSCRIPTION].label;
-        user.USER_GENDER = civilityList[user.USER_GENDER].label;
+    this[ALIAS.expeditor.footLabel] = school ? datas.Institut.label : GETSKILLS.label;
+    this[ALIAS.expeditor.footAdress1] = school ? datas.Institut.adress1 : GETSKILLS.adress1;
+    this[ALIAS.expeditor.footAdress2] = school ? datas.Institut.adress2 : GETSKILLS.adress2;
+    this[ALIAS.expeditor.footZipcode] = school ? datas.Institut.zipcode : GETSKILLS.zipcode;
+    this[ALIAS.expeditor.footCity] = school ? datas.Institut.city : GETSKILLS.city;
+    this[ALIAS.expeditor.footPhone] = school ? datas.Institut.phone : GETSKILLS.phone;
+    this[ALIAS.expeditor.footEmail] = school ? datas.Institut.email : GETSKILLS.email;
+    this[ALIAS.expeditor.footCountry] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
 
-        let oExams = {};
+    this[ALIAS.expeditor.footFullAdress] =
+        school
+            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
+            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
+    this[ALIAS.expeditor.footFullInlineAdress] =
+        school
+            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
+            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
 
-        let nbExams = 0;
-        examens.forEach((exam, index) => {
-            oExams[`EXAM_${++index}`] = exam.EXAM;
-            nbExams += 1;
+
+    // receiver
+    this[ALIAS.receiver.label] = school ? '' : datas.Institut.label;
+    this[ALIAS.receiver.gender] = school ? GENDERS[sessionUser.User.gender].label : '';
+    this[ALIAS.receiver.firstname] = school ? sessionUser.User.firstname : '';
+    this[ALIAS.receiver.lastname] = school ? sessionUser.User.lastname : '';
+    this[ALIAS.receiver.adress1] = school ? sessionUser.User.adress1 : datas.Institut.adress1;
+    this[ALIAS.receiver.adress2] = school ? sessionUser.User.adress2 : datas.Institut.adress2;
+    this[ALIAS.receiver.zipcode] = school ? sessionUser.User.zipcode : datas.Institut.zipcode;
+    this[ALIAS.receiver.city] = school ? sessionUser.User.city : datas.Institut.city;
+    this[ALIAS.receiver.fullAdress] =
+        school
+            ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2)
+            : formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
+    this[ALIAS.receiver.fullInlineAdress] =
+        school
+            ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true)
+            : formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
+    this[ALIAS.receiver.country] = school ? sessionUser.User.country.label : datas.Institut.institutCountry.label;
+    this[ALIAS.receiver.phone] = school ? sessionUser.User.phone : datas.Institut.phone;
+    this[ALIAS.receiver.email] = school ? sessionUser.User.email : datas.Institut.email;
+
+
+    // user
+    if (sessionUser) {
+        this[ALIAS.candidat.gender] = GENDERS[sessionUser.User.gender].label;
+        this[ALIAS.candidat.firstname] = sessionUser.User.firstname;
+        this[ALIAS.candidat.lastname] = sessionUser.User.lastname;
+        this[ALIAS.candidat.adress1] = sessionUser.User.adress1;
+        this[ALIAS.candidat.adress2] = sessionUser.User.adress2;
+        this[ALIAS.candidat.zipcode] = sessionUser.User.zipcode;
+        this[ALIAS.candidat.city] = sessionUser.User.city;
+        this[ALIAS.candidat.fullAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2);
+        this[ALIAS.candidat.fullInlineAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true);
+        this[ALIAS.candidat.phone] = sessionUser.User.phone;
+        this[ALIAS.candidat.email] = sessionUser.User.email;
+        this[ALIAS.candidat.country] = sessionUser.User.country.label;
+        this[ALIAS.candidat.language] = sessionUser.User.firstlanguage.label;
+        this[ALIAS.candidat.nationality] = sessionUser.User.nationality.label;
+        this[ALIAS.candidat.birthday] = Math.ceil(Math.abs((new Date(sessionUser.User.birthday)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+        this[ALIAS.candidat.payment] = PAYMENTS[sessionUser.paymentMode].label;
+        this[ALIAS.candidat.numInscrip] = new Date(sessionUser.inscription).getFullYear().toString() + new Date(sessionUser.inscription).getMonth().toString().padStart(2, "0") + sessionUser.sessionUser_id.toString().padStart(6, "0");
+
+        this[ALIAS.exams.nb] = 0;
+        sessionUser.sessionUserOptions.forEach((suo, index) => {
+
+            this[ALIAS.exams.nb] += 1;
+            this[ALIAS.exams.label + '_' + (index + 1)] = suo.Exam.label;
+            this[ALIAS.exams.address + '_' + (index + 1)] = (suo.addressExam) ? suo.Exam.sessionHasExams[0].adressExam : suo.addressExam;
+            this[ALIAS.exams.room + '_' + (index + 1)] = suo.Exam.sessionHasExams[0].room ? suo.Exam.sessionHasExams[0].room : '';
+            this[ALIAS.exams.start + '_' + (index + 1)] = suo.DateTime ? formaterDate(suo.DateTime) : formaterDate(suo.Exam.sessionHasExams[0].DateTime);
+            this[ALIAS.exams.hour + '_' + (index + 1)] = suo.DateTime ? formaterHour(suo.DateTime) : formaterHour(suo.Exam.sessionHasExams[0].DateTime);
+
+        })
+    }
+
+    // exams
+    this[ALIAS.sessions.test] = datas.Test.label;
+    this[ALIAS.sessions.level] = datas.Level.label ? datas.Level.label : '';
+    this[ALIAS.sessions.start] = formaterDate(datas.start);
+    this[ALIAS.sessions.hour] = formaterHour(datas.start);
+
+
+    // invoices
+
+    this[ALIAS.invoice.labels] = "";
+    this[ALIAS.invoice.quantities] = "";
+    this[ALIAS.invoice.articles_pu] = "";
+    this[ALIAS.invoice.articles_tva] = "";
+    this[ALIAS.invoice.articles_ht] = '';
+    this[ALIAS.invoice.articles_ttc] = '';
+    this[ALIAS.invoice.total_ht] = 0;
+    this[ALIAS.invoice.total_ttc] = 0;
+    this[ALIAS.invoice.total_tva] = 0;
+    this[ALIAS.invoice.tvas] = '';
+    this[ALIAS.invoice.total_ht_par_tva] = '';
+    this[ALIAS.invoice.total_ttc_par_tva] = '';
+
+    let lines = [];
+
+    // invoices : school VERS candidats
+    if (school) {
+
+        lines = sessionUser.sessionUserOptions.reduce((prev, curr, index) => {
+            prev.push({
+                label: curr.Exam.label,
+                puTtc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
+                tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
+                qty: 1,
+            });
+            return prev;
+        }, [])
+
+    }
+
+    // invoices : getskills VERS schools
+    if (!school) {
+        let concatLines = [];
+
+        datas.sessionUsers.forEach((su) => {
+            concatLines = concatLines.concat(su.sessionUserOptions);
         })
 
-        let oFacture = formaterLaFacture(linesFactures);
-        oFacture = {
-            ...oFacture, TEST: factures[0].TEST, LEVEL: factures[0].LEVEL, DATE_START: factures[0].DATE_START
-        }
+        lines = concatLines.reduce((prev, curr, index) => {
 
-        // on regroupe toutes les données concernant un USER dans un objet DATA
-        data = Object.assign(instituts[0], user, examenInfos[0], oExams, {NB_EXAMS: nbExams}, oFacture);
+            const line = prev.filter(item => item.examId === curr.Exam.exam_id);
 
-        // on l'ajoute dans un tableau
-        datasForPdf = [...datasForPdf, {...data}];
-    })
-
-    // console.log(datasForPdf);
-    return datasForPdf;
-}
-
-/**
- * obtenir un institut avec son id
- * @param institutId
- * @returns {string}
- * @constructor
- */
-const REQ_INSTITUT = (institutId) => {
-    let requete = "SELECT ";
-    requete += "instituts.label as SCHOOL_NAME, instituts.label as SCHOOL_NAME_PIED, ";
-    requete += "IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,'\r\n',instituts.adress2)) as SCHOOL_ADDRESS1, IF(ISNULL(instituts.adress2) OR instituts.adress2 = '', instituts.adress1, CONCAT(instituts.adress1,' - ',instituts.adress2)) as SCHOOL_ADDRESS1_PIED, ";
-    requete += "instituts.adress1 as SCHOOL_ADDRESS2, instituts.adress1 as SCHOOL_ADDRESS2_PIED, ";
-    requete += "instituts.zipcode as SCHOOL_ZIPCODE, instituts.zipcode as SCHOOL_ZIPCODE_PIED, ";
-    requete += "instituts.city as SCHOOL_CITY, instituts.city as SCHOOL_CITY_PIED, ";
-    requete += "instituts.phone as SCHOOL_PHONE, instituts.phone as SCHOOL_PHONE_PIED, ";
-    requete += "instituts.email as SCHOOL_EMAIL, instituts.email as SCHOOL_EMAIL_PIED ";
-    requete += "FROM instituts ";
-    requete += "WHERE instituts.institut_id = " + institutId;
-    return requete;
-}
-
-
-
-/**
- * Obtenir la liste des candidats pour la session
- * @param sessionId
- * @param userId
- * @returns {string}
- * @constructor
- */
-const REQ_USERS = (sessionId, userId) => {
-    let requete = "SELECT DISTINCT ";
-    requete += "users.civility as USER_GENDER, ";
-    requete += "users.user_id as USER_ID, ";
-    requete += "users.lastname as USER_LASTNAME, ";
-    requete += "users.firstname as USER_FIRSTNAME, ";
-    requete += "IF(ISNULL(users.adress2) OR users.adress2 = '', users.adress1, CONCAT(users.adress1,'\r\n',users.adress2)) as USER_ADRESS1, ";
-    requete += "users.adress2 as USER_ADRESS2, ";
-    requete += "users.zipcode as USER_ZIPCODE, ";
-    requete += "users.city as USER_CITY, ";
-    requete += "users.phone as USER_PHONE, ";
-    requete += "users.email as USER_MAIL, ";
-    requete += "DATEDIFF(sessions.start, '1899-12-30') as SESSION_START_DATE, ";
-    requete += "(HOUR(sessions.start) * 60 + MINUTE(sessions.start))/1440 as SESSION_START_HOUR, ";
-    requete += "IFNULL(levels.label, '') as LEVEL, ";
-    requete += "tests.label as TEST, ";
-    requete += "sessionUsers.paymentMode as PAIEMENT_INSCRIPTION, "
-    requete += "DATEDIFF(IFNULL(sessionUsers.inscription, '1899-12-30'), '1899-12-30') as USER_DATE_INSCR, ";
-    requete += "IFNULL(sessionUsers.numInscrAnt, '-') as USER_NUM_INSCR, "
-    requete += "DATEDIFF(users.birthday, '1899-12-30') as USER_BIRTHDAY, ";
-    requete += "countries.label as USER_COUNTRY, ";
-    requete += "countries.countryNationality as USER_NATIONALITY, ";
-    requete += "countries.countryLanguage as USER_LANGUAGE, ";
-    requete += "CONCAT(DATE_FORMAT(sessionUsers.inscription, '%Y'), DATE_FORMAT(sessionUsers.inscription, '%m'), sessionUsers.sessionUser_id) as USER_NUM_INSCR "
-    requete += "from users ";
-    requete += "join sessionUsers on sessionUsers.user_id = users.user_id ";
-    requete += "join sessions on sessions.session_id = sessionUsers.session_id ";
-    requete += "join countries on countries.country_id = users.country_id ";
-    requete += "join session_user_option on sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
-    requete += "join exams on session_user_option.exam_id = exams.exam_id ";
-    requete += "join tests on tests.test_id = exams.test_id ";
-    requete += "left join levels on exams.level_id = levels.level_id ";
-    requete += "where sessions.session_id = " + sessionId + " ";
-    if (userId) requete += "AND users.user_id = " + userId + " ";
-    requete += "AND session_user_option.isCandidate = true "
-    requete += "order by user_id";
-    return requete;
-}
-
-/**
- * Obtenir la liste des épreuves pour la session
- * @param sessionId
- * @returns {string}
- * @constructor
- */
-const REQ_EXAMS = (sessionId) => {
-    let requete = "SELECT ";
-    requete += "users.user_id as USER_ID, ";
-    requete += "exams.label as EXAM ";
-    requete += "from sessions ";
-    requete += "join tests on tests.test_id = sessions.test_id ";
-    requete += "left join exams on tests.test_id = exams.test_id ";
-    requete += "left join levels on exams.level_id = levels.level_id ";
-    requete += "join sessionUsers on sessionUsers.session_id = sessions.session_id ";
-    requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
-    requete += "join users on sessionUsers.user_id = users.user_id ";
-    requete += "where sessions.session_id = " + sessionId + " ";
-    requete += "AND session_user_option.isCandidate = true "
-    requete += "GROUP BY users.user_id, exams.label, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
-    requete += "order by user_id";
-    return requete
-}
-
-const REQ_EXAMS_INFOS = (sessionId) => {
-    let requete = "SELECT ";
-    requete += "users.user_id as USER_ID, ";
-    requete += "session_user_option.isCandidate as EXAM_IS_CANDIDATE, ";
-    requete += "session_user_option.DateTime as USER_DATE_INSCRIPTION, ";
-    requete += "session_user_option.addressExam as EXAM_ADDRESS ";
-    requete += "from sessions ";
-    requete += "join tests on tests.test_id = sessions.test_id ";
-    requete += "left join exams on tests.test_id = exams.test_id ";
-    requete += "left join levels on exams.level_id = levels.level_id ";
-    requete += "join sessionUsers on sessionUsers.session_id = sessions.session_id ";
-    requete += "join session_user_option on session_user_option.exam_id = exams.exam_id ";
-    requete += "join users on sessionUsers.user_id = users.user_id ";
-    requete += "where sessions.session_id = " + sessionId + " ";
-    requete += "AND session_user_option.isCandidate = true ";
-    requete += "GROUP BY users.user_id, session_user_option.isCandidate, session_user_option.DateTime, session_user_option.addressExam "
-    requete += "order by user_id";
-    return requete
-}
-
-
-/**
- * Récupérer les prix des examens par utilisateur.
- * Générer une facture du CIFLE vers une école.
- * @param sessionId
- * @param institutId
- * @param userId
- * @returns {string}
- * @constructor
- */
-const REQ_FACTURE_STUDENT = (sessionId, institutId, userId) => {
-    let requete = "SELECT ";
-    requete += "users.user_id as USER_ID, "
-    requete += "exams.label as label, ";
-    requete += "tests.label as TEST, "
-    requete += "levels.label as LEVEL, ";
-    requete += "sessions.start as DATE_START, ";
-    requete += "Institut_has_prices.tva as tva, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price) as price_pu_ttc, ";
-    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)) as TOTAL_TTC, ";
-    requete += "COUNT(sessionUsers.user_id) as quantity "
-    requete += "from exams ";
-    requete += "JOIN session_user_option ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN sessionUsers ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
-    requete += "JOIN sessions ON sessions.session_id = sessionUsers.session_id ";
-    requete += "JOIN Institut_has_prices ON Institut_has_prices.exam_id = exams.exam_id "
-    requete += "JOIN users ON users.user_id = sessionUsers.user_id ";
-    requete += "JOIN tests ON exams.test_id = tests.test_id  ";
-    requete += "right JOIN levels ON levels.level_id = exams.level_id ";
-    requete += "WHERE sessions.session_id = " + sessionId + " ";
-    requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
-    requete += "AND session_user_option.isCandidate = true ";
-    if (userId) requete += "AND users.user_id = " + userId + " ";
-    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price, sessionUsers.user_id, users.user_id, tests.label, levels.label, sessions.start "
-    requete += "ORDER BY user_id";
-    return requete
-}
-
-const REQ_FACTURE = (sessionId, institutId) => {
-    let requete = "SELECT ";
-    requete += "exams.label                 as DESCRIPTION, ";
-    requete += "tests.label                 as TEST, ";
-    requete += "levels.label                as LEVEL, ";
-    requete += "sessions.start              as DATE_START, ";
-    requete += "Institut_has_prices.tva     as TVA, ";
-    requete += "IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price)       as PU, ";
-    requete += "SUM(IF(ISNULL(session_user_option.user_price), Institut_has_prices.price, session_user_option.user_price))  as TOTAL_TTC, ";
-    requete += "COUNT(sessionUsers.user_id) as QUANTITY "
-    requete += "from exams ";
-    requete += "JOIN session_user_option    ON session_user_option.exam_id = exams.exam_id ";
-    requete += "JOIN sessionUsers           ON sessionUsers.sessionUser_id = session_user_option.sessionUser_id ";
-    requete += "JOIN sessions               ON sessions.session_id = sessionUsers.session_id ";
-    requete += "JOIN Institut_has_prices    ON Institut_has_prices.exam_id = exams.exam_id "
-    requete += "JOIN users                  ON users.user_id = sessionUsers.user_id ";
-    requete += "JOIN tests                  ON exams.test_id = tests.test_id  ";
-    requete += "left JOIN levels                 ON levels.level_id = exams.level_id ";
-    requete += "WHERE sessions.session_id = " + sessionId + " ";
-    requete += "AND Institut_has_prices.institut_id = " + institutId + " ";
-    requete += "AND session_user_option.isCandidate = true ";
-    requete += "GROUP BY exams.label, Institut_has_prices.tva, session_user_option.user_price, Institut_has_prices.price,tests.label,levels.label "
-    return requete
-}
-
-function formaterLaFacture (lines) {
-
-    let articleLine = {
-        DESCRIPTIONS: '',
-        QUANTITES: '',
-        ARTICLES_PU: '',
-        ARTICLES_HT: '',
-        ARTICLES_TVA: '',
-        ARTICLES_TTC: '',
-        TOTAL_HT: 0,
-        TOTAL_TVA: 0,
-        TOTAL_TTC: 0,
-        LIST_TVA: ''
+            if (line.length === 0) {
+                prev.push({
+                    examId: curr.Exam.exam_id,
+                    label: curr.Exam.label,
+                    puTtc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
+                    tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
+                    qty: 1,
+                });
+                return prev
+            } else {
+                line[0].qty += 1;
+            }
+            return prev
+        }, [])
     }
 
-    let datasForPdf = lines.reduce((prev, curr) => {
-        // retours chariots
-        const RC = "\n";
-        const RC2 = "\n\n";
-        let carriage = RC;
 
-        if (curr.label.length < 40) {
-            prev.DESCRIPTIONS += curr.label + RC;
-        } else if (curr.label.length >= 40 && curr.label.length < 80) {
-            carriage = RC2;
-            prev.DESCRIPTIONS += curr.label.substr(0, 79) + RC;
-        } else {
-            carriage = RC2;
-            prev.DESCRIPTIONS += curr.label.substr(0, 79) + '...' + RC;
-        }
-
-        prev.QUANTITES += curr.quantity + carriage;
-        prev.ARTICLES_PU += curr.price_pu_ttc + carriage;
-        prev.ARTICLES_TVA += curr.tva + carriage;
-        prev.ARTICLES_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100))).toFixed(2) + carriage;
-        prev.ARTICLES_TTC += (curr.price_pu_ttc * curr.quantity) + carriage;
-        prev.TOTAL_HT += ((curr.quantity * curr.price_pu_ttc) / (1 + (curr.tva / 100)));
-        prev.TOTAL_TVA += (curr.quantity * curr.price_pu_ttc) * (1 - (1 / (1 + (curr.tva / 100))));
-        prev.TOTAL_TTC += curr.quantity * curr.price_pu_ttc;
-
-        return prev;
-    }, articleLine)
+    lines.forEach(line => {
+        let carriage = manageCarriage(line.label);
+        this[ALIAS.invoice.labels] += line.label + carriage;
+        this[ALIAS.invoice.quantities] += line.qty + carriage;
+        this[ALIAS.invoice.articles_pu] += line.puTtc + carriage;
+        this[ALIAS.invoice.articles_tva] += line.tva + carriage;
+        this[ALIAS.invoice.articles_ht] += calculer_HT(line.qty, line.puTtc, line.tva).toFixed(2) + carriage;
+        this[ALIAS.invoice.articles_ttc] += calculer_TTC(line.qty, line.puTtc).toFixed(2) + carriage;
+        this[ALIAS.invoice.total_ht] += calculer_HT(line.qty, line.puTtc, line.tva);
+        this[ALIAS.invoice.total_ttc] += calculer_TTC(line.qty, line.puTtc);
+        this[ALIAS.invoice.total_tva] += calculer_TVA(line.qty, line.puTtc, line.tva);
+    })
 
     const listTva = lines.reduce((prev, curr) => {
         if (!prev.includes(curr.tva)) {
@@ -362,42 +428,151 @@ function formaterLaFacture (lines) {
         return prev;
     }, []);
 
-    datasForPdf = {
-        ...datasForPdf,
-        LIST_TVA: listTva.reduce((prev, curr) => prev + curr.toFixed(2) + "\n", ''),
-    }
-
-    datasForPdf = {...datasForPdf, LIST_TTC: '', LIST_HT: ''};
+    this[ALIAS.invoice.tvas] = listTva.reduce((prev, curr) => {
+        return prev + curr + "\n";
+    }, '')
 
     listTva.forEach((tva) => {
-        datasForPdf.LIST_HT += lines
+        this[ALIAS.invoice.total_ht_par_tva] += lines
                 .filter((line) => line.tva === tva)
-                .reduce((prev, curr) => prev + ((curr.price_pu_ttc * curr.quantity) / (1 + (tva / 100))), 0)
+                .reduce((prev, curr) => {
+                    return prev + calculer_HT(curr.qty, curr.puTtc, curr.tva)
+                }, 0)
                 .toFixed(2)
             + "\n"
 
-        datasForPdf.LIST_TTC += lines
+        this[ALIAS.invoice.total_ttc_par_tva] += lines
                 .filter((fact) => fact.tva === tva)
-                .reduce((prev, curr) => prev + (curr.price_pu_ttc * curr.quantity), 0)
+                .reduce((prev, curr) => {
+                    return prev + (curr.qty * curr.puTtc)
+                }, 0)
                 .toFixed(2)
             + "\n"
     })
 
-    return datasForPdf;
+
+    // méthodes
+    function manageCarriage (label) {
+        // retours chariots
+        const RC = "\n";
+        if (label.length < 40) return RC;
+        if (label.length < 80) return RC + RC;
+        if (label.length < 120) return RC + RC + RC;
+        if (label.length < 160) return RC + RC + RC + RC;
+    }
+
+    function calculer_TVA (quantity, price_pu_ttc, tva) {
+        return (quantity * price_pu_ttc) - (((quantity * price_pu_ttc) / (1 + (tva / 100))));
+    }
+
+    function calculer_TTC (quantity, price_pu_ttc) {
+        return (quantity * price_pu_ttc);
+    }
+
+    function calculer_HT (quantity, price_pu_ttc, tva) {
+        return ((quantity * price_pu_ttc) / (1 + (tva / 100)));
+    }
+
+    function formaterAdress (adress1, adress2, inline = false) {
+        if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
+        if (!inline) return adress2 ? adress1 + "\n" + adress2 : adress1
+    }
+
+    function formaterDate (myDate) {
+        return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+    }
+
+    function formaterHour (myHour) {
+        return (myHour.getHours() + (myHour.getMinutes() / 60)) / 24;
+    }
 
 }
 
+/**
+ * Requete pour obtenir tous les champs pour la génération des documents.
+ * Obtiens toutes les données d'une session.
+ * Si user != null, obtient toutes les données de la session souhaitée pour le user souhaité.
+ * @param institutId
+ * @param sessionId
+ * @param userId
+ * @returns {Promise<*>}
+ */
+async function getAllFields (institutId, sessionId, userId = null) {
 
-module.exports = {
-    Requete,
-    ConstructDatasForPDf,
-    ConstructDatasForInvoiceInPDF,
-    REQ_INSTITUT,
-    REQ_EXAMS,
-    REQ_FACTURE_STUDENT,
-    REQ_USERS,
-    REQ_EXAMS_INFOS,
-    REQ_FACTURE,
-    formaterLaFacture
+    return await models['Session'].findOne({
+        where: {session_id: sessionId},
+        include: [
+            {
+                model: models['Test'],
+            },
+            {
+                model: models['Level'],
+                required: false,
+            },
+            {
+                model: models['Institut'],
+                include:
+                    [
+                        {
+                            attributes: [['label', 'label']],
+                            model: models['Country'],
+                            as: 'institutCountry'
+                        },
+                    ]
+            },
+            {
+                model: models['sessionUser'],
+                include:
+                    [
+                        {
+                            model: models['User'],
+                            where: userId ? {user_id: userId} : {},
+                            attributes: {exclude: ['password']},
+                            include:
+                                [
+                                    {
+                                        attributes: [['name', 'label']],
+                                        model: models['Language'],
+                                        as: 'firstlanguage'
+                                    },
+                                    {
+                                        attributes: [['label', 'label']],
+                                        model: models['Country'],
+                                        as: 'country'
+                                    },
+                                    {
+                                        attributes: [['countryNationality', 'label']],
+                                        model: models['Country'],
+                                        as: 'nationality'
+                                    }
+                                ]
+                        },
+                        {
+                            model: models['sessionUserOption'],
+                            where: {isCandidate: true},
+                            include:
+                                [
+                                    {
+                                        model: models['Exam'],
+                                        include:
+                                            [
+                                                {
+                                                    model: models['InstitutHasPrices'],
+                                                    required: false,
+                                                    where: {institut_id: institutId},
+                                                },
+                                                {
+                                                    model: models['sessionHasExam'],
+                                                    where: {session_id: sessionId}
+                                                }
+                                            ]
+                                    }
+                                ]
+                        }
+                    ]
+            },
+        ]
+    })
 }
 
+module.exports = {getAllFieldsForGetSkillsDocuments, getAllFieldsForSchoolDocuments};
