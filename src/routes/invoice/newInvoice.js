@@ -49,9 +49,7 @@ module.exports = (app) => {
 
         try {
 
-            const order = await generateOrder(institutId, sessionId, [{
-                label: 'frais en plus', price_pu_ttc: 10, tva: 20, quantity: 3
-            }]);
+            const order = await generateOrder(institutId, sessionId);
 
             if (!order) {
                 return res.status(200).json({message: 'no order generated', data: null});
