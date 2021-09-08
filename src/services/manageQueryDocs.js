@@ -211,21 +211,15 @@ async function getAllFieldsForSchoolDocuments (institutId, sessionId, userId = n
 
 /**
  * Un objet contenant tous les champs des documents
- * Génerer les champs pour les documents de Getskills aux écoles :      userId = -1
  * Générer les champs pour les  d'une école pour 1 candidat :           userId >= 0
  * @param datas
  * @param userId
  * @constructor
  */
-function FieldsForDocuments (datas, userId = -1) {
+function FieldsForDocuments (datas, userId) {
 
-    let sessionUser = null
-    let school = false;
+    const sessionUser = datas.sessionUsers.filter((su) => su.user_id === userId)[0];
 
-    if (userId >= 0) {
-        sessionUser = datas.sessionUsers.filter((su) => su.user_id === userId)[0];
-        school = true
-    }
 
     // school
     this[ALIAS.institut.label] = datas.Institut.label;
@@ -252,63 +246,49 @@ function FieldsForDocuments (datas, userId = -1) {
 
 
     // expeditor
-    this[ALIAS.expeditor.label] = school ? datas.Institut.label : GETSKILLS.label;
-    this[ALIAS.expeditor.adress1] = school ? datas.Institut.adress1 : GETSKILLS.adress1;
-    this[ALIAS.expeditor.adress2] = school ? datas.Institut.adress2 : GETSKILLS.adress2;
-    this[ALIAS.expeditor.zipcode] = school ? datas.Institut.zipcode : GETSKILLS.zipcode;
-    this[ALIAS.expeditor.city] = school ? datas.Institut.city : GETSKILLS.city;
-    this[ALIAS.expeditor.phone] = school ? datas.Institut.phone : GETSKILLS.phone;
-    this[ALIAS.expeditor.email] = school ? datas.Institut.email : GETSKILLS.email;
-    this[ALIAS.expeditor.country] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
-    this[ALIAS.expeditor.fullAdress] =
-        school
-            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
-            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
-    this[ALIAS.expeditor.fullInlineAdress] =
-        school
-            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
-            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2, true)
+    this[ALIAS.expeditor.label] = datas.Institut.label;
+    this[ALIAS.expeditor.adress1] = datas.Institut.adress1;
+    this[ALIAS.expeditor.adress2] = datas.Institut.adress2;
+    this[ALIAS.expeditor.zipcode] = datas.Institut.zipcode;
+    this[ALIAS.expeditor.city] = datas.Institut.city;
+    this[ALIAS.expeditor.phone] = datas.Institut.phone;
+    this[ALIAS.expeditor.email] = datas.Institut.email;
+    this[ALIAS.expeditor.country] = datas.Institut.institutCountry.label;
+    this[ALIAS.expeditor.fullAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
+    this[ALIAS.expeditor.fullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
 
-    this[ALIAS.expeditor.footLabel] = school ? datas.Institut.label : GETSKILLS.label;
-    this[ALIAS.expeditor.footAdress1] = school ? datas.Institut.adress1 : GETSKILLS.adress1;
-    this[ALIAS.expeditor.footAdress2] = school ? datas.Institut.adress2 : GETSKILLS.adress2;
-    this[ALIAS.expeditor.footZipcode] = school ? datas.Institut.zipcode : GETSKILLS.zipcode;
-    this[ALIAS.expeditor.footCity] = school ? datas.Institut.city : GETSKILLS.city;
-    this[ALIAS.expeditor.footPhone] = school ? datas.Institut.phone : GETSKILLS.phone;
-    this[ALIAS.expeditor.footEmail] = school ? datas.Institut.email : GETSKILLS.email;
-    this[ALIAS.expeditor.footCountry] = school ? datas.Institut.institutCountry.label : GETSKILLS.country;
+    this[ALIAS.expeditor.footLabel] = datas.Institut.label;
+    this[ALIAS.expeditor.footAdress1] = datas.Institut.adress1;
+    this[ALIAS.expeditor.footAdress2] = datas.Institut.adress2;
+    this[ALIAS.expeditor.footZipcode] = datas.Institut.zipcode;
+    this[ALIAS.expeditor.footCity] = datas.Institut.city;
+    this[ALIAS.expeditor.footPhone] = datas.Institut.phone;
+    this[ALIAS.expeditor.footEmail] = datas.Institut.email;
+    this[ALIAS.expeditor.footCountry] = datas.Institut.institutCountry.label;
 
-    this[ALIAS.expeditor.footFullAdress] =
-        school
-            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
-            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
-    this[ALIAS.expeditor.footFullInlineAdress] =
-        school
-            ? formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
-            : formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2)
-
+    this[ALIAS.expeditor.footFullAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
+    this[ALIAS.expeditor.footFullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
 
     // receiver
-    this[ALIAS.receiver.label] = school ? '' : datas.Institut.label;
-    this[ALIAS.receiver.gender] = school ? GENDERS[sessionUser.User.gender].label : '';
-    this[ALIAS.receiver.firstname] = school ? sessionUser.User.firstname : '';
-    this[ALIAS.receiver.lastname] = school ? sessionUser.User.lastname : '';
-    this[ALIAS.receiver.adress1] = school ? sessionUser.User.adress1 : datas.Institut.adress1;
-    this[ALIAS.receiver.adress2] = school ? sessionUser.User.adress2 : datas.Institut.adress2;
-    this[ALIAS.receiver.zipcode] = school ? sessionUser.User.zipcode : datas.Institut.zipcode;
-    this[ALIAS.receiver.city] = school ? sessionUser.User.city : datas.Institut.city;
-    this[ALIAS.receiver.fullAdress] =
-        school
-            ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2)
-            : formaterAdress(datas.Institut.adress1, datas.Institut.adress2)
-    this[ALIAS.receiver.fullInlineAdress] =
-        school
-            ? formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true)
-            : formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true)
-    this[ALIAS.receiver.country] = school ? sessionUser.User.country.label : datas.Institut.institutCountry.label;
-    this[ALIAS.receiver.phone] = school ? sessionUser.User.phone : datas.Institut.phone;
-    this[ALIAS.receiver.email] = school ? sessionUser.User.email : datas.Institut.email;
+    this[ALIAS.receiver.label] = '';
+    this[ALIAS.receiver.gender] = GENDERS[sessionUser.User.gender].label;
+    this[ALIAS.receiver.firstname] = sessionUser.User.firstname;
+    this[ALIAS.receiver.lastname] = sessionUser.User.lastname;
+    this[ALIAS.receiver.adress1] = sessionUser.User.adress1;
+    this[ALIAS.receiver.adress2] = sessionUser.User.adress2;
+    this[ALIAS.receiver.zipcode] = sessionUser.User.zipcode;
+    this[ALIAS.receiver.city] = sessionUser.User.city;
+    this[ALIAS.receiver.fullAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2);
+    this[ALIAS.receiver.fullInlineAdress] = formaterAdress(sessionUser.User.adress1, sessionUser.User.adress2, true);
+    this[ALIAS.receiver.country] = sessionUser.User.country.label;
+    this[ALIAS.receiver.email] = sessionUser.User.email;
+    this[ALIAS.receiver.phone] = sessionUser.User.phone;
 
+    // exams
+    this[ALIAS.sessions.test] = datas.Test.label;
+    this[ALIAS.sessions.level] = datas.Level.label ? datas.Level.label : '';
+    this[ALIAS.sessions.start] = formaterDate(datas.start);
+    this[ALIAS.sessions.hour] = formaterHour(datas.start);
 
     // user
     if (sessionUser) {
@@ -341,158 +321,161 @@ function FieldsForDocuments (datas, userId = -1) {
             this[ALIAS.exams.hour + '_' + (index + 1)] = suo.DateTime ? formaterHour(suo.DateTime) : formaterHour(suo.Exam.sessionHasExams[0].DateTime);
 
         })
-    }
 
-    // exams
-    this[ALIAS.sessions.test] = datas.Test.label;
-    this[ALIAS.sessions.level] = datas.Level.label ? datas.Level.label : '';
-    this[ALIAS.sessions.start] = formaterDate(datas.start);
-    this[ALIAS.sessions.hour] = formaterHour(datas.start);
+        // invoices
+
+        let lines = generateLinesInvoiceSchoolsForItsCandidats(sessionUser);
+
+        // invoices : school VERS candidats
+        const LinesForInvoices = new LinesForInvoice(lines);
+        const TableVat = new TableVat(lines);
+
+        this[ALIAS.invoice.labels] = LinesForInvoices[ALIAS.invoice.labels];
+        this[ALIAS.invoice.quantities] = LinesForInvoices[ALIAS.invoice.quantities];
+        this[ALIAS.invoice.articles_pu] = LinesForInvoices[ALIAS.invoice.articles_pu];
+        this[ALIAS.invoice.articles_tva] = LinesForInvoices[ALIAS.invoice.articles_tva];
+        this[ALIAS.invoice.articles_ht] = LinesForInvoices[ALIAS.invoice.articles_ht];
+        this[ALIAS.invoice.articles_ttc] = LinesForInvoices[ALIAS.invoice.articles_ttc];
+        this[ALIAS.invoice.total_ht] = LinesForInvoices[ALIAS.invoice.total_ht];
+        this[ALIAS.invoice.total_ttc] = LinesForInvoices[ALIAS.invoice.total_ttc];
+        this[ALIAS.invoice.total_tva] = LinesForInvoices[ALIAS.invoice.total_tva];
+
+        this[ALIAS.invoice.tvas] = TableVat[ALIAS.invoice.tvas];
+        this[ALIAS.invoice.total_ht_par_tva] = TableVat[ALIAS.invoice.total_ht_par_tva];
+        this[ALIAS.invoice.total_ttc_par_tva] = TableVat[ALIAS.invoice.total_ttc_par_tva];
+    }
+}
+
+
+/**
+ * Créer les lignes pour la commande au client
+ * @param sessionUser
+ * @returns {T[]}
+ */
+function generateLinesInvoiceSchoolsForItsCandidats (sessionUser) {
+    return sessionUser.sessionUserOptions.reduce((prev, curr, index) => {
+        prev.push({
+            label: curr.Exam.label,
+            price_pu_ttc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
+            tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
+            quantity: 1,
+        });
+        return prev;
+    }, [])
+}
+
+
+/**
+ * Créer les lignes pour la commande au client
+ * @param datas
+ * @returns {T[]}
+ */
+function generateLinesInvoiceGetSkillsForItsClients (datas) {
+    // invoices : getskills VERS schools
+
+    let concatLines = [];
+
+    datas.sessionUsers.forEach((su) => {
+        concatLines = concatLines.concat(su.sessionUserOptions);
+    })
+
+    const lines = concatLines.reduce((prev, curr, index) => {
+
+        const line = prev.filter(item => item.examId === curr.Exam.exam_id);
+
+        if (line.length === 0) {
+            prev.push({
+                examId: curr.Exam.exam_id,
+                label: curr.Exam.label,
+                price_pu_ttc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
+                tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
+                quantity: 1,
+            });
+            return prev
+        } else {
+            line[0].quantity += 1;
+        }
+        return prev
+    }, [])
+
+    return lines.reduce((prev, curr) => {
+        prev.push({
+            label: curr.label, price_pu_ttc: curr.price_pu_ttc, tva: curr.tva, quantity: curr.quantity
+        })
+        return prev;
+    }, []);
+
+}
+
+function FieldsForInvoice (datas) {
+
+    // expeditor
+    this[ALIAS.expeditor.label] = GETSKILLS.label;
+    this[ALIAS.expeditor.adress1] = GETSKILLS.adress1;
+    this[ALIAS.expeditor.adress2] = GETSKILLS.adress2;
+    this[ALIAS.expeditor.zipcode] = GETSKILLS.zipcode;
+    this[ALIAS.expeditor.city] = GETSKILLS.city;
+    this[ALIAS.expeditor.phone] = GETSKILLS.phone;
+    this[ALIAS.expeditor.email] = GETSKILLS.email;
+    this[ALIAS.expeditor.country] = GETSKILLS.country;
+    this[ALIAS.expeditor.fullAdress] = formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2);
+    this[ALIAS.expeditor.fullInlineAdress] = formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2, true);
+
+    this[ALIAS.expeditor.footLabel] = GETSKILLS.label;
+    this[ALIAS.expeditor.footAdress1] = GETSKILLS.adress1;
+    this[ALIAS.expeditor.footAdress2] = GETSKILLS.adress2;
+    this[ALIAS.expeditor.footZipcode] = GETSKILLS.zipcode;
+    this[ALIAS.expeditor.footCity] = GETSKILLS.city;
+    this[ALIAS.expeditor.footPhone] = GETSKILLS.phone;
+    this[ALIAS.expeditor.footEmail] = GETSKILLS.email;
+    this[ALIAS.expeditor.footCountry] = GETSKILLS.country;
+
+    this[ALIAS.expeditor.footFullAdress] = formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2);
+    this[ALIAS.expeditor.footFullInlineAdress] = formaterAdress(GETSKILLS.adress1, GETSKILLS.adress2, true);
+
+    // receiver
+    this[ALIAS.receiver.label] = datas.Institut.label;
+    this[ALIAS.receiver.gender] = '';
+    this[ALIAS.receiver.firstname] = '';
+    this[ALIAS.receiver.lastname] = '';
+    this[ALIAS.receiver.adress1] = datas.Institut.adress1;
+    this[ALIAS.receiver.adress2] = datas.Institut.adress2;
+    this[ALIAS.receiver.zipcode] = datas.Institut.zipcode;
+    this[ALIAS.receiver.city] = datas.Institut.city;
+    this[ALIAS.receiver.fullAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2);
+    this[ALIAS.receiver.fullInlineAdress] = formaterAdress(datas.Institut.adress1, datas.Institut.adress2, true);
+    this[ALIAS.receiver.country] = datas.Institut.institutCountry.label;
+    this[ALIAS.receiver.email] = datas.Institut.email;
+    this[ALIAS.receiver.phone] = datas.Institut.phone;
 
 
     // invoices
 
-    this[ALIAS.invoice.date_invoice] = formaterDate(new Date().toString());
-    // this[ALIAS.invoice.reference] =
-    // this[ALIAS.invoice.numero] =
-    this[ALIAS.invoice.labels] = "";
-    this[ALIAS.invoice.quantities] = "";
-    this[ALIAS.invoice.articles_pu] = "";
-    this[ALIAS.invoice.articles_tva] = "";
-    this[ALIAS.invoice.articles_ht] = '';
-    this[ALIAS.invoice.articles_ttc] = '';
-    this[ALIAS.invoice.total_ht] = 0;
-    this[ALIAS.invoice.total_ttc] = 0;
-    this[ALIAS.invoice.total_tva] = 0;
-    this[ALIAS.invoice.tvas] = '';
-    this[ALIAS.invoice.total_ht_par_tva] = '';
-    this[ALIAS.invoice.total_ttc_par_tva] = '';
-
-    let lines = [];
+    this[ALIAS.invoice.numero] = datas.reference + "-" + datas.invoice_id.toString().padStart(6, "0");
+    this[ALIAS.invoice.reference] = datas.reference;
+    this[ALIAS.invoice.date_invoice] = formaterDate(datas.createdAt);
+    this[ALIAS.invoice.total_ttc] = datas.price_total_TTC;
 
     // invoices : school VERS candidats
-    if (school) {
+    const LinesForInvoices = new LinesForInvoice(datas.lines);
+    const myTableVat = new TableVat(datas.lines);
 
-        lines = sessionUser.sessionUserOptions.reduce((prev, curr, index) => {
-            prev.push({
-                label: curr.Exam.label,
-                puTtc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
-                tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
-                qty: 1,
-            });
-            return prev;
-        }, [])
+    this[ALIAS.invoice.labels] = LinesForInvoices[ALIAS.invoice.labels];
+    this[ALIAS.invoice.quantities] = LinesForInvoices[ALIAS.invoice.quantities];
+    this[ALIAS.invoice.articles_pu] = LinesForInvoices[ALIAS.invoice.articles_pu];
+    this[ALIAS.invoice.articles_tva] = LinesForInvoices[ALIAS.invoice.articles_tva];
+    this[ALIAS.invoice.articles_ht] = LinesForInvoices[ALIAS.invoice.articles_ht];
+    this[ALIAS.invoice.articles_ttc] = LinesForInvoices[ALIAS.invoice.articles_ttc];
+    this[ALIAS.invoice.total_ht] = LinesForInvoices[ALIAS.invoice.total_ht];
+    this[ALIAS.invoice.total_ttc] = LinesForInvoices[ALIAS.invoice.total_ttc];
+    this[ALIAS.invoice.total_tva] = LinesForInvoices[ALIAS.invoice.total_tva];
 
-    }
-
-    // invoices : getskills VERS schools
-    if (!school) {
-        let concatLines = [];
-
-        datas.sessionUsers.forEach((su) => {
-            concatLines = concatLines.concat(su.sessionUserOptions);
-        })
-
-        lines = concatLines.reduce((prev, curr, index) => {
-
-            const line = prev.filter(item => item.examId === curr.Exam.exam_id);
-
-            if (line.length === 0) {
-                prev.push({
-                    examId: curr.Exam.exam_id,
-                    label: curr.Exam.label,
-                    puTtc: curr.user_price ? curr.user_price : curr.Exam.InstitutHasPrices[0].price,
-                    tva: curr.tva ? curr.tva : curr.Exam.InstitutHasPrices[0].tva,
-                    qty: 1,
-                });
-                return prev
-            } else {
-                line[0].qty += 1;
-            }
-            return prev
-        }, [])
-    }
-
-
-    lines.forEach(line => {
-        let carriage = manageCarriage(line.label);
-        this[ALIAS.invoice.labels] += line.label + carriage;
-        this[ALIAS.invoice.quantities] += line.qty + carriage;
-        this[ALIAS.invoice.articles_pu] += line.puTtc + carriage;
-        this[ALIAS.invoice.articles_tva] += line.tva + carriage;
-        this[ALIAS.invoice.articles_ht] += calculer_HT(line.qty, line.puTtc, line.tva).toFixed(2) + carriage;
-        this[ALIAS.invoice.articles_ttc] += calculer_TTC(line.qty, line.puTtc).toFixed(2) + carriage;
-        this[ALIAS.invoice.total_ht] += calculer_HT(line.qty, line.puTtc, line.tva);
-        this[ALIAS.invoice.total_ttc] += calculer_TTC(line.qty, line.puTtc);
-        this[ALIAS.invoice.total_tva] += calculer_TVA(line.qty, line.puTtc, line.tva);
-    })
-
-    const listTva = lines.reduce((prev, curr) => {
-        if (!prev.includes(curr.tva)) {
-            prev.push(curr.tva);
-        }
-        return prev;
-    }, []);
-
-    this[ALIAS.invoice.tvas] = listTva.reduce((prev, curr) => {
-        return prev + curr + "\n";
-    }, '')
-
-    listTva.forEach((tva) => {
-        this[ALIAS.invoice.total_ht_par_tva] += lines
-                .filter((line) => line.tva === tva)
-                .reduce((prev, curr) => {
-                    return prev + calculer_HT(curr.qty, curr.puTtc, curr.tva)
-                }, 0)
-                .toFixed(2)
-            + "\n"
-
-        this[ALIAS.invoice.total_ttc_par_tva] += lines
-                .filter((fact) => fact.tva === tva)
-                .reduce((prev, curr) => {
-                    return prev + (curr.qty * curr.puTtc)
-                }, 0)
-                .toFixed(2)
-            + "\n"
-    })
-
-
-    // méthodes
-    function manageCarriage (label) {
-        // retours chariots
-        const RC = "\n";
-        if (label.length < 40) return RC;
-        if (label.length < 80) return RC + RC;
-        if (label.length < 120) return RC + RC + RC;
-        if (label.length < 160) return RC + RC + RC + RC;
-    }
-
-    function calculer_TVA (quantity, price_pu_ttc, tva) {
-        return (quantity * price_pu_ttc) - (((quantity * price_pu_ttc) / (1 + (tva / 100))));
-    }
-
-    function calculer_TTC (quantity, price_pu_ttc) {
-        return (quantity * price_pu_ttc);
-    }
-
-    function calculer_HT (quantity, price_pu_ttc, tva) {
-        return ((quantity * price_pu_ttc) / (1 + (tva / 100)));
-    }
-
-    function formaterAdress (adress1, adress2, inline = false) {
-        if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
-        if (!inline) return adress2 ? adress1 + "\n" + adress2 : adress1
-    }
-
-    function formaterDate (myDate) {
-        return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
-    }
-
-    function formaterHour (myHour) {
-        return (myHour.getHours() + (myHour.getMinutes() / 60)) / 24;
-    }
+    this[ALIAS.invoice.tvas] = myTableVat[ALIAS.invoice.tvas];
+    this[ALIAS.invoice.total_ht_par_tva] = myTableVat[ALIAS.invoice.total_ht_par_tva];
+    this[ALIAS.invoice.total_ttc_par_tva] = myTableVat[ALIAS.invoice.total_ttc_par_tva];
 
 }
+
 
 /**
  * Requete pour obtenir tous les champs pour la génération des documents.
@@ -581,4 +564,109 @@ async function getAllFields (institutId, sessionId, userId = null) {
     })
 }
 
-module.exports = {getAllFieldsForGetSkillsDocuments, getAllFieldsForSchoolDocuments};
+// méthodes
+
+function LinesForInvoice (lines) {
+
+    this[ALIAS.invoice.labels] = "";
+    this[ALIAS.invoice.quantities] = "";
+    this[ALIAS.invoice.articles_pu] = "";
+    this[ALIAS.invoice.articles_tva] = "";
+    this[ALIAS.invoice.articles_ht] = '';
+    this[ALIAS.invoice.articles_ttc] = '';
+    this[ALIAS.invoice.total_ht] = 0;
+    this[ALIAS.invoice.total_ttc] = 0;
+    this[ALIAS.invoice.total_tva] = 0;
+
+
+    lines.forEach(line => {
+        let carriage = manageCarriage(line.label);
+        this[ALIAS.invoice.labels] += line.label + carriage;
+        this[ALIAS.invoice.quantities] += line.quantity + carriage;
+        this[ALIAS.invoice.articles_pu] += line.price_pu_ttc + carriage;
+        this[ALIAS.invoice.articles_tva] += line.tva + carriage;
+        this[ALIAS.invoice.articles_ht] += calculer_HT(line.quantity, line.price_pu_ttc, line.tva).toFixed(2) + carriage;
+        this[ALIAS.invoice.articles_ttc] += calculer_TTC(line.quantity, line.price_pu_ttc).toFixed(2) + carriage;
+        this[ALIAS.invoice.total_ht] += calculer_HT(line.quantity, line.price_pu_ttc, line.tva);
+        this[ALIAS.invoice.total_ttc] += calculer_TTC(line.quantity, line.price_pu_ttc);
+        this[ALIAS.invoice.total_tva] += calculer_TVA(line.quantity, line.price_pu_ttc, line.tva);
+    })
+}
+
+function TableVat (lines) {
+
+    this[ALIAS.invoice.tvas] = '';
+    this[ALIAS.invoice.total_ht_par_tva] = '';
+    this[ALIAS.invoice.total_ttc_par_tva] = '';
+
+    const listTva = lines.reduce((prev, curr) => {
+        if (!prev.includes(curr.tva)) {
+            prev.push(curr.tva);
+        }
+        return prev;
+    }, []);
+
+    this[ALIAS.invoice.tvas] = listTva.reduce((prev, curr) => {
+        return prev + curr + "\n";
+    }, '');
+
+    listTva.forEach((tva) => {
+        this[ALIAS.invoice.total_ht_par_tva] += lines
+                .filter((line) => line.tva === tva)
+                .reduce((prev, curr) => {
+                    return prev + calculer_HT(curr.quantity, curr.price_pu_ttc, curr.tva)
+                }, 0)
+                .toFixed(2)
+            + "\n";
+
+        this[ALIAS.invoice.total_ttc_par_tva] += lines
+                .filter((fact) => fact.tva === tva)
+                .reduce((prev, curr) => {
+                    return prev + (curr.quantity * curr.price_pu_ttc)
+                }, 0)
+                .toFixed(2)
+            + "\n";
+    })
+}
+
+function manageCarriage (label) {
+    // retours chariots
+    const RC = "\n";
+    if (label.length < 40) return RC;
+    if (label.length < 80) return RC + RC;
+    if (label.length < 120) return RC + RC + RC;
+    if (label.length < 160) return RC + RC + RC + RC;
+}
+
+function calculer_TVA (quantity, price_pu_ttc, tva) {
+    return (quantity * price_pu_ttc) - (((quantity * price_pu_ttc) / (1 + (tva / 100))));
+}
+
+function calculer_TTC (quantity, price_pu_ttc) {
+    return (quantity * price_pu_ttc);
+}
+
+function calculer_HT (quantity, price_pu_ttc, tva) {
+    return ((quantity * price_pu_ttc) / (1 + (tva / 100)));
+}
+
+function formaterAdress (adress1, adress2, inline = false) {
+    if (inline) return adress2 ? adress1 + " - " + adress2 : adress1
+    if (!inline) return adress2 ? adress1 + "\n" + adress2 : adress1
+}
+
+function formaterDate (myDate) {
+    return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+}
+
+function formaterHour (myHour) {
+    return (myHour.getHours() + (myHour.getMinutes() / 60)) / 24;
+}
+
+module.exports = {
+    getAllFields,
+    FieldsForInvoice,
+    generateLinesInvoiceGetSkillsForItsClients,
+    getAllFieldsForGetSkillsDocuments,
+    getAllFieldsForSchoolDocuments
+};

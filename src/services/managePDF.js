@@ -2,6 +2,10 @@ const unoconv = require('unoconv-promise');
 const PDFMerger = require('pdf-merger-js');
 const path = require("path");
 const fs = require("fs");
+const {getFilesInTemporaryFolder} = require("./manageFileSystem");
+const {models} = require("../models");
+const {destroyTemporaryFolders} = require("./manageFileSystem");
+const {createRepository} = require("./manageFileSystem");
 
 
 /**
@@ -52,6 +56,37 @@ async function mergePdf (files) {
 }
 
 /**
+ * Génération de un ou plusieurs fichiers PDF par objet. Chaque flat object engendrera la création d'un pdf.
+ * (flat object : pas d'arrays ni d'objets dans l'objet)
+ * @param datasForPdf sous la forme : [ { flat object }, { } ...]
+ * @param documentId
+ * @param sessionId
+ * @param userId
+ * @returns {Promise<string[]>}
+ */
+async function getDocumentPDF (datasForPdf, documentId, sessionId, userId) {
+
+    // destruction du dossier temporaire si existant
+    await destroyTemporaryFolders();
+
+    // récupération du template oo
+    let odtTemplate = await models['Document'].findByPk(documentId, {attributes: ['filepath', 'filepath']});
+
+    if (!odtTemplate)
+        throw new Error('no template found');
+
+    // création du dossier temporaire dans lequel on met les PDF générés
+    const folder = createRepository();
+
+    // création des pdf en boucle sur les données construites
+    await createPdfWithTemplate(odtTemplate.dataValues.filepath, folder, datasForPdf);
+
+    // récupération des fichiers PDF qui ont été générés
+    return getFilesInTemporaryFolder();
+
+}
+
+/**
  * Envoyer le PDF dans la réponse HTTP
  * @param responseHttp
  * @param attachment
@@ -65,4 +100,4 @@ function reponseHTTPWithPdf (pdfFile, responseHttp, attachment = false) {
     s.pipe(responseHttp);
 }
 
-module.exports = {createPdfWithTemplate, mergePdf, reponseHTTPWithPdf}
+module.exports = {getDocumentPDF, createPdfWithTemplate, mergePdf, reponseHTTPWithPdf}

@@ -1,7 +1,40 @@
-const { REQ_FACTURE, Requete} = require("../../services/manageQueryDocs");
+const {getAllFields, generateLinesInvoiceGetSkillsForItsClients} = require("../../services/manageQueryDocs");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
+
+    /**
+     * Génération d'une commande. la méthode va rechercher les données concernant une session :
+     * [{liste des épreuves, quantité par épreuve, tva, prix unitaire}, ...]
+     * ===
+     * La méthode permet aussi d'y ajouter des lignes avec addedLines.
+     * [{ label, puTtc, tva, qty }, ...]
+     * @param institutId
+     * @param sessionId
+     * @param addedLines [{ label, puTtc, tva, qty }, ...]
+     * @returns {Promise<{test: *, date_session, price_total_TTC: number, lines: T[]}>}
+     */
+    async function generateOrder (institutId, sessionId, addedLines = []) {
+
+        // récupération des données de facturation
+        const orderDatas = await getAllFields(institutId, sessionId);
+
+        // organisation des données sous forme de lignes d'articles
+        // ces lignes contiennent : {nom de l'épreuve, tva, Pu, qty}
+        let lines = generateLinesInvoiceGetSkillsForItsClients(orderDatas);
+
+        const order = {
+            date_session: orderDatas.start,
+            test: orderDatas.Test.label + (orderDatas.Level.label ? " " + orderDatas.Level.label : ''),
+            price_total_TTC: lines.reduce((prev, curr) => {
+                return prev + (curr.price_pu_ttc * curr.quantity);
+            }, 0),
+            lines: lines.concat(addedLines), // ajout de lignes supplémentaires pour la facture
+        }
+
+        return order;
+
+    }
 
     /**
      * Obtenir les données de facturation d'une session pour une école.
@@ -16,29 +49,15 @@ module.exports = (app) => {
 
         try {
 
-            const orderDatas = await Requete(REQ_FACTURE(institutId, sessionId), 'facture');
+            const order = await generateOrder(institutId, sessionId, [{
+                label: 'frais en plus', price_pu_ttc: 10, tva: 20, quantity: 3
+            }]);
 
-            if (orderDatas.length === 0) {
-                return res.status(200).json({message: 'no facture generated', data: null});
+            if (!order) {
+                return res.status(200).json({message: 'no order generated', data: null});
             }
 
-            const order = {
-                date_session: orderDatas[0].DATE_START,
-                test: orderDatas[0].TEST + " " + orderDatas[0].LEVEL ,
-                price_total_TTC: orderDatas.reduce((prev, curr) => {
-                    return prev + curr.TOTAL_TTC;
-                }, 0),
-                lines : orderDatas.reduce((prev, curr) => {
-                    return [...prev, {
-                        label: curr.DESCRIPTION,
-                        quantity: curr.QUANTITY,
-                        tva: curr.TVA,
-                        price_pu_ttc: curr.PU
-                    }]
-                }, [])
-            }
-
-            return res.status(200).json({message: 'facture', data: order})
+            return res.status(200).json({message: 'order', data: order})
 
         } catch (e) {
             return res.status(500).json({message: 'error:' + e.message, data: null});

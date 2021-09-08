@@ -4,43 +4,13 @@ const {mergePdf} = require("../../services/managePDF");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
+const {getDocumentPDF} = require("../../services/managePDF");
 const {getFilesInTemporaryFolder} = require("../../services/manageFileSystem");
 const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
 const {getAllFieldsForSchoolDocuments, getAllFieldsForGetSkillsDocuments} = require("../../services/manageQueryDocs");
 
 
 module.exports = (app) => {
-
-    /**
-     * Génération de un ou plusieurs fichiers PDF
-     * @param datasForPdf
-     * @param documentId
-     * @param sessionId
-     * @param userId
-     * @returns {Promise<string[]>}
-     */
-    async function getDocumentPDF (datasForPdf, documentId, sessionId, userId) {
-
-        // destruction du dossier temporaire si existant
-        await destroyTemporaryFolders();
-
-        // récupération du template oo
-        let odtTemplate = await models['Document'].findByPk(documentId, {attributes: ['filepath', 'filepath']});
-
-        if (!odtTemplate)
-            throw new Error('no template found');
-
-        // création du dossier temporaire dans lequel on met les PDF générés
-        const folder = createRepository();
-
-        // création des pdf en boucle sur les données construites
-        await createPdfWithTemplate(odtTemplate.dataValues.filepath, folder, datasForPdf);
-
-        // récupération des fichiers PDF qui ont été générés
-        return getFilesInTemporaryFolder();
-
-    }
-
 
     /**
      * La génération de PDF est réalisée par les écoles.
