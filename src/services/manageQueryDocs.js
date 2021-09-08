@@ -136,6 +136,9 @@ const ALIAS = {
         tvas: 'LIST_TVA',
         total_ht_par_tva: 'LIST_HT',
         total_ttc_par_tva: 'LIST_TTC',
+        date_invoice: 'DATE_FACTURE',
+        reference: 'REFERENCE',
+        numero: 'NUM_INVOICE',
     }
 
 }
@@ -349,6 +352,9 @@ function FieldsForDocuments (datas, userId = -1) {
 
     // invoices
 
+    this[ALIAS.invoice.date_invoice] = formaterDate(new Date().toString());
+    // this[ALIAS.invoice.reference] =
+    // this[ALIAS.invoice.numero] =
     this[ALIAS.invoice.labels] = "";
     this[ALIAS.invoice.quantities] = "";
     this[ALIAS.invoice.articles_pu] = "";
