@@ -61,7 +61,7 @@ module.exports = (app) => {
      */
     app.post('/api/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const doctype = req.params.doctype;
+        const doctype = parseInt(req.params.doctype);
 
         try {
             const document = await uploadDocument(doctype, req.files, null)

@@ -1,3 +1,4 @@
+const DOC_TYPES = require("../documents");
 const {getDocumentPDF, reponseHTTPWithPdf} = require("../../services/managePDF");
 const {FieldsForInvoice} = require("../../services/manageQueryDocs");
 const {models} = require("../../models");
@@ -49,8 +50,11 @@ module.exports = (app) => {
 
             const datasForPdf = await generateInvoiceInPDF(invoiceId);
 
-            // todo: docuementid
-            const files = await getDocumentPDF(datasForPdf, 1);
+            const document = await models['Document'].findOne({
+                where: {institut_id: null, doctype: DOC_TYPES.findIndex("Facture") }
+            })
+
+            const files = await getDocumentPDF(datasForPdf, document.document_id);
 
             // pas de fichier PDF trouvés
             if (files.length === 0) {

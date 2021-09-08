@@ -1,13 +1,9 @@
-const {ConstructDatasForPDf} = require("../../services/manageQueryDocs");
-const {createRepository, destroyTemporaryFolders} = require("../../services/manageFileSystem");
 const {mergePdf} = require("../../services/managePDF");
-const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 const path = require("path");
 const {getDocumentPDF} = require("../../services/managePDF");
-const {getFilesInTemporaryFolder} = require("../../services/manageFileSystem");
-const {createPdfWithTemplate, reponseHTTPWithPdf} = require("../../services/managePDF");
-const {getAllFieldsForSchoolDocuments, getAllFieldsForGetSkillsDocuments} = require("../../services/manageQueryDocs");
+const {reponseHTTPWithPdf} = require("../../services/managePDF");
+const {getAllFieldsForSchoolDocuments} = require("../../services/manageQueryDocs");
 
 
 module.exports = (app) => {
