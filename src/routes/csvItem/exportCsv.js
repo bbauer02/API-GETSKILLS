@@ -1,10 +1,9 @@
-const { ValidationError, UniqueConstraintError } = require('sequelize');
+const { Op } = require('sequelize');
 const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+const { createRepository, destroyTemporaryFolders } = require("../documents/manageFileSystem");
 const fs = require('fs');
-const del = require("del");
 const path = require("path");
-const { Parser } = require('json2csv');
 
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/sessions/:session_id/exports',
@@ -31,19 +30,17 @@ module.exports = (app) => {
                 try {
 
                     const parameters = {};
-                    // TODO forEach req.body.sessionUserIds dans le try en passant en param l'id
                     parameters.where = {
-                        sessionUser_id: 2
+                        sessionUser_id: {
+                            [Op.in]: req.body.sessionUserIds
+                        }
                     };
 
                     parameters.include = [{
                         model: models['User'],
                         attributes: {
                             exclude: [
-                                'password',
-                                'user_id',
-                                'firstlanguage_id',
-                                'systemRole_id',
+                                'password'
                             ]
                         },
                         include: [{
@@ -64,60 +61,25 @@ module.exports = (app) => {
                     },
                     {
                         model: models['Session'],
-                        attributes: {
-                            exclude: [
-                                'session_id',
-                                'institut_id',
-                                'test_id',
-                                'level_id',
-                            ]
-                        },
                         include: [{
                             model: models['sessionHasExam'],
-                            attributes: {
-                                exclude: [
-                                    'sessionHasExam_id',
-                                    'exam_id',
-                                    'session_id'
-                                ]
-                            }
+                            include: [{
+                                model: models['Exam']
+                            }]
                         }]
                     },
                     {
-                        model: models['sessionUserOption'],
-                        attributes: {
-                            exclude: [
-                                'option_id',
-                                'exam_id',
-                                'sessionUser_id'
-                            ]
-                        }
+                        model: models['sessionUserOption']
                     },
                     {
                         model: models['sessionExamHasExaminator'],
-                        attributes: {
-                            exclude: [
-                                'sessionExamHasExaminator_id'
-                            ]
-                        },
                         include: [{
                             model: models['empowermentTests'],
-                            attributes: {
-                                exclude: [
-                                    'empowermentTest_id',
-                                    'user_id',
-                                    'institut_id',
-                                    'test_id'
-                                ]
-                            },
                             include: [{
                                 model: models['User'],
                                 attributes: {
                                     exclude: [
-                                        'password',
-                                        'user_id',
-                                        'firstlanguage_id',
-                                        'systemRole_id'
+                                        'password'
                                     ]
                                 },
                             }]
@@ -127,13 +89,13 @@ module.exports = (app) => {
                     // parameters.raw = true;
                     // parameters.nest = true;
 
-                    const allInformations = await models['sessionUser'].findOne(parameters);
+                    const allInformations = await models['sessionUser'].findAll(parameters);
 
                     return JSON.parse(JSON.stringify(allInformations));
 
                 } catch (error) {
 
-                    const message = `An error has occured finding all the informations from sessionUser_id`;
+                    const message = `An error has occured finding all the informations`;
                     return res.status(500).json({ message, data: error.message })
                 }
             }
@@ -142,269 +104,236 @@ module.exports = (app) => {
             async function generateFile(csvItems, allInformations) {
                 try {
 
-
                     const arrayOfFields = Object.values(csvItems).map((item) => (
-                        item.field
+                        `"${item.label}"`
                     ));
 
-                    console.log(arrayOfFields);
-
-                    // Première ligne avec les fields
-
-                    let csv = arrayOfFields.join(";");
+                    let csv = arrayOfFields.join(",");
                     csv += "\n";
 
-                    let sessionUser = allInformations?.User;
-                    let json = { ...allInformations };
-                    delete json.informations;
-                    delete json.hasPaid;
-                    delete json.inscription;
-                    delete json.numInscrAnt;
-                    delete json.paymentMode;
-                    delete json.sessionUser_id;
-                    delete json.session_id;
-                    delete json.user_id;
-                    json["sessionUser"] = sessionUser;
+                    // TODO METTRE À JOUR LES CHAMPS DANS LE SWITCH CASE CI DESSOUS
+                    // TODO METTRE AUSSI À JOUR LES CHAMPS EN FRONT DANS src\redux\slices\templateCsv.js
 
+                    allInformations.forEach((allInformation) => {
 
-                    // On veux user firstname
-                    // Pour chaque field du template
-                    csvItems.forEach((item) => {
-                        // On créer un tableau pour insérer dans la ligne
+                        // On créer un tableau pour chaque ligne, qu'on explosera avec des ";" + un "\n" à la fin
                         const row = [];
-                        // On va ensuite checker la table pour pas confondre les fields de même noms
-                        switch (item.table) {
-                            case "User":
-                                row.push(json?.User[item.field]);
-                                break;
 
-                            case "Session":
-                                row.push(json?.Session[item.field]);
-                                break;
+                        csvItems.forEach((item) => {
+                            switch (item.field) {
 
-                            case "sessionExamHasExaminators":
-                                row.push(json?.sessionExamHasExaminators[item.field]);
-                                break;
+                                // USER
+                                case "User_firstname":
+                                    row.push(allInformation.User.firstname);
+                                    break;
 
-                            case "sessionUser":
-                                row.push(json?.sessionUser[item.field]);
-                                break;
+                                case "User_lastname":
+                                    row.push(allInformation.User.lastname);
+                                    break;
 
-                            case "sessionUserOptions":
-                                row.push(json?.sessionUserOptions[item.field]);
-                                break;
+                                case "User_email":
+                                    row.push(allInformation.User.email);
+                                    break;
 
-                            default:
-                                row.push("undefined");
-                        }
+                                case "User_phone":
+                                    row.push(allInformation.User.phone);
+                                    break;
 
-                        csv = csv + row.join(";");
-                        csv = csv +"\n";
+                                case "User_civility":
+                                    row.push(allInformation.User.civility);
+                                    break;
+
+                                case "User_gender":
+                                    row.push(allInformation.User.gender);
+                                    break;
+
+                                case "User_adress1":
+                                    row.push(allInformation.User.adress1);
+                                    break;
+
+                                case "User_adress2":
+                                    row.push(allInformation.User.adress2);
+                                    break;
+
+                                case "User_zipcode":
+                                    row.push(allInformation.User.zipcode);
+                                    break;
+
+                                case "User_city":
+                                    row.push(allInformation.User.city);
+                                    break;
+
+                                case "User_birthday":
+                                    row.push(allInformation.User.birthday);
+                                    break;
+
+                                case "User_nationality":
+                                    row.push(allInformation.User.nationality.label);
+                                    break;
+
+                                case "User_country":
+                                    row.push(allInformation.User.country.label);
+                                    break;
+
+                                case "User_firstlanguage":
+                                    row.push(allInformation.User.firstlanguage.name);
+                                    break;
+
+                                // SESSIONUSER
+                                case "sessionUser_paymentMode":
+                                    row.push(allInformation.paymentMode);
+                                    break;
+
+                                case "sessionUser_numInscrAnt":
+                                    row.push(allInformation.numInscrAnt);
+                                    break;
+
+                                case "sessionUser_inscription":
+                                    row.push(allInformation.inscription);
+                                    break;
+
+                                case "sessionUser_hasPaid":
+                                    row.push(allInformation.hasPaid);
+                                    break;
+
+                                case "sessionUser_informations":
+                                    row.push(allInformation.informations);
+                                    break;
+
+                                // SESSIONHASEXAM
+                                case "sessionHasExam_adressExam":
+                                    const allAdress = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
+                                        allAdress.push(sessionHasExam.adressExam);
+                                    })
+                                    row.push(allAdress);
+                                    break;
+
+                                case "sessionHasExam_room":
+                                    const allRoom = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
+                                        allRoom.push(sessionHasExam.room);
+                                    })
+                                    row.push(allRoom);
+                                    break;
+
+                                case "sessionHasExam_DateTime":
+                                    const allDateTime = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
+                                        allDateTime.push(sessionHasExam.DateTime);
+                                    })
+                                    row.push(allDateTime);
+                                    break;
+
+
+                                // EXAMS
+                                case "Exam_label":
+                                    const allExamLabel = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
+                                        allExamLabel.push(sessionHasExam.Exam.label);
+                                    })
+                                    row.push(allExamLabel);
+                                    break;
+
+                                // SESSIONUSEROPTION
+                                case "sessionUserOption_userPrice":
+                                    const allUserPrice = [];
+                                    allInformation.sessionUserOptions.forEach((sessionUserOption) => {
+                                        allUserPrice.push(sessionUserOption.userPrice);
+                                    });
+                                    row.push(allUserPrice);
+                                    break;
+
+                                case "sessionUserOption_isCandidate":
+                                    const allIsCandidate = [];
+                                    allInformation.sessionUserOptions.forEach((sessionUserOption) => {
+                                        allIsCandidate.push(sessionUserOption.isCandidate);
+                                    });
+                                    row.push(allIsCandidate);
+                                    break;
+
+                                // EXAMINATOR
+                                case "Examinator_firstname":
+                                    const allFirstname = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam, index) => {
+                                        // si le cnadidat ne participe pas à une session, il ne peut
+                                        // pas avoir d'examinateur attribuer (sessionExamHasExaminator inéxistant)
+                                        allInformation.sessionUserOptions.forEach((sessionUserOption) => {
+
+                                            if (sessionUserOption.exam_id === sessionHasExam.exam_id) {
+                                                if (sessionUserOption.isCandidate === true) {
+                                                    allFirstname.push(
+                                                        allInformation.sessionExamHasExaminators[index].empowermentTest?.User.firstname || ""
+                                                    );
+                                                } else {
+                                                    allFirstname.push("");
+                                                }
+                                            }
+                                        })
+                                    });
+                                    row.push(allFirstname);
+                                    break;
+
+                                case "Examinator_lastname":
+                                    const allLastname = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam, index) => {
+                                        // si le cnadidat ne participe pas à une session, il ne peut
+                                        // pas avoir d'examinateur attribué (sessionExamHasExaminator inéxistant)
+                                        allInformation.sessionUserOptions.forEach((sessionUserOption) => {
+
+                                            if (sessionUserOption.exam_id === sessionHasExam.exam_id) {
+                                                if (sessionUserOption.isCandidate === true) {
+                                                    allLastname.push(
+                                                        allInformation.sessionExamHasExaminators[index].empowermentTest?.User.lastname || ""
+                                                    );
+                                                } else {
+                                                    allLastname.push("");
+                                                }
+                                            }
+                                        })
+                                    });
+                                    row.push(allLastname);
+                                    break;
+
+                                case "Examinator_code":
+                                    const allcode = [];
+                                    allInformation.Session.sessionHasExams.forEach((sessionHasExam, index) => {
+                                        // si le cnadidat ne participe pas à une session, il ne peut
+                                        // pas avoir d'examinateur attribuer (sessionExamHasExaminator inéxistant)
+                                        allInformation.sessionUserOptions.forEach((sessionUserOption) => {
+
+                                            if (sessionUserOption.exam_id === sessionHasExam.exam_id) {
+                                                if (sessionUserOption.isCandidate === true) {
+                                                    allcode.push(
+                                                        allInformation.sessionExamHasExaminators[index].empowermentTest?.User.code || ""
+                                                    );
+                                                } else {
+                                                    allcode.push("");
+                                                }
+                                            }
+                                        })
+                                    });
+                                    row.push(allcode);
+                                    break;
+
+                                default:
+                                    row.push("undefined")
+                                    break;
+                            }
+                        })
+                        const rowData = row.map((content) => (
+                            `"${content}"`
+                        )).join(",");
+
+                        csv = csv + rowData + "\n";
                     })
 
-                    console.log("\n\n", csv, '\n\n');
-
-                    const messagefdg = `ok`;
-                    return res.status(200).json({ messagefdg, data: csv })
-
-                    /*
-                      {
-    "User": {
-        "login": "bauer",
-        "email": "bbauer02@gmail.com",
-        "phone": "+330323522248",
-        "civility": 1,
-        "gender": 1,
-        "firstname": "Baptiste",
-        "lastname": "Bauer",
-        "adress1": "30 rue Robert Leroux",
-        "adress2": "",
-        "zipcode": "02000",
-        "city": "LAON",
-        "country_id": 76,
-        "birthday": "1982-08-04",
-        "nationality_id": 76,
-        "createdAt": "2021-09-07T13:20:34.000Z",
-        "updatedAt": "2021-09-07T13:20:34.000Z",
-        "country": {
-            "label": "France"
-        },
-        "nationality": {
-            "label": "French"
-        },
-        "firstlanguage": {
-            "name": "Pashto"
-        }
-    },
-    "Session": {
-        "start": "2021-06-01T07:00:00.000Z",
-        "end": "2021-06-05T15:00:00.000Z",
-        "limitDateSubscribe": "2021-05-31T21:59:00.000Z",
-        "placeAvailable": 3,
-        "validation": true,
-        "sessionHasExams": [
-            {
-                "adressExam": "Reims - Lycée Roosevelt",
-                "room": "B16",
-                "DateTime": "2021-07-03T07:00:00.000Z"
-            },
-            {
-                "adressExam": "Reims - Lycée Roosevelt",
-                "room": "B16",
-                "DateTime": "2021-07-03T08:00:00.000Z"
-            },
-            {
-                "adressExam": "Reims - Lycée Roosevelt",
-                "room": "B16",
-                "DateTime": "2021-07-03T09:00:00.000Z"
-            }
-        ]
-    },
-    "sessionUserOptions": [
-        {
-            "user_price": null,
-            "addressExam": null,
-            "isCandidate": true,
-            "DateTime": null
-        },
-        {
-            "user_price": null,
-            "addressExam": null,
-            "isCandidate": true,
-            "DateTime": null
-        },
-        {
-            "user_price": null,
-            "addressExam": null,
-            "isCandidate": true,
-            "DateTime": null
-        }
-    ],
-    "sessionExamHasExaminators": [
-        {
-            "sessionHasExam_id": 2,
-            "sessionUser_id": 2,
-            "empowermentTest_id": 1,
-            "empowermentTest": {
-                "code": "FJGCI87",
-                "User": {
-                    "login": "didierM",
-                    "email": "didierMoulard@gmail.com",
-                    "phone": "1234567899",
-                    "civility": 1,
-                    "gender": 1,
-                    "firstname": "Didier",
-                    "lastname": "Moulard",
-                    "adress1": "2 rue du Louvres",
-                    "adress2": null,
-                    "zipcode": "51100",
-                    "city": "REIMS",
-                    "country_id": 76,
-                    "birthday": "1987-11-14",
-                    "nationality_id": 76,
-                    "createdAt": "2021-09-07T13:20:35.000Z",
-                    "updatedAt": "2021-09-07T13:20:35.000Z"
-                }
-            }
-        },
-        {
-            "sessionHasExam_id": 3,
-            "sessionUser_id": 2,
-            "empowermentTest_id": 1,
-            "empowermentTest": {
-                "code": "FJGCI87",
-                "User": {
-                    "login": "didierM",
-                    "email": "didierMoulard@gmail.com",
-                    "phone": "1234567899",
-                    "civility": 1,
-                    "gender": 1,
-                    "firstname": "Didier",
-                    "lastname": "Moulard",
-                    "adress1": "2 rue du Louvres",
-                    "adress2": null,
-                    "zipcode": "51100",
-                    "city": "REIMS",
-                    "country_id": 76,
-                    "birthday": "1987-11-14",
-                    "nationality_id": 76,
-                    "createdAt": "2021-09-07T13:20:35.000Z",
-                    "updatedAt": "2021-09-07T13:20:35.000Z"
-                }
-            }
-        },
-        {
-            "sessionHasExam_id": 4,
-            "sessionUser_id": 2,
-            "empowermentTest_id": 1,
-            "empowermentTest": {
-                "code": "FJGCI87",
-                "User": {
-                    "login": "didierM",
-                    "email": "didierMoulard@gmail.com",
-                    "phone": "1234567899",
-                    "civility": 1,
-                    "gender": 1,
-                    "firstname": "Didier",
-                    "lastname": "Moulard",
-                    "adress1": "2 rue du Louvres",
-                    "adress2": null,
-                    "zipcode": "51100",
-                    "city": "REIMS",
-                    "country_id": 76,
-                    "birthday": "1987-11-14",
-                    "nationality_id": 76,
-                    "createdAt": "2021-09-07T13:20:35.000Z",
-                    "updatedAt": "2021-09-07T13:20:35.000Z"
-                }
-            }
-        }
-    ],
-    "sessionUser": {
-        "login": "bauer",
-        "email": "bbauer02@gmail.com",
-        "phone": "+330323522248",
-        "civility": 1,
-        "gender": 1,
-        "firstname": "Baptiste",
-        "lastname": "Bauer",
-        "adress1": "30 rue Robert Leroux",
-        "adress2": "",
-        "zipcode": "02000",
-        "city": "LAON",
-        "country_id": 76,
-        "birthday": "1982-08-04",
-        "nationality_id": 76,
-        "createdAt": "2021-09-07T13:20:34.000Z",
-        "updatedAt": "2021-09-07T13:20:34.000Z",
-        "country": {
-            "label": "France"
-        },
-        "nationality": {
-            "label": "French"
-        },
-        "firstlanguage": {
-            "name": "Pashto"
-        }
-    }
-}
-                    */
-
-                    /*
-                    const parser = new Parser({ arrayOfFields });
-                    const csv = parser.parse(allInformations);
-                    */
-
-                    console.log("\n\n", csv, "\n\n");
-
-                    /*
-                    res.attachment('allInformations.csv')
-                    res.status(200).send(csv);
-                    */
+                    // console.log("\n\n", csv, "\n\n");
+                    return csv;
 
                 } catch (error) {
 
-                    const message = `An error has occured finding all the informations from sessionUser_id`;
+                    const message = `An error has occured building the csv file`;
                     return res.status(500).json({ message, data: error.message })
                 }
             }
@@ -417,8 +346,27 @@ module.exports = (app) => {
                 // On prend toutes les informations nécéssaire pour le csv
                 const allInformations = await getAllInformations();
 
-                // On génére le fichier csv, filtrés par les csvItemsFound
-                await generateFile(csvItemsFound, allInformations)
+                // On génére le fichier csv
+                const csvGenerated = await generateFile(csvItemsFound, allInformations);
+
+                // destruction du dossier temporaire si existant
+                await destroyTemporaryFolders();
+
+                // création du dossier temporaire dans lequel on met les PDF générés
+                const folder = createRepository();
+                
+                // création du fichier csv dans le dossier temporaire
+                fs.writeFile(`${folder}${allInformations[0].Session.start}.csv`, csvGenerated, function (error) {
+                    if (error) {
+                        return console.log(error);
+                    }
+                });
+
+                // on va chercher le fichier dans le dossier temporaire
+                const csvFile = fs.createReadStream(path.join("..", "..", "services", "temporary", `${folder}${allInformations[0].Session.start}.csv`));
+
+                res.setHeader('Content-Type', "application/csv");
+                csvFile.pipe(res);
 
             } catch (error) {
                 const message = `An error has occured.`;
