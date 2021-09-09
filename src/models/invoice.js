@@ -1,36 +1,40 @@
 module.exports = (sequelize, DataTypes) => {
     const Invoice = sequelize.define('Invoice', {
-        invoice_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            invoice_id: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true
+            },
+            institut_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            reference: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            isPaid: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+                allowNull: false,
+            },
+            ref_client: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            test: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            price_total_TTC: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+            },
+            DateTime: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
         },
-        institut_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        reference: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        isPaid: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-            allowNull: false,
-        },
-        ref_client: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        test: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        price_total_TTC: {
-            type: DataTypes.FLOAT,
-            allowNull: false,
-        }
-    },
         {
             tableName: 'invoice',
             timestamps: true
