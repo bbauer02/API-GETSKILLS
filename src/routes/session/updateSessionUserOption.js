@@ -54,7 +54,7 @@ module.exports = (app) => {
             }
         }
 
-
+        // Check si l'exam existe
         async function findSessionExam(session) {
             try {
 
@@ -156,6 +156,37 @@ module.exports = (app) => {
             }
         }
 
+        // On reprend toute les informations requise pour la slice
+        async function findSessionUser() {
+            try {
+                const parameters = {};
+
+                parameters.where = {
+                    sessionUser_id: req.params.sessionUser_id
+                };
+
+                parameters.include = [{
+                    model: models['sessionUserOption'],
+                    include: [{
+                        model: models['Exam']
+                    }]
+                }];
+
+                const sessionUser = await models['sessionUser'].findOne(parameters);
+
+                if (sessionUser === null) {
+                    const message = `The sessionUser doesn't exist.`;
+                    return res.status(404).json({ message });
+                }
+
+                return sessionUser;
+
+            } catch (error) {
+                const message = `An error has occured finding the sessionUser.`;
+                return res.status(500).json({ message, data: error.message })
+            }
+        }
+
 
         try {
             const session = await checkSessionValidation();
@@ -184,8 +215,10 @@ module.exports = (app) => {
                 }
             });
 
-            const message = `The sessionUserOption session has been updated `;
-            res.json({ message, data: sessionUserOptionFound });
+            const sessionUserUpdated = await findSessionUser();
+
+            const message = `The sessionUser session has been updated `;
+            res.json({ message, data: sessionUserUpdated });
         }
         catch (error) {
             if (error instanceof UniqueConstraintError) {
