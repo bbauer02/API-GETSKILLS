@@ -38,7 +38,7 @@ module.exports = (app) => {
      * OPération effectuée par l'administrateur de l'école en charge de valider les sessions.
      * @param app
      */
-    app.get('/api/instituts/:institut_id/sessions/:session_id/orders',isAuthorized, isAuthenticated, async (req, res) => {
+    app.get('/api/instituts/:institut_id/sessions/:session_id/orders', isAuthenticated, isAuthorized, async (req, res) => {
 
 
 
