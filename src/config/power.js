@@ -28,7 +28,8 @@ module.exports = (env) => ({
                 documents: {
                     default: env.DOCUMENTS_GET,
                     download: env.DOCUMENTS_GET,
-                }
+                },
+                exports: env.SESSIONS_EXPORT
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_GET,

@@ -1,7 +1,8 @@
 const { Op } = require('sequelize');
 const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
-const { createRepository, destroyTemporaryFolders } = require("../documents/manageFileSystem");
+const { createRepository, destroyTemporaryFolders } = require("../../services/manageFileSystem");
+const { reponseHTTPWithCsv } = require("../../services/manageCSV");
 const fs = require('fs');
 const path = require("path");
 
@@ -354,19 +355,19 @@ module.exports = (app) => {
 
                 // création du dossier temporaire dans lequel on met les PDF générés
                 const folder = createRepository();
-                
+
+                // Nom du fichier à créer
+                const fileName = `Session_${new Date(allInformations[0]?.Session.start).toISOString().slice(0,10).replace(/-/g,"")}.csv`;
+
                 // création du fichier csv dans le dossier temporaire
-                fs.writeFile(`${folder}${allInformations[0].Session.start}.csv`, csvGenerated, function (error) {
-                    if (error) {
-                        return console.log(error);
-                    }
-                });
+                try {
+                    fs.writeFileSync(`${path.join(folder, fileName)}`, csvGenerated)
+                    console.log("File written successfully")
+                } catch (error) {
+                    console.log(error)
+                }
 
-                // on va chercher le fichier dans le dossier temporaire
-                const csvFile = fs.createReadStream(path.join("..", "..", "services", "temporary", `${folder}${allInformations[0].Session.start}.csv`));
-
-                res.setHeader('Content-Type', "application/csv");
-                csvFile.pipe(res);
+                reponseHTTPWithCsv(fileName, res);
 
             } catch (error) {
                 const message = `An error has occured.`;

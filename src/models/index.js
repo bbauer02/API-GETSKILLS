@@ -24,6 +24,7 @@ const sessionHasExams = require('../db/mock-session_has_exam');
 const empowerments = require('../db/mock-empowerment');
 const sessionExamHasExaminators = require('../db/mock-session_exam_has_examinator');
 const invoices = require("../db/mock-invoices");
+const csvItems = require('../db/mock-items_csv');
 
 const initDB = async (sequelize) => {
     fs
