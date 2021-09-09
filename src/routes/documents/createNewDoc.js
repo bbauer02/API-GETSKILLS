@@ -43,7 +43,7 @@ module.exports = (app) => {
                     doctype: doctype,
                     filepath: uploadPath,
                 })
-            
+
             if (!docCreated) {
                 throw new Error('An error occurred during creation in the database.');
             }
@@ -59,9 +59,9 @@ module.exports = (app) => {
     /**
      * Upload de documents super admin
      */
-    app.post('/api/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const doctype = parseInt(req.params.doctype);
+        const doctype = parseInt(req.body.doctype);
 
         try {
             const document = await uploadDocument(doctype, req.files, null)
@@ -74,10 +74,10 @@ module.exports = (app) => {
     /**
      * Upload de documents admin d'institut
      */
-    app.post('/api/instituts/:institut_id/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
         const institutId = req.params.institut_id
-        const doctype = req.params.doctype;
+        const doctype = req.body.doctype;
 
         try {
             const document = await uploadDocument(doctype, req.files, institutId)

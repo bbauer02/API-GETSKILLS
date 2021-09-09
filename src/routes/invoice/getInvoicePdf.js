@@ -38,6 +38,12 @@ module.exports = (app) => {
         return [new FieldsForInvoice(invoice)];
     }
 
+    async function findInvoice () {
+        return await models['Document'].findOne({
+            where: {institut_id: null, doctype: DOC_TYPES.findIndex((item) => item === "Facture") }
+        })
+    }
+
 
     /**
      * Génération du PDF de la facture des sessions pour les écoles.
@@ -50,9 +56,7 @@ module.exports = (app) => {
 
             const datasForPdf = await generateInvoiceInPDF(invoiceId);
 
-            const document = await models['Document'].findOne({
-                where: {institut_id: null, doctype: DOC_TYPES.findIndex("Facture") }
-            })
+            const document = await findInvoice();
 
             const files = await getDocumentPDF(datasForPdf, document.document_id);
 
@@ -83,8 +87,9 @@ module.exports = (app) => {
 
             const datasForPdf = await generateInvoiceInPDF(invoiceId);
 
-            // todo: docuementid
-            const files = await getDocumentPDF(datasForPdf, 1);
+            const document = await findInvoice();
+
+            const files = await getDocumentPDF(datasForPdf, document.document_id);
 
             // pas de fichier PDF trouvés
             if (files.length === 0) {
