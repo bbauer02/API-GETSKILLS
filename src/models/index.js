@@ -23,7 +23,7 @@ const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
 const sessionHasExams = require('../db/mock-session_has_exam');
 const empowerments = require('../db/mock-empowerment');
 const sessionExamHasExaminators = require('../db/mock-session_exam_has_examinator');
-const csvItems = require('../db/mock-items_csv');
+const invoices = require("../db/mock-invoices");
 
 const initDB = async (sequelize) => {
     fs
@@ -172,7 +172,6 @@ const initDB = async (sequelize) => {
         // TABLE 'sessionUsers'
         for (const sessionUser of sessionUsers) {
             await models['sessionUser'].create({
-
                 session_id: sessionUser.session_id,
                 user_id: sessionUser.user_id,
                 paymentMode: sessionUser.paymentMode,
@@ -349,6 +348,15 @@ const initDB = async (sequelize) => {
             }
 
         ]);
+
+        // mocks invoices
+        for(const invoice of invoices) {
+            await models['Invoice'].create(invoice)
+            for(const line of invoice.lines) {
+                await models['InvoiceLines'].create(line)
+            }
+        }
+
     } catch (error) {
         throw error;
     }

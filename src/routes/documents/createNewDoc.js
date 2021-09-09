@@ -1,58 +1,90 @@
 const path = require('path');
 const fs = require("fs");
 const {models} = require("../../models");
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/docs', isAuthenticated, isAuthorized, async (req, res) => {
 
-        // TODO: revoir la notion d'institut id
-        const institutId = req.body.institut_id // req.body.institutId;
-        const doctype = req.body.doctype;
+    /**
+     * Uplaod one document odt
+     * @param doctype
+     * @param files
+     * @param institutId
+     * @returns {Promise<*>}
+     */
+    async function uploadDocument (doctype, files, institutId = null) {
+
         const STORE_FILES = process.cwd() + '/public/';
         const d = new Date();
 
-        // vérifier l'institut
-        await models['Institut'].findOne({
-            where: {institut_id: institutId}
-        }).then(function (institutFound) {
-            if (institutFound === null) {
-                const message = `institut doesn't exist. Retry with an other institut id.`;
-                return res.status(404).json({message});
-            }
-        }).catch(function (error) {
-            const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
-        });
-
         // création du document
         // on teste que la requete contient au moins 1 fichier
-        if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send('No files were uploaded.');
+        if (!files || Object.keys(files).length === 0) {
+            throw new Error('No files were uploaded.');
         }
 
         // on récupère le  fichier et on crée le filepath
-        const newFile = req.files.newFile;
+        const newFile = files.newFile;
         const uploadPath = STORE_FILES + d.getTime() + '.odt';
 
         // déplacement du fichier uploader dans le dossier public
-        await newFile.mv(uploadPath)
-            // enregistrement des données du fichier dans la table
-            .then(models['Document'].create({
+        try {
+            await newFile.mv(uploadPath)
+        } catch (e) {
+            throw new Error('Moving uploaded file failed -> ' + e.message);
+        }
+
+        // enregistrement des données du fichier dans la table
+        try {
+            const docCreated = await models['Document']
+                .create({
                     institut_id: institutId,
                     filename: newFile.name,
                     doctype: doctype,
                     filepath: uploadPath,
-                }).then(function (docCreated) {
-                    const message = `${docCreated.filename} has been created.`;
-                    return res.status(200).json({message, data: docCreated})
-                }).catch(function (error) {
-                    const message = `Creation impossible`;
-                    return res.status(500).json({message, data: error.message})
                 })
-            ).catch(function (err) {
-                if (err) return res.status(500).send('Moving uploaded file failed');
-                return res.send('File uploaded');
-            })
-    });
+            
+            if (!docCreated) {
+                throw new Error('An error occurred during creation in the database.');
+            }
+
+            return docCreated
+
+        } catch (e) {
+            throw new Error('Creation impossible -> ' + e.message);
+        }
+
+    }
+
+    /**
+     * Upload de documents super admin
+     */
+    app.post('/api/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+
+        const doctype = parseInt(req.params.doctype);
+
+        try {
+            const document = await uploadDocument(doctype, req.files, null)
+            return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
+        } catch (e) {
+            res.status(500).json({message: e.message, data: null})
+        }
+    })
+
+    /**
+     * Upload de documents admin d'institut
+     */
+    app.post('/api/instituts/:institut_id/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+
+        const institutId = req.params.institut_id
+        const doctype = req.params.doctype;
+
+        try {
+            const document = await uploadDocument(doctype, req.files, institutId)
+            return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
+        } catch (e) {
+            res.status(500).json({message: e.message, data: null})
+        }
+
+    })
 }

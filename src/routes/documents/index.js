@@ -1,5 +1,5 @@
 /**
- * Conserver facture en position 0
+ * Liste des docuements accessibles pour les écoles
  * @type {string[]}
  */
 const DOC_TYPES = [

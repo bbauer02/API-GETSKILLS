@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true
         },
+        tva: {
+          type: DataTypes.FLOAT,
+          allowNull: true
+        },
         addressExam: {
             type: DataTypes.TEXT,
             allowNull: true
