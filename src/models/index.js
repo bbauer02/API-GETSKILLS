@@ -24,6 +24,8 @@ const sessionHasExams = require('../db/mock-session_has_exam');
 const empowerments = require('../db/mock-empowerment');
 const sessionExamHasExaminators = require('../db/mock-session_exam_has_examinator');
 const invoices = require("../db/mock-invoices");
+const del = require("del");
+const {uploadDocument, DOC_TYPES} = require("../routes/documents/index");
 
 const initDB = async (sequelize) => {
     fs
@@ -46,7 +48,7 @@ const initDB = async (sequelize) => {
     });
 
     try {
-        await sequelize.sync({ force: true })
+        await sequelize.sync({force: true})
         console.log("La base de données est synchronisée !")
         // Remplissage des tables avec des données tests. 
 
@@ -115,11 +117,11 @@ const initDB = async (sequelize) => {
         }
         // TABLE 'institutHasUser'
         await models['institutHasUser'].bulkCreate([
-            { 'user_id': 1, 'institut_id': 2, 'role_id': 1 },
-            { 'user_id': 1, 'institut_id': 1, 'role_id': 1 },
-            { 'user_id': 2, 'institut_id': 1, 'role_id': 4 },
-            { 'user_id': 3, 'institut_id': 2, 'role_id': 1 },
-            { 'user_id': 4, 'institut_id': 2, 'role_id': 2 }
+            {'user_id': 1, 'institut_id': 2, 'role_id': 1},
+            {'user_id': 1, 'institut_id': 1, 'role_id': 1},
+            {'user_id': 2, 'institut_id': 1, 'role_id': 4},
+            {'user_id': 3, 'institut_id': 2, 'role_id': 1},
+            {'user_id': 4, 'institut_id': 2, 'role_id': 2}
         ]);
 
         // TABLE 'tests'
@@ -340,16 +342,17 @@ const initDB = async (sequelize) => {
         ]);
 
         // mocks invoices
-        for(const invoice of invoices) {
+        for (const invoice of invoices) {
             await models['Invoice'].create(invoice)
-            for(const line of invoice.lines) {
+            for (const line of invoice.lines) {
                 await models['InvoiceLines'].create(line)
             }
         }
+
 
     } catch (error) {
         throw error;
     }
 }
 
-module.exports = { initDB, models }
+module.exports = {initDB, models}

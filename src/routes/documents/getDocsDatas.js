@@ -2,6 +2,7 @@ const {Op} = require("sequelize");
 const {models} = require("../../models");
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
+
 module.exports = (app) => {
 
     /**

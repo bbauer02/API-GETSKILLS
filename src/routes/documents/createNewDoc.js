@@ -3,6 +3,7 @@ const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
+
 module.exports = (app) => {
 
     /**
@@ -14,7 +15,7 @@ module.exports = (app) => {
      */
     async function uploadDocument (doctype, files, institutId = null) {
 
-        const STORE_FILES = process.cwd() + '/public/';
+        const STORE_FILES = path.join(process.cwd(),'public', 'templates');
         const d = new Date();
 
         // création du document
@@ -25,7 +26,8 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = files.newFile;
-        const uploadPath = STORE_FILES + d.getTime() + '.odt';
+
+        const uploadPath = path.join(STORE_FILES, d.getTime() + '.odt');
 
         // déplacement du fichier uploader dans le dossier public
         try {
@@ -63,6 +65,7 @@ module.exports = (app) => {
 
         const doctype = parseInt(req.body.doctype);
 
+
         try {
             const document = await uploadDocument(doctype, req.files, null)
             return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
@@ -76,8 +79,8 @@ module.exports = (app) => {
      */
     app.post('/api/instituts/:institut_id/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const institutId = req.params.institut_id
-        const doctype = req.body.doctype;
+        const institutId = parseInt(req.params.institut_id);
+        const doctype = parseInt(req.body.doctype);
 
         try {
             const document = await uploadDocument(doctype, req.files, institutId)

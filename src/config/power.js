@@ -30,6 +30,15 @@ module.exports = (env) => ({
                     download: env.DOCUMENTS_GET,
                 }
             },
+            documents: {
+                default: env.DOCUMENTS_GET,
+                download: env.DOCUMENTS_GET,
+                filetypes: env.DOCUMENTS_GET,
+            },
+            invoices: {
+                default: env.INVOICES_GET,
+                download: env.INVOICES_GET,
+            },
             sessionexams: {
                 default: env.SESSIONS_EXAM_GET,
                 sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_GET
