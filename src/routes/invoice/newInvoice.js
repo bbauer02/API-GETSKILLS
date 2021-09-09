@@ -15,7 +15,6 @@ module.exports = (app) => {
      * @returns {Promise<{test: *, date_session, price_total_TTC: number, lines: T[]}>}
      */
     async function generateOrder (institutId, sessionId, addedLines = []) {
-
         // récupération des données de facturation
         const orderDatas = await getAllFields(institutId, sessionId);
 
@@ -23,7 +22,7 @@ module.exports = (app) => {
         // ces lignes contiennent : {nom de l'épreuve, tva, Pu, qty}
         let lines = generateLinesInvoiceGetSkillsForItsClients(orderDatas);
 
-        const order = {
+        return {
             date_session: orderDatas.start,
             test: orderDatas.Test.label + (orderDatas.Level.label ? " " + orderDatas.Level.label : ''),
             price_total_TTC: lines.reduce((prev, curr) => {
@@ -31,9 +30,6 @@ module.exports = (app) => {
             }, 0),
             lines: lines.concat(addedLines), // ajout de lignes supplémentaires pour la facture
         }
-
-        return order;
-
     }
 
     /**
@@ -42,12 +38,14 @@ module.exports = (app) => {
      * OPération effectuée par l'administrateur de l'école en charge de valider les sessions.
      * @param app
      */
-    app.get('/api/instituts/:institut_id/sessions/:session_id/orders', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/sessions/:session_id/orders',isAuthorized, isAuthenticated, async (req, res) => {
 
-        const institutId = req.params.institut_id;
-        const sessionId = req.params.session_id;
+
 
         try {
+
+            const institutId = req.params.institut_id;
+            const sessionId = req.params.session_id;
 
             const order = await generateOrder(institutId, sessionId);
 
