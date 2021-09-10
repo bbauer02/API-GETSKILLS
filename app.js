@@ -96,14 +96,16 @@ require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/updateSessionAdmin')(app);
-require('./src/routes/session/addUserSession')(app);
-require('./src/routes/session/updateSessionUser')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);
-require('./src/routes/session/findSessionUser')(app);
-require('./src/routes/session/updateSessionUserOption')(app);
-require('./src/routes/session/addSessionUserOption')(app);
-require('./src/routes/session/deleteUserSession')(app);
-require('./src/routes/session/findSessionUsers')(app);
+
+// SessionUsers
+require('./src/routes/sessionUser/addSessionUser')(app);
+require('./src/routes/sessionUser/addSessionUserOption')(app);
+require('./src/routes/sessionUser/deleteSessionUser')(app);
+require('./src/routes/sessionUser/findSessionUser')(app);
+require('./src/routes/sessionUser/findSessionUsers')(app);
+require('./src/routes/sessionUser/updateSessionUser')(app);
+require('./src/routes/sessionUser/updateSessionUserOption')(app);
 
 // SessionHasExams
 require('./src/routes/sessionHasExam/createSessionHasExam')(app);
