@@ -6,7 +6,7 @@ module.exports = (app) => {
     app.put('/api/instituts/:institut_id/sessionUsers/:sessionUser_id/exams/:exam_id/options/:option_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // Check si la session est validée
-        async function checkSessionValidation() {
+        async function checkSession() {
             try {
 
                 const session = await models['Session'].findOne({
@@ -16,15 +16,13 @@ module.exports = (app) => {
                 if (session === null) {
                     const message = `session doesn't exist. Retry with an other session id.`;
                     return res.status(404).json({ message });
-                } else if (session.dataValues.validation === true) {
-                    const message = `session is validate, can't update sessionUserOptions!`;
-                    return res.status(500).json({ message });
-                } else {
-                    return session;
                 }
 
+                return session;
+
+
             } catch (error) {
-                const message = `An error has occured checking the session validation.`;
+                const message = `An error has occured checking the session.`;
                 return res.status(500).json({ message, data: error.message })
             }
         }
@@ -125,7 +123,7 @@ module.exports = (app) => {
                 return res.status(500).json({ message, data: error.message })
             }
         }
-        
+
 
         async function deleteSessionExamHasExaminator(sessionExamHasExaminator) {
             try {
@@ -189,23 +187,28 @@ module.exports = (app) => {
 
 
         try {
-            const session = await checkSessionValidation();
+            const session = await checkSession();
+
             const sessionUserOptionFound = await checkSessionUserOption();
 
-            // Si le candidat ne participe plus à une épreuve (isCandidate)
-            // On supprime le sessionExamHasExaminator correspondant
-            if (req.body.isCandidate === false && sessionUserOptionFound.dataValues.isCandidate === true) {
-                const sessionExamFoundForDelete = await findSessionExam(session);
-                const sessionExamHasExaminatorFound = await findSessionExamHasExaminator(sessionExamFoundForDelete)
-                await deleteSessionExamHasExaminator(sessionExamHasExaminatorFound);
+
+            if (req.body.idCandidate) {
+                // Si le candidat ne participe plus à une épreuve (isCandidate)
+                // On supprime le sessionExamHasExaminator correspondant
+                if (req.body.isCandidate === false && sessionUserOptionFound.dataValues.isCandidate === true) {
+                    const sessionExamFoundForDelete = await findSessionExam(session);
+                    const sessionExamHasExaminatorFound = await findSessionExamHasExaminator(sessionExamFoundForDelete)
+                    await deleteSessionExamHasExaminator(sessionExamHasExaminatorFound);
+                }
+
+                // A l'inverse, si un candidat s'inscrit à une épreuve optionnelle
+                // On créer le sessionExamHasExaminator correspondant
+                if (req.body.isCandidate === true && sessionUserOptionFound.dataValues.isCandidate === false) {
+                    const sessionExamFoundForCreate = await findSessionExam(session);
+                    await createSessionExamHasExaminator(sessionExamFoundForCreate)
+                }
             }
 
-            // A l'inverse, si un candidat s'inscrit à une épreuve optionnelle
-            // On créer le sessionExamHasExaminator correspondant
-            if (req.body.isCandidate === true && sessionUserOptionFound.dataValues.isCandidate === false) {
-                const sessionExamFoundForCreate = await findSessionExam(session);
-                await createSessionExamHasExaminator(sessionExamFoundForCreate)
-            }
 
             await sessionUserOptionFound.update(req.body, {
                 where: {
