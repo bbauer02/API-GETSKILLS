@@ -54,7 +54,7 @@ async function getInstitutHasPrice (institutId, examId) {
 
 
 module.exports = (app) => {
-    app.post('/api/instituts/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
         //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
