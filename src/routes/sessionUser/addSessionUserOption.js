@@ -2,6 +2,7 @@ const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
+// Unused
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/options', isAuthorized, isAuthenticated, async (req,res) => {
         try{

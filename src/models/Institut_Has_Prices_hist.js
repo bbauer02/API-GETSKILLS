@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.FLOAT,
             defaultValue: 0.
         },
+        tva: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+            defaultValue: 20.
+        }
     }, {
         tableName: 'Institut_Has_Prices_Hist',
         timestamps: true,
