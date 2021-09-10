@@ -97,7 +97,7 @@ require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/updateSessionAdmin')(app);
 require('./src/routes/session/addUserSession')(app);
-require('./src/routes/session/updateUserSession')(app);
+require('./src/routes/session/updateSessionUser')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);
 require('./src/routes/session/findSessionUser')(app);
 require('./src/routes/session/updateSessionUserOption')(app);

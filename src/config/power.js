@@ -129,7 +129,8 @@ module.exports = (env) => ({
                 admin: {
                     default: env.SESSIONS_ADMIN_PUT
                 },
-                exams: env.SESSIONS_EXAM_PUT
+                exams: env.SESSIONS_EXAM_PUT,
+                users: env.SESSIONS_USER_OPTION_PUT
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_PUT,
