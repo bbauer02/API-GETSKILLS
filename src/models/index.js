@@ -18,8 +18,7 @@ const sessionsHist = require('../db/mock-sessionsHist');
 const sessionUsers = require('../db/mock-session_has_user');
 const exams = require('../db/mock-exams');
 const skills = require("../db/mock-skills");
-const prices_exams = require("../db/mock-instituts_has_prices");
-const INSTITUT_HAS_PRICES = require("../db/mock-prices_exams");
+const institutsHasPrices = require("../db/mock-instituts_has_prices");
 const sessionHasExams = require('../db/mock-session_has_exam');
 const empowerments = require('../db/mock-empowerment');
 const sessionExamHasExaminators = require('../db/mock-session_exam_has_examinator');
@@ -240,10 +239,11 @@ const initDB = async (sequelize) => {
         }
 
         // TABLE 'Institut_has_prices'
-        for (const price of INSTITUT_HAS_PRICES) {
+        for (const price of institutsHasPrices) {
             await models['InstitutHasPrices'].create({
                 institut_id: price.institut_id,
                 exam_id: price.exam_id,
+                tva: price.tva,
                 price: price.price
             });
         }
