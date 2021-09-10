@@ -1,3 +1,4 @@
+const {getAllFields} = require("../../services/manageQueryDocs");
 const {getAllFieldsForSchoolDocuments} = require("../../services/manageQueryDocs");
 
 module.exports = (app) => {
@@ -9,7 +10,8 @@ module.exports = (app) => {
 
         try {
 
-            const result = await getAllFieldsForSchoolDocuments(institutId, sessionId, userId);
+            // const result = await getAllFieldsForSchoolDocuments(institutId, sessionId, userId);
+            const result = await getAllFields(institutId, sessionId, userId);
 
             if (result.length === 0)
                 return res.status(400).json({message: 'no result found', data: {}})

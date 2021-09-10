@@ -48,7 +48,7 @@ module.exports = (app) => {
     app.get('/api/instituts/:institut_id/invoices', isAuthenticated, isAuthorized, async (req, res) => {
 
         // constantes
-        const institutId = req.params.institut_id;
+        const institutId = parseInt(req.params.institut_id);
 
         try {
 

@@ -3,6 +3,7 @@ const fs = require("fs");
 const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
+
 module.exports = (app) => {
 
     /**
@@ -14,7 +15,7 @@ module.exports = (app) => {
      */
     async function uploadDocument (doctype, files, institutId = null) {
 
-        const STORE_FILES = process.cwd() + '/public/';
+        const STORE_FILES = path.join(process.cwd(),'public', 'templates');
         const d = new Date();
 
         // création du document
@@ -25,7 +26,8 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = files.newFile;
-        const uploadPath = STORE_FILES + d.getTime() + '.odt';
+
+        const uploadPath = path.join(STORE_FILES, d.getTime() + '.odt');
 
         // déplacement du fichier uploader dans le dossier public
         try {
@@ -43,7 +45,7 @@ module.exports = (app) => {
                     doctype: doctype,
                     filepath: uploadPath,
                 })
-            
+
             if (!docCreated) {
                 throw new Error('An error occurred during creation in the database.');
             }
@@ -59,9 +61,10 @@ module.exports = (app) => {
     /**
      * Upload de documents super admin
      */
-    app.post('/api/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const doctype = parseInt(req.params.doctype);
+        const doctype = parseInt(req.body.doctype);
+
 
         try {
             const document = await uploadDocument(doctype, req.files, null)
@@ -74,10 +77,10 @@ module.exports = (app) => {
     /**
      * Upload de documents admin d'institut
      */
-    app.post('/api/instituts/:institut_id/documents/:doctype/upload', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const institutId = req.params.institut_id
-        const doctype = req.params.doctype;
+        const institutId = parseInt(req.params.institut_id);
+        const doctype = parseInt(req.body.doctype);
 
         try {
             const document = await uploadDocument(doctype, req.files, institutId)

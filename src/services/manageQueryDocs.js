@@ -94,15 +94,15 @@ const ALIAS = {
         gender: 'USER_GENDER',
         firstname: 'USER_FIRSTNAME',
         lastname: 'USER_LASTNAME',
-        adress1: 'USER_ADDRESS1',
-        adress2: 'USER_ADDRESS2',
+        adress1: 'USER_ADRESS1',
+        adress2: 'USER_ADRESS2',
         fullAdress: 'USER_ADRESS_FULL',
         fullInlineAdress: 'USER_ADRESS_FULL_INLINE',
         zipcode: 'USER_ZIPCODE',
         city: 'USER_CITY',
         country: 'USER_COUNTRY',
         phone: 'USER_PHONE',
-        email: 'USER_EMAIL',
+        email: 'USER_MAIL',
         language: 'USER_LANGUAGE',
         nationality: 'USER_NATIONALITY',
         birthday: 'USER_BIRTHDAY',
@@ -121,7 +121,7 @@ const ALIAS = {
         room: 'EXAM_LOCATION',
         start: 'EXAM_START_DATE',
         hour: 'EXAM_START_HOUR',
-        nb: 'EXAMS_NB',
+        nb: 'NB_EXAMS',
     },
     invoice: {
         labels: 'DESCRIPTIONS',
@@ -155,7 +155,7 @@ const GETSKILLS = {
 }
 
 /**
- * Retourne toutes les données pour les docuements de Getskills
+ * Retourne toutes les données pour les documents de Getskills
  * @param institutId
  * @param sessionId
  * @returns {Promise<*[]>}
@@ -291,6 +291,7 @@ function FieldsForDocuments (datas, userId) {
     this[ALIAS.sessions.hour] = formaterHour(datas.start);
 
     // user
+
     if (sessionUser) {
         this[ALIAS.candidat.gender] = GENDERS[sessionUser.User.gender].label;
         this[ALIAS.candidat.firstname] = sessionUser.User.firstname;
@@ -304,7 +305,7 @@ function FieldsForDocuments (datas, userId) {
         this[ALIAS.candidat.phone] = sessionUser.User.phone;
         this[ALIAS.candidat.email] = sessionUser.User.email;
         this[ALIAS.candidat.country] = sessionUser.User.country.label;
-        this[ALIAS.candidat.language] = sessionUser.User.firstlanguage.label;
+        this[ALIAS.candidat.language] = sessionUser.User.firstlanguage.name;
         this[ALIAS.candidat.nationality] = sessionUser.User.nationality.label;
         this[ALIAS.candidat.birthday] = Math.ceil(Math.abs((new Date(sessionUser.User.birthday)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
         this[ALIAS.candidat.payment] = PAYMENTS[sessionUser.paymentMode].label;
@@ -328,7 +329,7 @@ function FieldsForDocuments (datas, userId) {
 
         // invoices : school VERS candidats
         const LinesForInvoices = new LinesForInvoice(lines);
-        const TableVat = new TableVat(lines);
+        const myTableVat = new TableVat(lines);
 
         this[ALIAS.invoice.labels] = LinesForInvoices[ALIAS.invoice.labels];
         this[ALIAS.invoice.quantities] = LinesForInvoices[ALIAS.invoice.quantities];
@@ -340,9 +341,9 @@ function FieldsForDocuments (datas, userId) {
         this[ALIAS.invoice.total_ttc] = LinesForInvoices[ALIAS.invoice.total_ttc];
         this[ALIAS.invoice.total_tva] = LinesForInvoices[ALIAS.invoice.total_tva];
 
-        this[ALIAS.invoice.tvas] = TableVat[ALIAS.invoice.tvas];
-        this[ALIAS.invoice.total_ht_par_tva] = TableVat[ALIAS.invoice.total_ht_par_tva];
-        this[ALIAS.invoice.total_ttc_par_tva] = TableVat[ALIAS.invoice.total_ttc_par_tva];
+        this[ALIAS.invoice.tvas] = myTableVat[ALIAS.invoice.tvas];
+        this[ALIAS.invoice.total_ht_par_tva] = myTableVat[ALIAS.invoice.total_ht_par_tva];
+        this[ALIAS.invoice.total_ttc_par_tva] = myTableVat[ALIAS.invoice.total_ttc_par_tva];
     }
 }
 
@@ -407,6 +408,11 @@ function generateLinesInvoiceGetSkillsForItsClients (datas) {
 
 }
 
+/**
+ * Créer des
+ * @param datas
+ * @constructor
+ */
 function FieldsForInvoice (datas) {
 
     // expeditor
@@ -452,9 +458,11 @@ function FieldsForInvoice (datas) {
     // invoices
 
     this[ALIAS.invoice.numero] = datas.reference + "-" + datas.invoice_id.toString().padStart(6, "0");
-    this[ALIAS.invoice.reference] = datas.reference;
+    this[ALIAS.invoice.reference] = datas.ref_client;
     this[ALIAS.invoice.date_invoice] = formaterDate(datas.createdAt);
     this[ALIAS.invoice.total_ttc] = datas.price_total_TTC;
+    this[ALIAS.sessions.start] = formaterDate(datas.DateTime);
+    this[ALIAS.candidat.payment] = '-';
 
     // invoices : school VERS candidats
     const LinesForInvoices = new LinesForInvoice(datas.lines);
@@ -520,7 +528,7 @@ async function getAllFields (institutId, sessionId, userId = null) {
                             include:
                                 [
                                     {
-                                        attributes: [['name', 'label']],
+                                        attributes: [['name', 'name']],
                                         model: models['Language'],
                                         as: 'firstlanguage'
                                     },
@@ -581,7 +589,7 @@ function LinesForInvoice (lines) {
 
     lines.forEach(line => {
         let carriage = manageCarriage(line.label);
-        this[ALIAS.invoice.labels] += line.label + carriage;
+        this[ALIAS.invoice.labels] += line.label + "\n";
         this[ALIAS.invoice.quantities] += line.quantity + carriage;
         this[ALIAS.invoice.articles_pu] += line.price_pu_ttc + carriage;
         this[ALIAS.invoice.articles_tva] += line.tva + carriage;
@@ -632,10 +640,10 @@ function TableVat (lines) {
 function manageCarriage (label) {
     // retours chariots
     const RC = "\n";
-    if (label.length < 40) return RC;
-    if (label.length < 80) return RC + RC;
-    if (label.length < 120) return RC + RC + RC;
-    if (label.length < 160) return RC + RC + RC + RC;
+    if (label.length < 43) return RC;
+    if (label.length < 86) return RC + RC;
+    if (label.length < 172) return RC + RC + RC;
+    if (label.length < 344) return RC + RC + RC + RC;
 }
 
 function calculer_TVA (quantity, price_pu_ttc, tva) {
@@ -656,11 +664,11 @@ function formaterAdress (adress1, adress2, inline = false) {
 }
 
 function formaterDate (myDate) {
-    return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-31'))) / (1000 * 60 * 60 * 24));
+    return Math.ceil(Math.abs((new Date(myDate)) - (new Date('1899-12-30'))) / (1000 * 60 * 60 * 24));
 }
 
 function formaterHour (myHour) {
-    return (myHour.getHours() + (myHour.getMinutes() / 60)) / 24;
+    return (myHour.getUTCHours() + (myHour.getUTCMinutes() / 60)) / 24;
 }
 
 module.exports = {
