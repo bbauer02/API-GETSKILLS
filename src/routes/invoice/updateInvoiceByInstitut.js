@@ -10,7 +10,6 @@ module.exports = (app) => {
 
         // constantes
         const invoiceId = req.params.invoice_id;
-        const isPaid = req.body.isPaid;
 
         try {
 
@@ -20,7 +19,7 @@ module.exports = (app) => {
             if(!invoice) {
                 return res.status(500).json({message: "no invoice found", data: null})
             } else {
-                invoice.isPaid = isPaid;
+                invoice.isPaid = !invoice.isPaid;
                 await invoice.save();
 
                 return res.status(200).json({message: `invoice numero ${invoice.invoice_id} has been updated`, data: invoice})
