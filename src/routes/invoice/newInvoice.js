@@ -21,7 +21,7 @@ async function generateOrder (institutId, sessionId, addedLines = []) {
     let lines = generateLinesInvoiceGetSkillsForItsClients(orderDatas);
 
     return {
-        date_session: orderDatas.start,
+        DateTime: orderDatas.start,
         test: orderDatas.Test.label + (orderDatas.Level.label ? " " + orderDatas.Level.label : ''),
         price_total_TTC: lines.reduce((prev, curr) => {
             return prev + (curr.price_pu_ttc * curr.quantity);
