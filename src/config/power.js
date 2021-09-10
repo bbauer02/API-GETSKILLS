@@ -22,9 +22,7 @@ module.exports = (env) => ({
                     exams: env.SESSIONS_EXAM_GET
                 },
                 exams: env.SESSIONS_EXAM_GET,
-                orders: {
-                    default: env.INVOICES_GET
-                },
+                orders: env.INVOICES_GET,
                 documents: {
                     default: env.DOCUMENTS_GET,
                     download: env.DOCUMENTS_GET,
@@ -33,7 +31,6 @@ module.exports = (env) => ({
             documents: {
                 default: env.DOCUMENTS_GET,
                 download: env.DOCUMENTS_GET,
-                filetypes: env.DOCUMENTS_GET,
             },
             invoices: {
                 default: env.INVOICES_GET,
