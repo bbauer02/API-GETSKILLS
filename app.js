@@ -57,18 +57,20 @@ require('./src/routes/empowerementTests/findEmpowermentTestsByPk')(app);
 require('./src/routes/empowerementTests/updateEmpowermentTests')(app);
 require('./src/routes/empowerementTests/findEmpowermentTestsByInstituts')(app);
 
-//Institutes
+// Institut
 require('./src/routes/institut/findAllInstituts')(app);
 require('./src/routes/institut/findInstitutByPk')(app);
 require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
-require('./src/routes/institut/addUserInstitut')(app);
-require('./src/routes/institut/deleteUserInstitut')(app);
-require('./src/routes/institut/findInstitutUsers')(app);
-require('./src/routes/institut/findInstitutExaminators')(app);
-require('./src/routes/institut/updateInstitutUser')(app);
-require('./src/routes/institut/findInstitutUser')(app);
+
+// Institut Users
+require('./src/routes/institutUser/addInstitutUser')(app);
+require('./src/routes/institutUser/deleteInstitutUser')(app);
+require('./src/routes/institutUser/findInstitutExaminators')(app);
+require('./src/routes/institutUser/findInstitutUser')(app);
+require('./src/routes/institutUser/findInstitutUsers')(app);
+require('./src/routes/institutUser/updateInstitutUser')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);

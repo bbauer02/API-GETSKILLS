@@ -2,7 +2,7 @@
 const { ValidationError, UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
-// IMPORTANT  //
+// IMPORTANT
 /*
 A la difference de updateSession,
 updateSessionAdmin n'efface pas l'attribut validation de la session
