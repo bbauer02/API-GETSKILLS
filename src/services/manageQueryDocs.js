@@ -324,6 +324,8 @@ function FieldsForDocuments (datas, userId) {
         })
 
         // invoices
+        this[ALIAS.invoice.numero] = new Date(sessionUser.inscription).getFullYear().toString() + new Date(sessionUser.inscription).getMonth().toString().padStart(2, "0") + sessionUser.sessionUser_id.toString().padStart(6, "0");
+        this[ALIAS.invoice.reference] = new Date(sessionUser.inscription).getFullYear().toString() + new Date(sessionUser.inscription).getMonth().toString().padStart(2, "0") + datas.Test.label + '-' + sessionUser.sessionUser_id.toString().padStart(6, "0");
 
         let lines = generateLinesInvoiceSchoolsForItsCandidats(sessionUser);
 
