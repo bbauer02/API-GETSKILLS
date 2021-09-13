@@ -286,7 +286,7 @@ function FieldsForDocuments (datas, userId) {
 
     // exams
     this[ALIAS.sessions.test] = datas.Test.label;
-    this[ALIAS.sessions.level] = datas.Level.label ? datas.Level.label : '';
+    this[ALIAS.sessions.level] = datas.Level?.label || '';
     this[ALIAS.sessions.start] = formaterDate(datas.start);
     this[ALIAS.sessions.hour] = formaterHour(datas.start);
 
