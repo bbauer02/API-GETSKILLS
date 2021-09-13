@@ -17,6 +17,10 @@ module.exports = (app) => {
                             test_id: req.body.idTest
                         }
                     });
+                    
+                    if (csvItemsFound === null) {
+                        return res.status(500).json({ message: "No template for this test" })
+                    }
 
                     return JSON.parse(JSON.stringify(csvItemsFound));
 
@@ -105,12 +109,19 @@ module.exports = (app) => {
             async function generateFile(csvItems, allInformations) {
                 try {
 
+                    let csv = "";
                     const arrayOfFields = Object.values(csvItems).map((item) => (
-                        `"${item.label}"`
+                        `${item.label}`
                     ));
-
-                    let csv = arrayOfFields.join(",");
+                    
+                    csv = arrayOfFields.join(";");
                     csv += "\n";
+
+                    // Determine pour le format de csv
+                    let inLine = false;
+
+                    // Utiliser pour créer l'autre csv si inLine === true
+                    let copyCsv = csv;
 
                     // TODO METTRE À JOUR LES CHAMPS DANS LE SWITCH CASE CI DESSOUS
                     // TODO METTRE AUSSI À JOUR LES CHAMPS EN FRONT DANS src\redux\slices\templateCsv.js
@@ -122,6 +133,11 @@ module.exports = (app) => {
 
                         csvItems.forEach((item) => {
                             switch (item.field) {
+
+                                // Pour format CSV
+                                case "inLine":
+                                    inLine = true;
+                                    break;
 
                                 // USER
                                 case "User_firstname":
@@ -207,7 +223,7 @@ module.exports = (app) => {
                                     allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
                                         allAdress.push(sessionHasExam.adressExam);
                                     })
-                                    row.push(allAdress);
+                                    row.push(allAdress.join(";"));
                                     break;
 
                                 case "sessionHasExam_room":
@@ -215,7 +231,7 @@ module.exports = (app) => {
                                     allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
                                         allRoom.push(sessionHasExam.room);
                                     })
-                                    row.push(allRoom);
+                                    row.push(allRoom.join(";"));
                                     break;
 
                                 case "sessionHasExam_DateTime":
@@ -223,7 +239,7 @@ module.exports = (app) => {
                                     allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
                                         allDateTime.push(sessionHasExam.DateTime);
                                     })
-                                    row.push(allDateTime);
+                                    row.push(allDateTime.join(";"));
                                     break;
 
 
@@ -233,7 +249,7 @@ module.exports = (app) => {
                                     allInformation.Session.sessionHasExams.forEach((sessionHasExam) => {
                                         allExamLabel.push(sessionHasExam.Exam.label);
                                     })
-                                    row.push(allExamLabel);
+                                    row.push(allExamLabel.join(";"));
                                     break;
 
                                 // SESSIONUSEROPTION
@@ -242,7 +258,7 @@ module.exports = (app) => {
                                     allInformation.sessionUserOptions.forEach((sessionUserOption) => {
                                         allUserPrice.push(sessionUserOption.userPrice);
                                     });
-                                    row.push(allUserPrice);
+                                    row.push(allUserPrice.join(";"));
                                     break;
 
                                 case "sessionUserOption_isCandidate":
@@ -250,7 +266,7 @@ module.exports = (app) => {
                                     allInformation.sessionUserOptions.forEach((sessionUserOption) => {
                                         allIsCandidate.push(sessionUserOption.isCandidate);
                                     });
-                                    row.push(allIsCandidate);
+                                    row.push(allIsCandidate.join(";"));
                                     break;
 
                                 // EXAMINATOR
@@ -272,7 +288,7 @@ module.exports = (app) => {
                                             }
                                         })
                                     });
-                                    row.push(allFirstname);
+                                    row.push(allFirstname.join(";"));
                                     break;
 
                                 case "Examinator_lastname":
@@ -293,7 +309,7 @@ module.exports = (app) => {
                                             }
                                         })
                                     });
-                                    row.push(allLastname);
+                                    row.push(allLastname.join(";"));
                                     break;
 
                                 case "Examinator_code":
@@ -314,7 +330,7 @@ module.exports = (app) => {
                                             }
                                         })
                                     });
-                                    row.push(allcode);
+                                    row.push(allcode.join(";"));
                                     break;
 
                                 default:
@@ -323,14 +339,75 @@ module.exports = (app) => {
                             }
                         })
                         const rowData = row.map((content) => (
-                            `"${content}"`
+                            `${content}`
                         )).join(",");
 
+                        // SI PAS INLINE
                         csv = csv + rowData + "\n";
+                        // SINON
                     })
 
-                    // console.log("\n\n", csv, "\n\n");
-                    return csv;
+                    const splited = csv.split("\n");
+                    const csvArray = [];
+
+                    // On remet tout sous forme de tableau
+                    splited.forEach((row, index) => {
+                        if (index !== 0) {
+                            csvArray.push(row.split(','))
+                        }
+                    });
+                    csvArray.pop();
+
+
+                    // On refactore le tableau pour les cases à plusieurs valeurs
+                    const arrayRefactor = [];
+                    csvArray.forEach((user) => {
+                        const arrayRow = [];
+                        user.forEach((row) => {
+                            // Si champ multiple
+                            arrayRow.push(row.split(";"));
+                        });
+                        arrayRefactor.push(arrayRow);
+                    });
+
+
+                    // On créer le dernier tableau content toutes les lignes
+                    const finalArray = [];
+                    arrayRefactor.forEach((user) => {
+                        const allRows = [];
+                        const allField = []
+                        user.forEach((fields, y) => {
+                            allField.push(fields[0]);
+
+                            if (fields.length > 1) {
+                                fields.forEach((field, z) => {
+                                    if (z > 0) {
+                                        let allSubFields = [];
+                                        if (allRows[z] !== undefined) {
+                                            allSubFields = [...allRows[z]];
+                                        }
+                                        allSubFields[y] = field;
+                                        allRows[z] = allSubFields;
+                                    }
+                                })
+                            }
+                        })
+                        allRows[0] = allField;
+                        finalArray.push(allRows);
+                    })
+
+
+                    // On reécrit le csv
+                    finalArray.forEach((user) => {
+                        user.forEach((row) => {
+                            copyCsv += row.join(";");
+                            copyCsv += "\n";
+                        })
+                    });
+
+
+                    // Depend de inLine
+                    return inLine ? csv : copyCsv;
 
                 } catch (error) {
 
@@ -357,7 +434,7 @@ module.exports = (app) => {
                 const folder = createRepository();
 
                 // Nom du fichier à créer
-                const fileName = `Session_${new Date(allInformations[0]?.Session.start).toISOString().slice(0,10).replace(/-/g,"")}.csv`;
+                const fileName = `Session_${new Date(allInformations[0]?.Session.start).toISOString().slice(0, 10).replace(/-/g, "")}.csv`;
 
                 // création du fichier csv dans le dossier temporaire
                 try {
