@@ -1,123 +1,25 @@
-# API : GET-TESTED.ONLINE
+
+# API : GET-TESTED.ONLINE![enter image description here](https://img.shields.io/badge/GET--TESTED-API%20v1.0-green)
 
 *GET-TESTED.ONLINE* est le nom provisoire du nouveau projet de la société **Get-skills.online**.
 Il s'agit d'une application gestion de tests et certifications en ligne. 
 Ce fichier décrit le fonctionnement de l'API pour les développeurs FRONT-END qui auront à travailler sur le projet. 
-Le développeur de cette API est : [Baptiste Bauer](mailto:bbauer02@gmail.com).
-La base de données a été conçu par : [Olivier Leroy](mailto:o.leroy@yahoo.fr) et [Baptiste Bauer](mailto:bbauer02@gmail.com)
+Les contributeur de cette API sont  : 
 
-# #Table : levels
-| nom du champ| description|
-|--|--|
-| *id* | identifiant d'un niveau|
-| *label* | Intitulé du niveau. Il doit être unique et non NULL|
-| *ref*| Référence du niveau. NULL s'il n'est pas renseigné|
-| *description*| Description du niveau. NULL s'il n'est pas renseigné|
+[Baptiste Bauer](mailto:bbauer02@gmail.com)
+[Paul Piazza](mailto:paul.piazza.pro@gmail.com)
+[Jules Debeaumont Bauer](deb.jules@outlook.fr)
 
 
-##  Ajouter un niveau
-
-|METHODE|URL|
-|--|--|
-|  **POST** | */api/levels* |
-<<<<<<< HEAD
-
-Format du fichier **JSON** à envoyer :
-
-     {
-         "label" : "Libélé du niveau",
-    	 "ref"  : "REFERENCE 123",
-    	 "description" : "Description du nouveau niveau"
-     }
-
-##  Modifier un niveau
-
-|METHODE|URL|Paramètre |
-|--|--|--|
-|  **PUT** | */api/levels/< id >* |***< id >*** est un *entier* |
-***< id >*** est l'identifiant du niveau à modifier.
-
-Exemple de **JSON** à envoyer : 
-
-     {
-        "id" : "1",
-    	"label" : "A1",
-    	"ref": "REF-123",
-        "description": "Ceci est un fichier JSON de démonstration"
-     }
-
-##  Supprimer un niveau
-
-|METHODE|URL|Paramètre |
-|--|--|--|
-|  **DEL** | */api/levels/< id >* |***< id >*** est un *entier* |
-***< id >*** est l'identifiant du niveau à supprimer.
-
-##  Lister les niveaux
-|METHODE|URL|
-|--|--|
-|  **GET** | */api/levels* |
-
-Retourne au format JSON la liste de tous les niveaux.
-
-##  Récupérer un niveaux précis
-|METHODE|URL| Paramètre |
-|--|--|--|
-|  **GET** | */api/levels/< id >** | ***< id >*** est un *entier* |
-
-***< id >*** est l'identifiant du niveau à supprimer.
-Retourne au format JSON un niveau en fonction de son identifiant. 
+La base de données a été conçue par : [Olivier Leroy](mailto:o.leroy@yahoo.fr) et [Baptiste Bauer](mailto:bbauer02@gmail.com)
 
 
-# #Table : tests
-=======
->>>>>>> 63f7918cf5192a341d0da30b2d7972d69711e7c2
+## Pour une installation en production : 
 
-Format du fichier **JSON** à envoyer :
+    npm run start
 
-     {
-         "label" : "Libélé du niveau",
-    	 "ref"  : "REFERENCE 123",
-    	 "description" : "Description du nouveau niveau"
-     }
+## Pour une installation en développement: 
 
-##  Modifier un niveau
+    npm run dev
 
-|METHODE|URL|Paramètre |
-|--|--|--|
-|  **PUT** | */api/levels/< id >* |***< id >*** est un *entier* |
-***< id >*** est l'identifiant du niveau à modifier.
-
-Exemple de **JSON** à envoyer : 
-
-     {
-        "id" : "1",
-    	"label" : "A1",
-    	"ref": "REF-123",
-        "description": "Ceci est un fichier JSON de démonstration"
-     }
-
-##  Supprimer un niveau
-
-|METHODE|URL|Paramètre |
-|--|--|--|
-|  **DEL** | */api/levels/< id >* |***< id >*** est un *entier* |
-***< id >*** est l'identifiant du niveau à supprimer.
-
-##  Lister les niveaux
-|METHODE|URL|
-|--|--|
-|  **GET** | */api/levels* |
-
-Retourne au format JSON la liste de tous les niveaux.
-
-##  Récupérer un niveaux précis
-|METHODE|URL| Paramètre |
-|--|--|--|
-|  **GET** | */api/levels/< id >** | ***< id >*** est un *entier* |
-
-***< id >*** est l'identifiant du niveau à supprimer.
-Retourne au format JSON un niveau en fonction de son identifiant. 
-
-
-# #Table : tests
+**Attention :**  lancer *npm run dev* sur un serveur en production supprimera tout le contenu de la base. 
