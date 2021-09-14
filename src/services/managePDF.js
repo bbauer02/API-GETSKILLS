@@ -70,7 +70,7 @@ async function getDocumentPDF (datasForPdf, documentId, sessionId, userId) {
     await destroyTemporaryFolders();
 
     // récupération du template oo
-    let odtTemplate = await models['Document'].findByPk(documentId, {attributes: ['filepath', 'filepath']});
+    let odtTemplate = await models['Document'].findByPk(documentId, {attributes: ['filepath']});
 
     if (!odtTemplate)
         throw new Error('no template found');
