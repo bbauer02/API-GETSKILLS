@@ -19,10 +19,10 @@ async function generateOrder (institutId, sessionId, addedLines = []) {
     // organisation des données sous forme de lignes d'articles
     // ces lignes contiennent : {nom de l'épreuve, tva, Pu, qty}
     let lines = generateLinesInvoiceGetSkillsForItsClients(orderDatas);
-
+    console.log(orderDatas);
     return {
         DateTime: orderDatas.start,
-        test: orderDatas.Test.label + (orderDatas.Level.label ? " " + orderDatas.Level.label : ''),
+        test: orderDatas.Test.label + (orderDatas.Level?.label || ''),
         price_total_TTC: lines.reduce((prev, curr) => {
             return prev + (curr.price_pu_ttc * curr.quantity);
         }, 0),
@@ -38,7 +38,7 @@ module.exports = (app) => {
      * OPération effectuée par l'administrateur de l'école en charge de valider les sessions.
      * @param app
      */
-    app.get('/api/instituts/:institut_id/sessions/:session_id/orders',isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/sessions/:session_id/orders', isAuthenticated, isAuthorized, async (req, res) => {
 
         // return res.status(200).json({data: 'route ok'});
 
