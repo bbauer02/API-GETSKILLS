@@ -53,7 +53,6 @@ const initDB = async (sequelize) => {
 
     try {
         let isDev = true;
-        console.log(process.env.NODE_ENV.toUpperCase())
         const mode = process.env.NODE_ENV;
         if(mode === "production") {
             isDev = false;
