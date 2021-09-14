@@ -253,7 +253,7 @@ const initDB = async (sequelize) => {
             await models['csvItem'].create({
                 label: csvItem.label,
                 field: csvItem.field,
-                order: csvItem.order,
+                inLine: csvItem.inLine,
                 test_id: csvItem.test_id
             });
         }

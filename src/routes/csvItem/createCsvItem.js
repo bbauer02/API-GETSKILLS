@@ -6,23 +6,8 @@ module.exports = (app) => {
     app.post('/api/tests/:test_id/csvitems',
         isAuthenticated, isAuthorized, async (req, res) => {
 
-            async function removeAllItemsWithTestId() {
-                try {
-    
-                    await models['csvItem'].destroy({
-                        where : {
-                            test_id: req.params.test_id
-                        }
-                    });
-
-                } catch (error) {
-
-                    const message = `An error has occured removing all the items for this test.`;
-                    return res.status(500).json({ message, data: error.message })
-                }
-            }
-
-
+            // Ancien fonctionnement
+            /*
             async function createAndUpdateAllItems() {
                 try {
 
@@ -53,20 +38,14 @@ module.exports = (app) => {
                     return res.status(500).json({ message, data: error.message })
                 }
             }
+            */
 
-            // unused
-            async function createNewItem() {
+            async function createOrUpdateItem() {
                 try {
 
-                    const values = {
-                        test_id: req.params.test_id,
-                        label: null,
-                        field: null,
-                        order: null
-                    };
-
-                    const itemCreated = await models['csvItem'].create(values);
-                    return itemCreated;
+                    // Create or update
+                    const itemCreatedOrUpdated = await models['csvItem'].upsert(req.body);
+                    return itemCreatedOrUpdated;
 
                 } catch (error) {
                     const message = `An error has occured creating the itemCsv.`;
@@ -75,14 +54,9 @@ module.exports = (app) => {
             }
 
             try {
-                // Le formulaire envoyant un série d'items sans pouvoir les supprimer,
-                // il faut donc supprimer tout les items avant des les recréer
-                await removeAllItemsWithTestId();
-
-                const allItemsCreated = await createAndUpdateAllItems();
-                
+                const itemCreatedOrUpdated = await createOrUpdateItem();
                 const messageItems = `Template has been updated !`;
-                res.json({ messageItems, data: allItemsCreated });
+                res.json({ messageItems, data: itemCreatedOrUpdated });
 
             } catch (error) {
                 const message = `An error has occured.`;

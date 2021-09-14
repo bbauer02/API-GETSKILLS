@@ -11,10 +11,13 @@ module.exports = (app) => {
                     test_id: req.params.test_id
                 };
 
-                parameters.order = [['order', 'ASC']]
+                const allCsvItemFound = await models['csvItem'].findOne(parameters);
 
-                const allCsvItemFound = await models['csvItem'].findAll(parameters);
-                const message = `${allCsvItemFound.length} csvItem(s) found`;
+                if (allCsvItemFound === null) {
+                    const message = `No template for this test`;
+                    return res.status(200).json({ message });
+                }
+                const message = `CSV Item found`;
                 res.json({ message, data: allCsvItemFound });
             }
             catch (error) {

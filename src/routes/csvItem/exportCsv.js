@@ -12,17 +12,17 @@ module.exports = (app) => {
 
             async function getAllItemCsvByTest() {
                 try {
-                    const csvItemsFound = await models['csvItem'].findAll({
+                    const templateCsvFound = await models['csvItem'].findOne({
                         where: {
                             test_id: req.body.idTest
                         }
                     });
                     
-                    if (csvItemsFound === null) {
+                    if (templateCsvFound === null) {
                         return res.status(500).json({ message: "No template for this test" })
                     }
 
-                    return JSON.parse(JSON.stringify(csvItemsFound));
+                    return JSON.parse(JSON.stringify(templateCsvFound));
 
                 } catch (error) {
 
@@ -106,19 +106,17 @@ module.exports = (app) => {
             }
 
 
-            async function generateFile(csvItems, allInformations) {
+            async function generateFile(templateCsvFound, allInformations) {
                 try {
 
                     let csv = "";
-                    const arrayOfFields = Object.values(csvItems).map((item) => (
-                        `${item.label}`
+                    const csvItems = templateCsvFound.field.split(";");
+                    const arrayOfFields = templateCsvFound.label.split(";").map((item) => (
+                        `${item}`
                     ));
                     
                     csv = arrayOfFields.join(";");
                     csv += "\n";
-
-                    // Determine pour le format de csv
-                    let inLine = false;
 
                     // Utiliser pour créer l'autre csv si inLine === true
                     let copyCsv = csv;
@@ -132,12 +130,7 @@ module.exports = (app) => {
                         const row = [];
 
                         csvItems.forEach((item) => {
-                            switch (item.field) {
-
-                                // Pour format CSV
-                                case "inLine":
-                                    inLine = true;
-                                    break;
+                            switch (item) {
 
                                 // USER
                                 case "User_firstname":
@@ -342,9 +335,7 @@ module.exports = (app) => {
                             `${content}`
                         )).join(",");
 
-                        // SI PAS INLINE
                         csv = csv + rowData + "\n";
-                        // SINON
                     })
 
                     const splited = csv.split("\n");
@@ -407,7 +398,7 @@ module.exports = (app) => {
 
 
                     // Depend de inLine
-                    return inLine ? csv : copyCsv;
+                    return templateCsvFound.inLine === true ? csv : copyCsv;
 
                 } catch (error) {
 
@@ -419,13 +410,13 @@ module.exports = (app) => {
 
             try {
                 // Charge le template
-                const csvItemsFound = await getAllItemCsvByTest();
+                const templateCsvFound = await getAllItemCsvByTest();
 
                 // On prend toutes les informations nécéssaire pour le csv
                 const allInformations = await getAllInformations();
 
                 // On génére le fichier csv
-                const csvGenerated = await generateFile(csvItemsFound, allInformations);
+                const csvGenerated = await generateFile(templateCsvFound, allInformations);
 
                 // destruction du dossier temporaire si existant
                 await destroyTemporaryFolders();

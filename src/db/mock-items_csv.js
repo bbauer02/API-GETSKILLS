@@ -1,59 +1,17 @@
 ﻿const csvItems = [
     {
         csvItem_id: 1,
-        field: "User_firstname",
-        label: "Prénom",
-        order: 0,
+        field: "User_firstname;User_lastname;User_phone;Exam_label;sessionHasExam_adressExam;sessionUserOption_isCandidate;Examinator_firstname;Examinator_lastname",
+        label: "Prénom;Nom;Téléphone;Epreuve;AdressEpreuve;EstCandidat;PrénomExaminateur;NomExaminateur",
+        inLine: false,
         test_id: 3
     },
     {
         csvItem_id: 2,
-        field: "User_lastname",
-        label: "Nom",
-        order: 1,
-        test_id: 3
-    },
-    {
-        csvItem_id: 3,
-        field: "User_phone",
-        label: "Téléhone",
-        order: 2,
-        test_id: 3
-    },
-    {
-        csvItem_id: 4,
-        field: "Exam_label",
-        label: "Epreuve",
-        order: 3,
-        test_id: 3
-    },
-    {
-        csvItem_id: 5,
-        field: "sessionHasExam_adressExam",
-        label: "AdresseEpreuve",
-        order: 4,
-        test_id: 3
-    },
-    {
-        csvItem_id: 6,
-        field: "sessionUserOption_isCandidate",
-        label: "EstCandidat",
-        order: 5,
-        test_id: 3
-    },
-    {
-        csvItem_id: 7,
-        field: "Examinator_firstname",
-        label: "PrénomExaminateur",
-        order: 6,
-        test_id: 3
-    },
-    {
-        csvItem_id: 8,
-        field: "Examinator_lastname",
-        label: "NomExaminateur",
-        order: 7,
-        test_id: 3
+        field: "User_firstname;User_city;Exam_label",
+        label: "Prénom;City;Epreuve",
+        inLine: true,
+        test_id: 4
     }
 ];
 

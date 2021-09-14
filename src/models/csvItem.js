@@ -8,14 +8,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         field: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false
         },
         label: {
             type: DataTypes.STRING,
             allowNull: true
         },
-        order: {
-            type: DataTypes.INTEGER,
+        inLine: {
+            type: DataTypes.BOOLEAN,
             allowNull: true
         },
         test_id: {
