@@ -19,10 +19,10 @@ async function generateOrder (institutId, sessionId, addedLines = []) {
     // organisation des données sous forme de lignes d'articles
     // ces lignes contiennent : {nom de l'épreuve, tva, Pu, qty}
     let lines = generateLinesInvoiceGetSkillsForItsClients(orderDatas);
-    console.log(orderDatas);
+
     return {
         DateTime: orderDatas.start,
-        test: orderDatas.Test.label + (orderDatas.Level?.label || ''),
+        test: orderDatas.Test.label + ' ' + (orderDatas.Level?.label || ''),
         price_total_TTC: lines.reduce((prev, curr) => {
             return prev + (curr.price_pu_ttc * curr.quantity);
         }, 0),

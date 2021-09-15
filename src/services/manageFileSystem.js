@@ -17,6 +17,18 @@ function createRepository () {
 }
 
 /**
+ * Création d'un dossier dans le dossier PUBLIC.
+ */
+function createRepositoryWithName (title) {
+    try {
+        fs.mkdirSync(path.join(process.cwd(), 'public', title));
+        console.log(path.join(process.cwd(), 'public', title), "folder has been created successfully.");
+    } catch (e) {
+        throw new Error('An error occured when trying to create temporary folder. \n' + e.message);
+    }
+}
+
+/**
  * Détruire les fichiers/dossiers temporaires
  * @returns {Promise<void>}
  */
@@ -25,6 +37,19 @@ async function destroyTemporaryFolders () {
         await del(path.join(__dirname, 'temporary'));
     } catch (e) {
         console.log(e.message)
+    }
+}
+
+/**
+ * Détruire les fichiers/dossiers dans public avec son nom
+ * @returns {Promise<void>}
+ */
+async function destroyFolder (title) {
+    try {
+        await del(path.join(process.cwd(), 'public', title));
+        console.log(path.join(process.cwd(), 'public', title),"has been destroyed!");
+    } catch (e) {
+        throw new Error(title + ' does not exists. \n' + e.message);
     }
 }
 
@@ -40,4 +65,4 @@ function getFilesInTemporaryFolder () {
     }
 }
 
-module.exports = {getFilesInTemporaryFolder, destroyTemporaryFolders, createRepository}
+module.exports = {getFilesInTemporaryFolder, destroyTemporaryFolders, createRepository, createRepositoryWithName, destroyFolder}
