@@ -18,6 +18,8 @@ const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const itemsCsv = require('../db/mock-items_csv');
 const _colors = require('colors');
+const {createRepositoryWithName} = require("../services/manageFileSystem");
+const {destroyFolder} = require("../services/manageFileSystem");
 
 const progressBar = (label,length) => {
     const bar = new cliProgress.SingleBar({
@@ -780,6 +782,19 @@ const initDB = async (sequelize) => {
             barUserOption.stop();
             await models['sessionUserOption'].bulkCreate(listSessionUserOption);
             console.log(_colors.green("OK"));
+        }
+
+        /**
+         * DEV MODE ONLY : suppression des templates odt
+         */
+        if(isDev) {
+            try {
+                await destroyFolder('templates');
+                createRepositoryWithName('templates');
+            } catch (e) {
+                console.log(e.messsage);
+            }
+
         }
         console.log("");
         console.log("");
