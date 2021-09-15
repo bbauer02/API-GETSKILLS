@@ -27,7 +27,7 @@
     {
         sessionHasExam_id: 3,
         sessionUser_id: 3,
-        empowermentTest_id: null
+        empowermentTest_id: 1
     },
     {
         sessionHasExam_id: 4,

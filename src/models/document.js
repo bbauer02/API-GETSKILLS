@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
             doctype: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
+            },
+            comments: {
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         {
@@ -36,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         });
 
     Docs.associate = models => {
-        Docs.belongsTo(models.Institut, {foreignKey: 'institut_id'});
+        Docs.belongsTo(models.Institut, {foreignKey: 'institut_id', sourceKey: 'institut_id', as: 'institut'});
     };
 
     return Docs;

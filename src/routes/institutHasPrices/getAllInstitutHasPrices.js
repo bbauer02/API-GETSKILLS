@@ -1,17 +1,10 @@
-const {models} = require('../../models');
-const {Op} = require('sequelize');
-const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
+const { models } = require('../../models');
+const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
-        // PARAMETERS
-        //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const institutId = parseInt(req.params.institut_id);
-
-        // récupérer tous les exams pour un institut
-        // sequelize.query(`SELECT i.label as 'institut', t.label as 'test', e.label as 'exam', p.price FROM instituts as i INNER JOIN prices_exams as p ON i.institut_id = p.institut_id INNER JOIN exams as e ON p.exam_id = e.exam_id INNER JOIN tests as t ON e.test_id = t.test_id WHERE i.institut_id = ${institutId}`)
-
 
         await models['Test'].findAndCountAll({
             attributes: ['test_id', 'label'],
@@ -21,27 +14,31 @@ module.exports = (app) => {
                 attributes: ['exam_id', 'label'],
                 required: true,
                 include: [{
-                    attributes: ['institut_id', 'label'],
-                    where: {institut_id: institutId},
-                    model: models['Institut'],
+                    model: models['InstitutHasPrices'],
+                    where: { institut_id: institutId },
                     required: true,
+                    include: [{
+                        model: models['Institut'],
+                        attributes: ['institut_id', 'label'],
+                        required: true
+                    }]
                 }]
             }]
         }).then(function (pricesFound) {
             if (pricesFound.length === 0) {
                 const message = `no prices found`;
-                return res.status(500).json({message, data: null})
+                return res.status(500).json({ message, data: null })
             } else {
                 // reconstruction de la réponse
                 return pricesFound.rows.reduce(function (prev, curr) {
                     curr.dataValues.Exams.forEach((exam) => {
-                        let item = {test_id: '', institut_id: '', exam_id: '', price: ''};
+                        let item = { test_id: '', institut_id: '', exam_id: '', price: '' };
                         item.test_id = curr.dataValues.test_id;
-                        item.institut_id = exam.Instituts[0].InstitutHasPrices.institut_id;
-                        item.exam_id = exam.Instituts[0].InstitutHasPrices.exam_id;
-                        item.price = exam.Instituts[0].InstitutHasPrices.price;
-                        item.isAdmin = exam.Instituts[0].InstitutHasPrices.isAdmin;
-                        item.price_id = exam.Instituts[0].InstitutHasPrices.price_id;
+                        item.institut_id = exam.InstitutHasPrices[0].institut_id;
+                        item.exam_id = exam.InstitutHasPrices[0].exam_id;
+                        item.price = exam.InstitutHasPrices[0].price;
+                        item.tva = exam.InstitutHasPrices[0].tva;
+                        item.price_id = exam.InstitutHasPrices[0].price_id;
                         prev = [...prev, item];
                     })
                     return prev;
@@ -49,10 +46,10 @@ module.exports = (app) => {
             }
         }).then(function (pricesFound) {
             const message = `${pricesFound.length} price(s) found`;
-            return res.json({message, data: pricesFound})
+            return res.json({ message, data: pricesFound })
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
-            return res.status(500).json({message, data: error.message})
+            return res.status(500).json({ message, data: error.message })
         })
     });
 }

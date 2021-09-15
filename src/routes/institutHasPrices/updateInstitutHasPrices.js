@@ -3,10 +3,8 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/instituts/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
 
-        // PARAMETERS
-        //TODO: il faudra récupérer l'id de l'institut directement à partir de l'id de l'utilisateur
         const priceId = req.body.price_id;
         const price = req.body.price;
 
