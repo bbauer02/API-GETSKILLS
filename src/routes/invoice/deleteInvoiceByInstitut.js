@@ -1,15 +1,19 @@
 const {models} = require("../../models");
+const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
+
 
 module.exports = (app) => {
-    app.delete('/api/instituts/:institut_id/order/:order_id', async (req, res) => {
+    /**
+     * Suppression des factures possible uniquement par le super admin get-skills
+     */
+    app.delete('/api/invoices/:invoice_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         // constantes
-        const institutId = req.params.institut_id;
-        const orderId = req.params.order_id;
+        const invoiceId = req.params.invoice_id;
 
         try {
 
-            const invoice = await models['Invoice'].findByPk(orderId)
+            const invoice = await models['Invoice'].findByPk(invoiceId)
 
             if(!invoice) {
                 return res.status(500).json({message: "no invoice found", data: null})

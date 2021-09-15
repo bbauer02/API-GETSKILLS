@@ -1,6 +1,7 @@
 ﻿const exams = [
     {
         exam_id: 1,
+        // should be 1 v
         test_id: 2,
         level_id: 1,
         label: "Epreuve écrite",
@@ -15,6 +16,7 @@
     {
         exam_id: 2,
         test_id: 2,
+        // should be 2 v
         level_id: 1,
         label: "Epreuve Orale",
         isWritten: false,

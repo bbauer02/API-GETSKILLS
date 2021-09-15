@@ -61,18 +61,20 @@ require('./src/routes/empowerementTests/findEmpowermentTestsByPk')(app);
 require('./src/routes/empowerementTests/updateEmpowermentTests')(app);
 require('./src/routes/empowerementTests/findEmpowermentTestsByInstituts')(app);
 
-//Institutes
+// Institut
 require('./src/routes/institut/findAllInstituts')(app);
 require('./src/routes/institut/findInstitutByPk')(app);
 require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
-require('./src/routes/institut/addUserInstitut')(app);
-require('./src/routes/institut/deleteUserInstitut')(app);
-require('./src/routes/institut/findInstitutUsers')(app);
-require('./src/routes/institut/findInstitutExaminators')(app);
-require('./src/routes/institut/updateInstitutUser')(app);
-require('./src/routes/institut/findInstitutUser')(app);
+
+// Institut Users
+require('./src/routes/institutUser/addInstitutUser')(app);
+require('./src/routes/institutUser/deleteInstitutUser')(app);
+require('./src/routes/institutUser/findInstitutExaminators')(app);
+require('./src/routes/institutUser/findInstitutUser')(app);
+require('./src/routes/institutUser/findInstitutUsers')(app);
+require('./src/routes/institutUser/updateInstitutUser')(app);
 
 // Levels
 require('./src/routes/level/findAllLevels')(app);
@@ -100,14 +102,16 @@ require('./src/routes/session/createSession')(app);
 require('./src/routes/session/deleteSession')(app);
 require('./src/routes/session/updateSession')(app);
 require('./src/routes/session/updateSessionAdmin')(app);
-require('./src/routes/session/addUserSession')(app);
-require('./src/routes/session/updateUserSession')(app);
 require('./src/routes/session/findAllSessionsByInstituts')(app);
-require('./src/routes/session/findSessionUser')(app);
-require('./src/routes/session/updateSessionUserOption')(app);
-require('./src/routes/session/addSessionUserOption')(app);
-require('./src/routes/session/deleteUserSession')(app);
-require('./src/routes/session/findSessionUsers')(app);
+
+// SessionUsers
+require('./src/routes/sessionUser/addSessionUser')(app);
+require('./src/routes/sessionUser/addSessionUserOption')(app);
+require('./src/routes/sessionUser/deleteSessionUser')(app);
+require('./src/routes/sessionUser/findSessionUser')(app);
+require('./src/routes/sessionUser/findSessionUsers')(app);
+require('./src/routes/sessionUser/updateSessionUser')(app);
+require('./src/routes/sessionUser/updateSessionUserOption')(app);
 
 // SessionHasExams
 require('./src/routes/sessionHasExam/createSessionHasExam')(app);
@@ -138,6 +142,9 @@ require('./src/routes/exam/deleteExam')(app);
 require('./src/routes/exam/updateExam')(app);
 require('./src/routes/exam/findExamByPk')(app);
 
+// Export 
+require('./src/routes/csvItem/exportCsv')(app);
+
 // Account
 require('./src/routes/account/myAccount')(app);
 
@@ -159,16 +166,22 @@ require('./src/routes/documents/createNewDoc')(app);
 require('./src/routes/documents/deleteDoc')(app);
 require('./src/routes/documents/getDocsTypes')(app);
 require('./src/routes/documents/getDocsDatas')(app);
-require('./src/routes/documents/getDocById')(app);
 require('./src/routes/documents/getDoc')(app);
-require('./src/routes/documents/getFacture')(app);
 
 // INVOICES
 require('./src/routes/invoice/getInvoicesByInstitut')(app);
 require('./src/routes/invoice/createInvoiceByInstitut')(app);
 require('./src/routes/invoice/updateInvoiceByInstitut')(app);
 require('./src/routes/invoice/deleteInvoiceByInstitut')(app);
+require('./src/routes/invoice/newInvoice')(app);
+require('./src/routes/invoice/getInvoicePdf')(app);
 
+// csvItems
+require('./src/routes/csvItem/createCsvItem')(app);
+require('./src/routes/csvItem/deleteCsvItem')(app);
+require('./src/routes/csvItem/findCsvItemByTest')(app);
+
+require('./src/routes/documents/testRequete')(app);
 
 app.listen(port, () => {
     console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));

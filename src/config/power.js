@@ -21,7 +21,21 @@ module.exports = (env) => ({
                     default: env.SESSIONS_USER_GET,
                     exams: env.SESSIONS_EXAM_GET
                 },
-                exams: env.SESSIONS_EXAM_GET
+                exams: env.SESSIONS_EXAM_GET,
+                orders: env.INVOICES_GET,
+                documents: {
+                    default: env.DOCUMENTS_GET,
+                    download: env.DOCUMENTS_GET,
+                },
+                exports: env.SESSIONS_EXPORT
+            },
+            documents: {
+                default: env.DOCUMENTS_GET,
+                download: env.DOCUMENTS_GET,
+            },
+            invoices: {
+                default: env.INVOICES_GET,
+                download: env.INVOICES_GET,
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_GET,
@@ -37,20 +51,36 @@ module.exports = (env) => ({
             default: env.ROLES_GET
         },
         sessions: env.SESSIONS_GET,
-        tests: env.TESTS_GET,
+        tests: {
+            default: env.TESTS_GET,
+            csvitems: {
+                default: env.TESTS_CSV_GET,
+                fields: env.TESTS_CSV_GET,
+            },
+        },
         users: {
             default: env.USERS_GET
         },
         options: env.OPTIONS_GET,
         skills: {
             default: env.SKILLS_GET
+        },
+        invoices: {
+            default: env.INVOICES_GET,
+            download: env.INVOICES_GET,
+        },
+        documents: {
+            default: env.DOCUMENTS_GET,
         }
     },
     POST: {
         instituts: {
             default: env.INSTITUTS_POST,
             users: env.INSTITUTS_USERS_POST,
-            docs: env.DOCS_POST,
+            documents: {
+                default: env.DOCUMENTS_POST,
+                upload: env.DOCUMENTS_POST
+            },
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
@@ -59,7 +89,11 @@ module.exports = (env) => ({
             sessions: {
                 default: env.SESSIONS_POST,
                 users: env.INSTITUTS_NEW_USER_POST,
-                exams: env.SESSIONS_EXAM_POST
+                exams: env.SESSIONS_EXAM_POST,
+                exports: env.SESSIONS_EXPORT
+            },
+            invoices: {
+                default: env.INVOICES_POST,
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_POST,
@@ -71,10 +105,17 @@ module.exports = (env) => ({
         levels: env.LEVELS_POST,
         roles: env.ROLES_POST,
         sessions: env.SESSIONS_POST,
-        tests: env.TESTS_POST,
+        tests: {
+            default: env.TESTS_POST,
+            csvitems: env.TESTS_CSV_POST
+        },
         users: env.USERS_POST,
         skills: {
             default: env.SKILLS_POST
+        },
+        documents: {
+            default: env.DOCUMENTS_POST,
+            upload: env.DOCUMENTS_POST
         }
     },
     PUT: {
@@ -94,7 +135,8 @@ module.exports = (env) => ({
                 admin: {
                     default: env.SESSIONS_ADMIN_PUT
                 },
-                exams: env.SESSIONS_EXAM_PUT
+                exams: env.SESSIONS_EXAM_PUT,
+                users: env.SESSIONS_USER_OPTION_PUT
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_PUT,
@@ -106,7 +148,10 @@ module.exports = (env) => ({
                     default: env.SESSIONS_USER_OPTION_PUT,
                     options: env.SESSIONS_USER_OPTION_PUT,
                 }
-            }
+            },
+        invoices: {
+            default: env.INVOICES_PUT,
+        }
         },
         exams: env.EXAMS_PUT,
         countries: env.COUNTRIES_PUT,
@@ -118,6 +163,9 @@ module.exports = (env) => ({
         options: env.OPTIONS_PUT,
         skills: {
             default: env.SKILLS_PUT
+        },
+        invoices: {
+            default: env.INVOICES_PUT,
         }
     },
     DELETE: {
@@ -137,6 +185,9 @@ module.exports = (env) => ({
             sessionexams: {
                 default: env.SESSIONS_EXAM_DELETE,
                 sessionexamexaminators: env.SESSIONS_EXAM_EXAMINATOR_DELETE
+            },
+            documents: {
+                default: env.DOCUMENTS_DELETE
             }
         },
         exams: env.EXAMS_DELETE,
@@ -144,10 +195,19 @@ module.exports = (env) => ({
         levels: env.LEVELS_DELETE,
         roles: env.ROLES_DELETE,
         sessions: env.SESSIONS_DELETE,
-        tests: env.TESTS_DELETE,
+        tests: {
+            default: env.TESTS_DELETE,
+            csvitems: env.TESTS_CSV_DELETE
+        },
         users: env.USERS_DELETE,
         skills: {
             default: env.SKILLS_DELETE
+        },
+        invoices: {
+            default: env.INVOICES_PUT,
+        },
+        documents: {
+            default: env.DOCUMENTS_DELETE
         }
     }
 });

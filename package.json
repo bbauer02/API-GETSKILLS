@@ -10,7 +10,6 @@
   "author": "Bauer Baptiste",
   "license": "ISC",
   "dependencies": {
-    "async-waterfall": "^0.1.5",
     "awesome-unoconv": "^1.0.1",
     "bcrypt": "^5.0.1",
     "cli-progress": "^3.9.0",

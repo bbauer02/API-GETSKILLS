@@ -52,6 +52,7 @@
         Test.hasMany(models.Exam,{foreignKey:'test_id',sourceKey: 'test_id'})
         Test.hasMany(models.empowermentTests,{foreignKey:'test_id', sourceKey:'test_id'});
 
+        Test.hasMany(models.csvItem,{foreignKey:'test_id', sourceKey:'test_id'});
     }
         return Test;  
 }   

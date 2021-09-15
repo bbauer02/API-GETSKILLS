@@ -30,15 +30,14 @@ async function destroyTemporaryFolders () {
 
 /**
  * Obtenir la liste des fichiers PDF créés dans le dossier
- * @param folder
  * @returns {string[]}
  */
-function getFilesIn (folder) {
+function getFilesInTemporaryFolder () {
     try {
-        return fs.readdirSync(folder)
+        return fs.readdirSync(path.join(__dirname, 'temporary'))
     } catch (err) {
         throw new Error('Error on get PDF from temporary folder : ' + err.message)
     }
 }
 
-module.exports = {getFilesIn, destroyTemporaryFolders, createRepository}
+module.exports = {getFilesInTemporaryFolder, destroyTemporaryFolders, createRepository}

@@ -743,4 +743,4 @@ const initDB = async (sequelize) => {
     }
 }
 
-module.exports = { initDB, models }
+module.exports = {initDB, models}
