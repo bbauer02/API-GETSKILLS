@@ -37,6 +37,7 @@
         empowermentTests.belongsTo(models.Institut,{foreignKey:'institut_id', sourceKey:'institut_id' });
         empowermentTests.belongsTo(models.Test,{foreignKey:'test_id', sourceKey:'test_id'});
         empowermentTests.belongsTo(models.User,{foreignKey:'user_id', sourceKey:'user_id'});
+        empowermentTests.hasMany(models.sessionExamHasExaminator, { foreignKey: 'empowermentTest_id', sourceKey: 'empowermentTest_id' });
     };
 
     return empowermentTests;

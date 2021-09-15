@@ -31,7 +31,7 @@ module.exports = (app) => {
         },
         {
             model: models['Test'],
-            attributes: ["label"]
+            attributes: ["label", "test_id"]
         }];
 
 

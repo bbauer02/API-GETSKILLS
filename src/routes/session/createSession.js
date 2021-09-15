@@ -10,8 +10,8 @@ module.exports = (app) => {
 
                 // Ici le req.body contient deux objects, un avec les infos de la session
                 // et un autre contenant toutes les info des sessionHasUser (adresse et heure épreuves)
-                // req.body.session et req.body.sessionHasExams
-                const SessionCreated = await models['Session'].create(req.body.session[0]);
+                // req.body.session et req.body.examsForSessionCreate
+                const SessionCreated = await models['Session'].create(req.body.session);
                 return SessionCreated;
 
             } catch (error) {
@@ -26,6 +26,8 @@ module.exports = (app) => {
             }
         }
 
+        // unused
+        /*
         async function findAllSessionExams() {
             try {
 
@@ -47,6 +49,7 @@ module.exports = (app) => {
                 return res.status(500).json({ message, data: error.message })
             }
         }
+        */
 
         // Unused et pas fonctionnel
         // Check le role des users_id si > 1 pour être examinateur
@@ -96,23 +99,23 @@ module.exports = (app) => {
         }
         */
 
-        async function postAllSessionHasExam() {
+        async function postAllSessionHasExam(_sessionCreated) {
             try {
 
                 let sessionHasExamsForCreate = [];
 
-                req.body.sessionHasExams.forEach((exam, index) => {
+                Object.values(req.body.examsForSessionCreate).map((exam, index) => {
                     sessionHasExamsForCreate[index] = {};
                     // exam_id
-                    sessionHasExamsForCreate[index].exam_id = req.body.sessionHasExams[index].exam_id;
-                    // user_id pour examinateur
-                    sessionHasExamsForCreate[index].user_id = req.body.sessionHasExams[index].user_id;
+                    sessionHasExamsForCreate[index].exam_id = exam.exam_id;
                     // session_id
-                    sessionHasExamsForCreate[index].session_id = req.body.sessionHasExams[index].session_id;
+                    sessionHasExamsForCreate[index].session_id = _sessionCreated.dataValues.session_id;
                     // adresse de l'épreuve
-                    sessionHasExamsForCreate[index].adressExam = req.body.sessionHasExams[index].adressExam;
+                    sessionHasExamsForCreate[index].adressExam = exam.adressExam;
+                    // salle de l'épreuve
+                    sessionHasExamsForCreate[index].room = exam.room;
                     // date et heure de l'épreuve
-                    sessionHasExamsForCreate[index].DateTime = req.body.sessionHasExams[index].DateTime;
+                    sessionHasExamsForCreate[index].DateTime = exam.DateTime;
                 });
 
                 await models['sessionHasExam'].bulkCreate(sessionHasExamsForCreate);
@@ -132,9 +135,9 @@ module.exports = (app) => {
         try {
 
             const sessionCreated = await createSession();
-            const allExamsFromSession = await findAllSessionExams();
+            // const allExamsFromSession = await findAllSessionExams();
             // await checkAllExaminatorForEachExam();
-            await postAllSessionHasExam();
+            await postAllSessionHasExam(sessionCreated);
 
             const message = `Session id : ${sessionCreated.dataValues.session_id} and all the sessionHasExam have been created.`;
             res.json({ message, data: sessionCreated })

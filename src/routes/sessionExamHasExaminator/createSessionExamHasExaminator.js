@@ -3,14 +3,16 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/sessions/:session_id/exams', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/sessionexams/:session_has_exam_id/sessionexamexaminators', 
+    isAuthenticated, isAuthorized, async (req, res) => {
 
-
-        async function createSessionHasExam() {
+        async function createSessionExamHasExaminator() {
             try {
 
-                const SessionHasExamCreated = await models['sessionHasExam'].create(req.body);
-                return SessionHasExamCreated;
+                delete req.body.sessionExamHasExaminator_id;
+            
+                const SessionExamHasExaminatorCreated = await models['sessionExamHasExaminator'].create(req.body);
+                return SessionExamHasExaminatorCreated;
 
             } catch (error) {
                 if (error instanceof ValidationError) {
@@ -26,9 +28,9 @@ module.exports = (app) => {
 
         try {
 
-            const SessionHasExamCreated = await createSessionHasExam();
-            const message = `SessionHasExam with id ${SessionHasExamCreated.dataValues.sessionHasExam_id} has been created !`;
-            res.json({ message, data: SessionHasExamCreated });
+            const SessionExamHasExaminatorCreated = await createSessionExamHasExaminator();
+            const message = `SessionHasExam with id ${SessionExamHasExaminatorCreated.sessionExamHasExaminator_id} has been created !`;
+            res.json({ message, data: SessionExamHasExaminatorCreated });
 
         } catch (error) {
             const message = `An error has occured.`;

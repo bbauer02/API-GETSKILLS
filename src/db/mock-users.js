@@ -76,27 +76,3 @@
     }
 ];
 module.exports = users;
-/* JSON GENERATOR
-[
-    '{{repeat(100)}}',
-    {
-      role_id: '{{integer(1, 5)}}',
-      login: '{{surname().toUpperCase()}}',
-      password:'{{surname()}}{{integer(0, 9)}}{{integer(0, 9)}}{{integer(0, 9)}}',
-      email: '{{email()}}',
-      phone: '+1 {{phone()}}',
-      civility:'{{integer(1, 3)}}',
-      gender : '{{integer(1, 2)}}',
-      firstname: '{{firstName()}}',
-      lastname: '{{surname()}}',
-      adress1:'{{integer(100, 999)}} {{street()}}, {{city()}}, {{state()}}',
-      adress2:'',
-      zipcode:'{{integer(100, 10000)}}',
-      city:'{{city()}}',
-      country_id:'{{integer(1, 249)}}',
-      birthday:'{{date(new Date(1940, 0, 1),new Date(2001, 0, 1), "YYYY-MM-dd")}}',
-      nationality_id:'{{integer(1, 249)}}',
-      firstlanguage_id:'{{integer(1, 249)}}'
-      
-    }
-  ]*/

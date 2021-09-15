@@ -17,6 +17,7 @@ module.exports =  (app) => {
                 }
                 parameters.limit = limit;
             }
+            
             // Parameter : OFFSET
             if(req.query.offset) {
                 const offset = parseInt(req.query.offset);       
@@ -26,10 +27,12 @@ module.exports =  (app) => {
                 }
                 parameters.offset = parseInt(req.query.offset);
             }
+
             parameters.attributes = {exclude:['password']};
             parameters.include = [
                 {
-                    model: models['Role']
+                    model: models['Role'],
+                    where: {}
                 },
                 {
                     
@@ -56,6 +59,12 @@ module.exports =  (app) => {
                     }]
                 }
             ];
+
+            // Parameter examinators
+            if(req.query.examinators === "true") {
+                parameters.include[0].where.power = { [Op.gt]: 1 }
+            }
+
             const Users = await models['institutHasUser'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;
             res.json({message, data: Users.rows});
