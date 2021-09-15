@@ -169,6 +169,35 @@ const initDB = async (sequelize) => {
             console.log(_colors.green("OK"));
         }         
 
+        /** 
+            CREATION D'UN UTILISATEUR PAR DEFAULT
+        */
+        if(!isDev) {
+            await models['User'].create({
+                login: "admin", 
+                password: await bcrypt.hash('admin', 2),
+                email: "contact@get-skills.online",
+                phone: "",
+                gender: 1,
+                civility: 1,
+                firstname: "Admin",
+                lastname: "Get-skills",
+                adress1: "place de l'église",
+                adress2: "",
+                zipcode: "02000",
+                city: "URCEL",
+                country_id: 76,
+                birthday: new Date(),
+                nationality_id: 76,
+                firstlanguage_id: 76,
+                systemRole_id: 5
+            });
+            console.log(_colors.red("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
+            console.log(_colors.red("!!!!!!! CREATION DE L'UTILISATEUR 'admin'. Modifiez le mot de passe par default !!!!!!!"));
+            console.log(_colors.red("!!!!!!!              identifiant: 'admin'   mot de passe: 'admin'               !!!!!!!"));
+            console.log(_colors.red("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
+            console.log(_colors.green("OK"));
+        }
         /**
          * 
          * DEV MODE ONLY : AJOUT DU SET DE DONNEES
