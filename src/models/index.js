@@ -766,13 +766,13 @@ const initDB = async (sequelize) => {
                     }
                     if(!listSessionUserOption.find(({exam_id,sessionUser_id}) => sessionUser_id === sessionUserId && exam_id ===ExamSession.exam_id)) {
                         const adress = faker.address.streetAddress() + " " +  faker.address.zipCode() + " " + faker.address.city();
-                        
+                        const isCandidate  = !listExam.find(({exam_id}) => exam_id === ExamSession.exam_id).isOption;
                         listSessionUserOption.push({
                             exam_id: ExamSession.exam_id,
                             user_price: userPrice,
                             addressExam: adress,
                             DateTime: faker.date.future(),
-                            isCandidate: false,
+                            isCandidate: isCandidate,
                             sessionUser_id: sessionUserId
                         });
                     }
