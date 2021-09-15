@@ -16,6 +16,7 @@ const levels = require('../db/mock-levels');
 const tests = require('../db/mock-tests');
 const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
+const itemsCsv = require('../db/mock-items_csv');
 const _colors = require('colors');
 
 const progressBar = (label,length) => {
@@ -168,18 +169,33 @@ const initDB = async (sequelize) => {
             console.log(_colors.green("OK"));
         }         
 
-
         /**
          * 
          * DEV MODE ONLY : AJOUT DU SET DE DONNEES
          * 
          */
 
-        
         if(isDev) {
             console.log("");
             console.log('\x1b[36m%s\x1b[0m',"## Ajout du jeu de données test ....");
-        
+            /**
+             * FILL TABLE 'csv_items'
+             */                             
+            const barItemCsv =progressBar('#Ajout des items CSV......................... ', itemsCsv.length);
+            const listItemsCsv = [];
+            for (const item of itemsCsv) {
+                listItemsCsv.push({
+                    csvItem_id : item.csvItem_id,
+                    field: item.field,
+                    label: item.label,
+                    inLine: item.inLine,
+                    test_id: item.test_id
+                });
+                barItemCsv.increment();
+            }
+            barItemCsv.stop();
+            await models['csvItem'].bulkCreate(listItemsCsv);
+            console.log(_colors.green("OK"));
             /**
              * FILL TABLE 'instituts' 
              */                              
@@ -233,6 +249,10 @@ const initDB = async (sequelize) => {
                 });
                 barUsers.increment();
             }
+
+            /**
+             * FILL TABLE 'users' utilisateur  test 'fixe' pour les MDP
+             */
             // Ajouts des utisateurs aléatoires
             
             for (let index = 1; index <= nbRandomUsers; index++) {
@@ -732,9 +752,6 @@ const initDB = async (sequelize) => {
             await models['sessionUserOption'].bulkCreate(listSessionUserOption);
             console.log(_colors.green("OK"));
         }
-            
-        
-
         console.log("");
         console.log("");
         console.log(_colors.green("API en écoute ..."));
