@@ -1,5 +1,6 @@
 ﻿const instituts = [
     {
+        institut_id: 1,
         label: "Institut Français",
         adress1: "123 rue du Général Degaule",
         adress2: "",
@@ -12,6 +13,7 @@
         socialNetwork: ["facebook","twitter","instagram","linkedin"]
     },
     {
+        institut_id: 2,
         label: "Tenri Japanese School",
         adress1: "456bis Avenue Jules Brunet",
         adress2: "Apt 15B - Bât 12",

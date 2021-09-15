@@ -8,7 +8,7 @@ const cors = require('cors');
 const port = process.env.PORT || 3003;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
-
+const _colors = require('colors');
 
 app
     .use(express.urlencoded({extended: true}))
@@ -19,8 +19,12 @@ app
     .use(cookieParser())
     .use(fileUpload())
 
+
 // Initialisation de la BDD
 models.initDB(sequelize);
+
+
+
 app.get('/', (req, res) => {
     res.json('Hello, API ! ');
 });
@@ -179,4 +183,10 @@ require('./src/routes/csvItem/findCsvItemByTest')(app);
 
 require('./src/routes/documents/testRequete')(app);
 
-app.listen(port, () => console.log(`***********************************************************\n*   API GET-TESTED.ONLINE est démarrée : localhost:${port}   *\n***********************************************************`));
+app.listen(port, () => {
+    console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+    console.log(_colors.yellow(`~ API GET-TESTED.ONLINE est démarrée sur le port : `) + _colors.green(`${port}`));
+    console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+    console.log(_colors.yellow("En mode : ") + _colors.green(process.env.NODE_ENV.toUpperCase()));
+});   
+

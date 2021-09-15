@@ -20,7 +20,7 @@ if(process.env.NODE_ENV==='production') {
                 }
             }
             ,
-            logging:true
+            logging:false
         }
     )
 }
@@ -41,7 +41,7 @@ else {
                 }
             }
             ,
-            logging:true
+            logging:false
         }
     )
 }
