@@ -782,20 +782,12 @@ const initDB = async (sequelize) => {
             barUserOption.stop();
             await models['sessionUserOption'].bulkCreate(listSessionUserOption);
             console.log(_colors.green("OK"));
+
+            // Suppression des Templates
+            await destroyFolder('templates');
+            createRepositoryWithName('templates');
         }
 
-        /**
-         * DEV MODE ONLY : suppression des templates odt
-         */
-        if(isDev) {
-            try {
-                await destroyFolder('templates');
-                createRepositoryWithName('templates');
-            } catch (e) {
-                console.log(e.messsage);
-            }
-
-        }
         console.log("");
         console.log("");
         console.log(_colors.green("API en écoute ..."));
