@@ -298,7 +298,7 @@ const initDB = async (sequelize) => {
                     }),
                     civility: faker.datatype.number({
                         'min': 1,
-                        'max': 3
+                        'max': 2
                     }),
                     firstname: faker.name.firstName(),
                     lastname: faker.name.lastName(),
