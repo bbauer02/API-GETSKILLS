@@ -458,20 +458,22 @@ const initDB = async (sequelize) => {
                 });
                 
                 // On récupére l'institut ID de cette session
-            const sessionInstitutId = listSession.find(({session_id}) => session_id == sessionId).institut_id;
-
+            const {institut_id, placeAvailable} = listSession.find(({session_id}) => session_id == sessionId);
             // On récupére un identifiant d'utilisateur
             const userId = faker.datatype.number({
                     'min': 1,
                     'max': users.length + nbRandomUsers - 1
                 });
-
+                // On vérifie la session de soit pas complete.
+                
                 // on verifie que l'utilisateur n'est pas déjà inscris dans la session
-                isSubscribed = listSessionsUsers.find(({user_id, session_id}) => user_id === userId && session_id === sessionId);
+                const isSubscribed = listSessionsUsers.find(({user_id, session_id}) => user_id === userId && session_id === sessionId);
+                const sessionUsers = listSessionsUsers.filter(({session_id}) => session_id === sessionId);
+                const isSessionFull = sessionUsers.length === placeAvailable ? true : false;
             // On vérifie que l'utilisateur est membre de l'institut
-            isInstitutMember = institutHasUserList.find( ({ user_id , institut_id}) => user_id === userId && institut_id === sessionInstitutId );          
+            isInstitutMember = institutHasUserList.find( ({ user_id , institut_id}) => user_id === userId && institut_id === institut_id );          
             // Si l'utilisateur est membre de l'institut, alors on l'ajoute dans la session de l'utilisateur
-            if(isInstitutMember && !isSubscribed ) {
+            if( isInstitutMember && !isSessionFull && !isSubscribed ) {
                     listSessionsUsers.push({
                         sessionUser_id : sessionUser_id,
                         session_id: sessionId,
