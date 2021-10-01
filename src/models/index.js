@@ -681,13 +681,12 @@ const initDB = async (sequelize) => {
             const barEmpowermentExaminator =progressBar('#Assignation des examinateurs................ ', listSessionsUsers.length );
             
             for(const sessionHasUser of listSessionsUsers) {
-                const { sessionUser_id, session_id } = sessionHasUser;
-                const sessionHasExam = listsessionHasExam.filter(({session_id}) => session_id === session_id);
-                const { institut_id, test_id } = listSession.find(({session_id}) => session_id === session_id);
-                const empowerment_test = listEmpowerment.filter(({institut_id, test_id}) => institut_id===institut_id && test_id===test_id);
+                const sessionHasExam = listsessionHasExam.filter(({session_id}) => session_id === sessionHasUser.session_id);
+                const session = listSession.find(({session_id}) => session_id === sessionHasUser.session_id);
+                const empowerment_test = listEmpowerment.filter(({institut_id, test_id}) => institut_id===session.institut_id && test_id===session.test_id);
                 
                 for(const sessionExam of sessionHasExam) {
-                    const isExist = listExamExaminator.find(({sessionHasExam_id,sessionUser_id}) => sessionHasExam_id===sessionExam.sessionHasExam_id && sessionUser_id === sessionUser_id);
+                    const isExist = listExamExaminator.find(({sessionHasExam_id,sessionUser_id}) => sessionHasExam_id===sessionExam.sessionHasExam_id && sessionUser_id === sessionHasUser.sessionUser_id);
                     
                     if(!isExist) {
                     let empowermentTestId = faker.datatype.number({
@@ -699,7 +698,7 @@ const initDB = async (sequelize) => {
                         listExamExaminator.push({
                             sessionExamHasExaminator_id: sessionExamHasExaminator_id,
                             sessionHasExam_id: sessionExam.sessionHasExam_id,
-                            sessionUser_id: sessionUser_id,
+                            sessionUser_id: sessionHasUser.sessionUser_id,
                             empowermentTest_id: empowermentTestId
                         });
                         sessionExamHasExaminator_id++;
