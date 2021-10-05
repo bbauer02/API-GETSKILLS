@@ -751,7 +751,9 @@ const initDB = async (sequelize) => {
             for(const sessionUser of listSessionsUsers) {
                 const sessionUserId = sessionUser.sessionUser_id;
                 const listExamBySessionId = listsessionHasExam.filter(({session_id}) => session_id === sessionUser.session_id);
+
                 for(const ExamSession of listExamBySessionId) {
+                    let tva = null;
                     let userPrice = faker.datatype.number({
                         'min': 0,
                         'max': 3
@@ -764,6 +766,10 @@ const initDB = async (sequelize) => {
                             'min': 200,
                             'max': 1000
                         });
+                        tva = faker.datatype.number({
+                            'min': 10,
+                            'max': 22
+                        });
                     }
                     if(!listSessionUserOption.find(({exam_id,sessionUser_id}) => sessionUser_id === sessionUserId && exam_id ===ExamSession.exam_id)) {
                         const adress = faker.address.streetAddress() + " " +  faker.address.zipCode() + " " + faker.address.city();
@@ -772,6 +778,7 @@ const initDB = async (sequelize) => {
                             exam_id: ExamSession.exam_id,
                             user_price: userPrice,
                             addressExam: adress,
+                            tva: tva,
                             DateTime: faker.date.future(),
                             isCandidate: isCandidate,
                             sessionUser_id: sessionUserId
