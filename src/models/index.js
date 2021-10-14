@@ -310,6 +310,10 @@ const initDB = async (sequelize) => {
                         'min': 1,
                         'max': countries.length
                     }),
+                    nativeCountry_id: faker.datatype.number({
+                        'min': 1,
+                        'max': countries.length
+                    }),
                     birthday: faker.date.between('1950-01-01', '2002-12-31'),
                     nationality_id: faker.datatype.number({
                         'min': 1,
