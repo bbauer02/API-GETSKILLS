@@ -1,7 +1,8 @@
 ﻿const jwt = require('jsonwebtoken');
 const ENV = require('dotenv').config().parsed;
 const { models } = require('../models');
-const { token: config, power } = require('../config');
+const { power } = require('../config');
+const config = require('../../config.prod');
 const crypto = require('crypto');
 
 
@@ -18,12 +19,12 @@ module.exports = {
             systemRole: userData.systemRole,
             xsrfToken
         },
-            config.accessToken.secret,
+            config.jw.accessToken.secret,
             {
-                algorithm: config.accessToken.algorithm,
-                audience: config.accessToken.audience,
-                expiresIn: config.accessToken.expiresIn / 1000,
-                issuer: config.accessToken.issuer,
+                algorithm: config.jw.accessToken.algorithm,
+                audience: config.jw.accessToken.audience,
+                expiresIn: config.jw.accessToken.expiresIn / 1000,
+                issuer: config.jw.accessToken.issuer,
                 subject: userData.user_id.toString()
             });
         const refreshToken = crypto.randomBytes(128).toString('base64');
@@ -31,7 +32,7 @@ module.exports = {
         await models['RefreshToken'].create({
             userId: userData.user_id,
             token: refreshToken,
-            expiresAt: Date.now() + config.refreshToken.expiresIn
+            expiresAt: Date.now() + config.jw.refreshToken.expiresIn
         });
 
 
@@ -54,8 +55,8 @@ module.exports = {
                 }
                 const xsrfToken = headers['x-xsrf-token'];
                 // On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer
-                const decodedToken = await jwt.verify(accessToken, config.accessToken.secret, {
-                    algorithms: config.accessToken.algorithm
+                const decodedToken = await jwt.verify(accessToken, config.jw.accessToken.secret, {
+                    algorithms: config.jw.accessToken.algorithm
                 });
                 /* On vérifie que le token CSRF correspond à celui présent dans le JWT  */
                 if (xsrfToken !== decodedToken.xsrfToken) {

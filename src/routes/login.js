@@ -1,7 +1,7 @@
 ﻿const {models} = require('../models');
 const bcrypt = require('bcrypt');
 const jwtUtils = require('../auth/jwt.utils');
-const { token: config } = require('../config');
+const config = require('../../config.prod');
 
 module.exports = (app) => {
     app.post('/api/login',async (req, res) => {
@@ -96,24 +96,24 @@ module.exports = (app) => {
             res.cookie('access_token',accessToken, {
                 httpOnly: true,
                 secure: true,
-                maxAge: config.accessToken.expiresIn
+                maxAge: config.jw.accessToken.expiresIn
             })
 
             // 11. On créer le cookie contenant le refresh token 
             res.cookie('refresh_token', refreshToken, {
                 httpOnly: true,
                 secure: true,
-                maxAge: config.refreshToken.expiresIn,
+                maxAge: config.jw.refreshToken.expiresIn,
                 path: '/token'
             });
 
             return res.json(
                 {
                     accessToken,
-                    tokenType: config.accessToken.type,
-                    accessTokenExpiresIn: config.accessToken.expiresIn,
+                    tokenType: config.jw.accessToken.type,
+                    accessTokenExpiresIn: config.jw.accessToken.expiresIn,
                     refreshToken,
-                    refreshTokenExpiresIn: config.refreshToken.expiresIn,
+                    refreshTokenExpiresIn: config.jw.refreshToken.expiresIn,
                     xsrfToken,
                     message, 
                     user

@@ -1,6 +1,5 @@
 ﻿const dotenv = require('dotenv');
 const dotenvParseVariables = require('dotenv-parse-variables');
-const token = require('./token');
 const power = require('./power');
 
 let env = dotenv.config({});
@@ -12,6 +11,5 @@ env = dotenvParseVariables(env.parsed);
  * @module config
  */
 module.exports = {
-  token: token(env),
   power: power(env)
 };
