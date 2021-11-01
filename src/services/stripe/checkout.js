@@ -15,7 +15,7 @@ async function createCheckoutSession(req, res) {
       mode: 'payment',
       line_items,
       customer_email,
-      metadata,
+      metadata : { "TEST" : "TEST" },
       success_url: `${domainUrl}/auth/register/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${domainUrl}/auth/register/canceled`
     });

@@ -1,11 +1,11 @@
 require('./crons');
-
+const config = require('./config.prod');
 const express = require('express');
 const sequelize = require('./src/db/sequelize');
 const models = require('./src/models');
 const app = express();
 const cors = require('cors');
-const port = process.env.PORT || 3003;
+const port = config.port | 3003;
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const _colors = require('colors');
@@ -22,8 +22,6 @@ app
 
 // Initialisation de la BDD
 models.initDB(sequelize);
-
-
 
 app.get('/', (req, res) => {
     res.json('Hello, API ! ');
