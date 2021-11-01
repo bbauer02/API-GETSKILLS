@@ -121,6 +121,14 @@ module.exports = (sequelize, DataTypes) => {
                 notNull: {msg: `User:birthday cannot be NULL!`}
             }
         },
+        nativeCountry_id: {
+            type: DataTypes.INTEGER,
+            allowNull:true,
+            validate : {
+                notEmpty:{msg: `User:nativeCountry_id cannot be empty !`}
+            }
+            
+        },
         nationality_id: {
             type: DataTypes.INTEGER,
             allowNull:true,
@@ -161,8 +169,13 @@ module.exports = (sequelize, DataTypes) => {
     });
     User.associate = models => {
 
+
         User.belongsTo(models.Country,{as: 'country',foreignKey:'country_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        User.belongsTo(models.Country,{as: 'nativeCountry',foreignKey:'nativeCountry_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        
         User.belongsTo(models.Country,{as: 'nationality',foreignKey:'nationality_id',sourceKey: 'country_id', timestamps: false,onDelete:'SET NULL'});
+        
+        
         User.belongsTo(models.Language,{as: 'firstlanguage',foreignKey:'firstlanguage_id',timestamps: false,onDelete:'SET NULL'});
         User.belongsTo(models.Role,{as:'systemRole',foreignKey:'systemRole_id',sourceKey: 'role_id'});
 

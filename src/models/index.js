@@ -189,6 +189,7 @@ const initDB = async (sequelize) => {
                 zipcode: "02000",
                 city: "URCEL",
                 country_id: 76,
+                nativeCountry_id: 76,
                 birthday: new Date(),
                 nationality_id: 76,
                 firstlanguage_id: 76,
@@ -273,6 +274,7 @@ const initDB = async (sequelize) => {
                     zipcode: user.zipcode,
                     city: user.city,
                     country_id: user.country_id,
+                    nativeCountry_id: user.country_id,
                     birthday: user.birthday,
                     nationality_id: user.nationality_id,
                     firstlanguage_id: user.firstlanguage_id,
@@ -307,6 +309,10 @@ const initDB = async (sequelize) => {
                     zipcode: faker.address.zipCode(),
                     city: faker.address.city(),
                     country_id: faker.datatype.number({
+                        'min': 1,
+                        'max': countries.length
+                    }),
+                    nativeCountry_id: faker.datatype.number({
                         'min': 1,
                         'max': countries.length
                     }),
@@ -681,13 +687,12 @@ const initDB = async (sequelize) => {
             const barEmpowermentExaminator =progressBar('#Assignation des examinateurs................ ', listSessionsUsers.length );
             
             for(const sessionHasUser of listSessionsUsers) {
-                const { sessionUser_id, session_id } = sessionHasUser;
-                const sessionHasExam = listsessionHasExam.filter(({session_id}) => session_id === session_id);
-                const { institut_id, test_id } = listSession.find(({session_id}) => session_id === session_id);
-                const empowerment_test = listEmpowerment.filter(({institut_id, test_id}) => institut_id===institut_id && test_id===test_id);
+                const sessionHasExam = listsessionHasExam.filter(({session_id}) => session_id === sessionHasUser.session_id);
+                const session = listSession.find(({session_id}) => session_id === sessionHasUser.session_id);
+                const empowerment_test = listEmpowerment.filter(({institut_id, test_id}) => institut_id===session.institut_id && test_id===session.test_id);
                 
                 for(const sessionExam of sessionHasExam) {
-                    const isExist = listExamExaminator.find(({sessionHasExam_id,sessionUser_id}) => sessionHasExam_id===sessionExam.sessionHasExam_id && sessionUser_id === sessionUser_id);
+                    const isExist = listExamExaminator.find(({sessionHasExam_id,sessionUser_id}) => sessionHasExam_id===sessionExam.sessionHasExam_id && sessionUser_id === sessionHasUser.sessionUser_id);
                     
                     if(!isExist) {
                     let empowermentTestId = faker.datatype.number({
@@ -699,7 +704,7 @@ const initDB = async (sequelize) => {
                         listExamExaminator.push({
                             sessionExamHasExaminator_id: sessionExamHasExaminator_id,
                             sessionHasExam_id: sessionExam.sessionHasExam_id,
-                            sessionUser_id: sessionUser_id,
+                            sessionUser_id: sessionHasUser.sessionUser_id,
                             empowermentTest_id: empowermentTestId
                         });
                         sessionExamHasExaminator_id++;
@@ -752,7 +757,9 @@ const initDB = async (sequelize) => {
             for(const sessionUser of listSessionsUsers) {
                 const sessionUserId = sessionUser.sessionUser_id;
                 const listExamBySessionId = listsessionHasExam.filter(({session_id}) => session_id === sessionUser.session_id);
+
                 for(const ExamSession of listExamBySessionId) {
+                    let tva = null;
                     let userPrice = faker.datatype.number({
                         'min': 0,
                         'max': 3
@@ -765,6 +772,10 @@ const initDB = async (sequelize) => {
                             'min': 200,
                             'max': 1000
                         });
+                        tva = faker.datatype.number({
+                            'min': 10,
+                            'max': 22
+                        });
                     }
                     if(!listSessionUserOption.find(({exam_id,sessionUser_id}) => sessionUser_id === sessionUserId && exam_id ===ExamSession.exam_id)) {
                         const adress = faker.address.streetAddress() + " " +  faker.address.zipCode() + " " + faker.address.city();
@@ -773,6 +784,7 @@ const initDB = async (sequelize) => {
                             exam_id: ExamSession.exam_id,
                             user_price: userPrice,
                             addressExam: adress,
+                            tva: tva,
                             DateTime: faker.date.future(),
                             isCandidate: isCandidate,
                             sessionUser_id: sessionUserId
