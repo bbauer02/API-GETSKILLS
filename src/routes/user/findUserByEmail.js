@@ -1,8 +1,8 @@
 ﻿const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/users/email', isAuthenticated, isAuthorized, async (req, res) => {
 
+    app.get('/api/instituts/:institut_id/users/email',isAuthenticated, isAuthorized,  async (req, res) => {
 
         // Cherche l'utilisateur
         async function findUser() {
@@ -125,7 +125,7 @@ module.exports = (app) => {
         } catch (error) {
             const message = `An error has occured .`;
             return res.status(500).json({ message, data: error.message })
-        }
+        } 
 
     });
 }

@@ -9,7 +9,6 @@ module.exports =  (app) => {
       //const countArgs = Object.keys(req.query).length;
       const parameters = {};
       // Parameter : LABEL ET REF
-      console.log(req.query.archive)
       if(req.query.label && req.query.ref) {
         parameters.where = {
           [Op.or]: [

@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
                 args : true,
                 msg: 'User:Email already exist!'
             }
-        },
+        }, 
         phone: {
             type: DataTypes.STRING,
             allowNull:true
@@ -115,11 +115,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         birthday: {
             type: DataTypes.DATEONLY,
-            allowNull:false,
-            validate : {
-                notEmpty:{msg: `User:birthday cannot be empty !`},
-                notNull: {msg: `User:birthday cannot be NULL!`}
-            }
+            allowNull:true,
+            
         },
         nativeCountry_id: {
             type: DataTypes.INTEGER,

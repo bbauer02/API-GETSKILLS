@@ -51,6 +51,7 @@ require('./src/routes/user/findAllUsers')(app);
 require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
+require('./src/routes/user/findUserByEmailOrLogin')(app);
 
 // UserEmpowerment
 require('./src/routes/empowerementTests/createEmpowerementTests')(app);
@@ -65,6 +66,7 @@ require('./src/routes/institut/findInstitutByPk')(app);
 require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
+require('./src/routes/institut/subscribeInstitut')(app);
 
 // Institut Users
 require('./src/routes/institutUser/addInstitutUser')(app);
