@@ -6,6 +6,7 @@ const cliProgress = require('cli-progress');
 const filebasename = path.basename(__filename);
 const models = {};
 
+ 
 // Jeux de données
 var faker = require('faker');
 
@@ -244,7 +245,8 @@ const initDB = async (sequelize) => {
                     email: institut.email,
                     siteweb: institut.siteweb,
                     phone: institut.phone,
-                    socialNetwork: institut.socialNetwork
+                    socialNetwork: institut.socialNetwork,
+                    stripeId: institut.stripeId
                 });
                 barInstituts.increment();
             }

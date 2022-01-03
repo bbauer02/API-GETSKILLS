@@ -9,6 +9,9 @@ module.exports = (env) => ({
                 },
                 empowermentTests: env.INSTITUTS_EXAMINATORS_GET
             },
+            stripeaccountlink: {
+                generate: env.INSTITUTS_STRIPEACCOUNTLINK_GET
+            },
             docs: env.SKILLS_GET,
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_GET

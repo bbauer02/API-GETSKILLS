@@ -86,7 +86,16 @@ module.exports = (sequelize, DataTypes) => {
             set(val) {
                 this.setDataValue('socialNetwork', val.join(';'));
             }
-        }
+        },
+        stripeId: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        stripeActivated: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false        
+        },
     },
         {
             tableName: 'instituts',

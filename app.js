@@ -67,6 +67,7 @@ require('./src/routes/institut/createInstitut')(app);
 require('./src/routes/institut/updateInstitut')(app);
 require('./src/routes/institut/deleteInstitut')(app);
 require('./src/routes/institut/subscribeInstitut')(app);
+require('./src/routes/institut/generateStripeAccountLink')(app);
 
 // Institut Users
 require('./src/routes/institutUser/addInstitutUser')(app);

@@ -117,20 +117,19 @@ module.exports = {
             // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
             // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
             let userMemberOfInstitut = null;
-            
             let userPower = 0;
             // console.log("\n\nentriesPoints==", entriesPoints,"\n\n");
             if (moduleName === 'instituts') {
                 // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
-                const reqInstitut_id = req.params.institut_id || req.body.institut_id || null;
+                const reqInstitut_id = req.params.institut_id || req.body.institut_id || req.query.institut_id || null;
                 if (reqInstitut_id) {
+                    
                     // on cherche dans le token de connexion l'objet relatif à l'identifiant de l'institut concerné. 
                     userMemberOfInstitut = decodedToken.instituts.find(({ institut_id }) => institut_id === parseInt(reqInstitut_id));
                     // on récupére le userPower
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
                 }
             }
-
             if (userPower >= powerNeed) {
                 return next();
             }
@@ -170,17 +169,16 @@ module.exports = {
             }
             return obj;
         }, {})[firstEntry];
-
         if(!entries.length) {
             if(typeof filtered === 'object') {
-            if(filtered.default) {
-                return filtered.default;
+                if(filtered.default) {
+                    return filtered.default;
+                }
+                else {
+                    return defaultPowerNeeded;
+                }
             }
-            else {
-            return defaultPowerNeeded;
-            }
-        }
-        else return filtered;
+            else return filtered;
         }
         return module.exports.getPowerNeed(filtered,entries, defaultPowerNeeded);
 

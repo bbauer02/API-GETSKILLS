@@ -10,7 +10,8 @@
         email: "contact@institut-france.com",
         siteweb: 'www.institut-france.fr',
         phone: '+33123456789',
-        socialNetwork: ["facebook","twitter","instagram","linkedin"]
+        socialNetwork: ["facebook","twitter","instagram","linkedin"],
+        stripeId: 'acct_1KDwc62HEKyn2oIX'
     },
     {
         institut_id: 2,
@@ -23,7 +24,8 @@
         email: "contact@tenri.co.jp",
         siteweb: 'www.tenri.co.jp',
         phone: '+9874561230',
-        socialNetwork: ["facebook","twitter","instagram","linkedin"]
+        socialNetwork: ["facebook","twitter","instagram","linkedin"],
+        stripeId: 'acct_1KDwc62HEKyn2oIX'
     }
 ];
 module.exports = instituts;
