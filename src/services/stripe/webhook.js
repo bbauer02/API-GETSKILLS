@@ -1,4 +1,5 @@
-﻿const stripeAPI  = require('../../../stripe');
+﻿const {models} = require('../../models');
+const stripeAPI  = require('../../../stripe');
 
 async function  webhook(req, res) {
   const sig = req.headers['stripe-signature'];
@@ -12,12 +13,24 @@ async function  webhook(req, res) {
   } catch(error) {
     return res.status(400).send(`WEBHOOK ERROR ${error.message}`);
   }
+  //  account.updated 
+  //  account.external_account.created
+  if(event.type ==='account.updated') {
+    const account = event.data.object;
+    // On va vérifier si les informations bancaires sont validées dans STRIPE.
+    const institut = await models['Institut'].findOne({where: {stripeId : account.id}});
+    if(!institut.stripeActivated && account.capabilities.transfers === 'active') {
+      await institut.update({stripeActivated: 1},{
+        where:{stripeId : account.id}
+      });
+    }
+
+  }
 
   if(event.type ==='checkout.session.completed') {
 
     /*
     /api/instituts/:institut_id/sessions/:session_id/users
-
     {
       user_id: '',
       login: 'dgg',
@@ -43,23 +56,8 @@ async function  webhook(req, res) {
       test_id: 4
     }
      */
-    const session = event.data.object;
-    // On récupére l'identifiant de l'intention de payment
-    const payment_intent = session.payment_intent;
-    // On créé un objet contenant les informations de l'intention de payment.
-    const paymentIntent = await stripeAPI.paymentIntents.retrieve(
-      payment_intent,
-      {
-        expand: ['charges.data.balance_transaction'],
-      }
-    );
-    // On récupére les détails de la transaction pour obtenir le charges prisent par STRIPE
-    const feeDetails = paymentIntent.charges.data[0].balance_transaction.fee_details;
-    // On ajoute l'utilisateur créé dans la table USER. 
-
-
-
     
+
   }
   if( event.type == 'application_fee.created') {
     console.log("application_fee.created")

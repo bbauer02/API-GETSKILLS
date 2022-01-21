@@ -11,7 +11,8 @@
         siteweb: 'www.institut-france.fr',
         phone: '+33123456789',
         socialNetwork: ["facebook","twitter","instagram","linkedin"],
-        stripeId: 'acct_1KDwc62HEKyn2oIX'
+        stripeId: 'acct_1KFnu72HNLYdSCJK',
+        stripeActivated: 1
     },
     {
         institut_id: 2,
@@ -25,7 +26,8 @@
         siteweb: 'www.tenri.co.jp',
         phone: '+9874561230',
         socialNetwork: ["facebook","twitter","instagram","linkedin"],
-        stripeId: 'acct_1KDwc62HEKyn2oIX'
+        stripeId: 'acct_1KFnu72HNLYdSCJK',
+        stripeActivated: 1
     }
 ];
 module.exports = instituts;

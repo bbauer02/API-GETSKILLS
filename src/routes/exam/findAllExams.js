@@ -8,7 +8,7 @@ module.exports = (app) => {
             const parameters = {};
             parameters.where = {};
             parameters.include = [{
-                attributes: ['price'],
+                attributes: ['exam_id','price', 'tva'],
                 model: models['InstitutHasPrices'],
                 as: 'InstitutHasPrices'
             },
@@ -18,6 +18,7 @@ module.exports = (app) => {
             {
                 model: models['Level']
             }];
+            
             
             // Parameter : TEST
             if (req.query.test) {

@@ -246,7 +246,8 @@ const initDB = async (sequelize) => {
                     siteweb: institut.siteweb,
                     phone: institut.phone,
                     socialNetwork: institut.socialNetwork,
-                    stripeId: institut.stripeId
+                    stripeId: institut.stripeId,
+                    stripeActivated: institut.stripeActivated
                 });
                 barInstituts.increment();
             }

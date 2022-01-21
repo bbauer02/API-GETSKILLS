@@ -96,7 +96,7 @@ module.exports = (app) => {
             parameters.include = [{
                 model: models['Institut'],
                 attributes: ["label", "country_id", "city", "adress1", "adress2", "zipcode", "email", "phone"],
-                where: {}
+                where: {stripeActivated:1}
             }];
 
             // Filtrer par nom d'institut

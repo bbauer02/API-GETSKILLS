@@ -52,6 +52,7 @@ require('./src/routes/user/createUser')(app);
 require('./src/routes/user/updateUser')(app);
 require('./src/routes/user/deleteUser')(app);
 require('./src/routes/user/findUserByEmailOrLogin')(app);
+require('./src/routes/user/registerUser')(app);
 
 // UserEmpowerment
 require('./src/routes/empowerementTests/createEmpowerementTests')(app);

@@ -20,10 +20,21 @@ module.exports = (app) => {
           card_payments: {requested: true},
           transfers: {requested: true},
         },
+        email:bodyInstitut.email,
         business_type: 'company',
         business_profile: {
           mcc: "8299",
           name: bodyInstitut.label,
+          support_email: bodyInstitut.email,
+          support_phone: bodyInstitut.phone, 
+          support_url: bodyInstitut.siteweb,
+          support_address: {
+            city:bodyInstitut.city,
+            country:bodyInstitut.countryCode,
+            line1:bodyInstitut.address,
+            line2:bodyInstitut.address2,
+            postal_code:bodyInstitut.zipcode
+          },
           url: bodyInstitut.siteweb
         },
         company: {
@@ -36,8 +47,13 @@ module.exports = (app) => {
             line2: bodyInstitut.adress2,
             postal_code: bodyInstitut.zipcode,
           }
+        },
+        settings: {
+          payments: {
+            statement_descriptor:bodyInstitut.label.toUpperCase()
+          }
         }
-      });
+      }); 
       // On créé dans la BDD l'institut
       bodyInstitut.stripeId = stripeAccount.id; 
       const institut = await models['Institut'].create(bodyInstitut);
