@@ -4,7 +4,7 @@ const {models} = require('../../models');
 
 async function createCheckoutSession(req, res) {
   const domainUrl = process.env.WEB_APP_URL;
-  const { examsId, email, institut_id, session_id } = req.body;
+  const { examsId, email, institut_id, session_id, sessionUser_id } = req.body;
   // check req body has line items and email
   if ( examsId.length == 0 || !email ) {
     return res.status(400).json({ error: 'missing required session parameters'});
@@ -50,7 +50,8 @@ async function createCheckoutSession(req, res) {
       customer_email:email,
       metadata : {
         institut_id : institut_id,
-        session_id : session_id
+        session_id : session_id,
+        sessionUser_id : sessionUser_id
       },
       payment_intent_data: {
         application_fee_amount: 123,

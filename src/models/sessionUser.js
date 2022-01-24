@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: new Date()
         },
         hasPaid: {
-            type: DataTypes.BOOLEAN
+            type: DataTypes.BOOLEAN,
+            default: false
         },
         informations: {
             type: DataTypes.TEXT
