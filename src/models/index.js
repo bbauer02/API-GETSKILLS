@@ -453,7 +453,7 @@ const initDB = async (sequelize) => {
             /**
             * FILL TABLE 'sessionUsers'
             */
-            const nbSessionUsers = 300;           
+            const nbSessionUsers = 600;           
             const barSessionUsers =progressBar('#Ajout des utilisateurs dans les sessions.... ', nbSessionUsers);
 
             const listSessionsUsers = [];
@@ -469,10 +469,9 @@ const initDB = async (sequelize) => {
                 // On récupére l'institut ID de cette session
             const {institut_id, placeAvailable} = listSession.find(({session_id}) => session_id == sessionId);
             // On récupére un identifiant d'utilisateur
-            const userId = faker.datatype.number({
-                    'min': 1,
-                    'max': users.length + nbRandomUsers - 1
-                });
+            const UserListByinstitutId = institutHasUserList.filter(institutUser => institutUser.institut_id === institut_id);
+          
+            const userId = faker.helpers.randomize(UserListByinstitutId)['user_id'];
                 // On vérifie la session de soit pas complete.
                 
                 // on verifie que l'utilisateur n'est pas déjà inscris dans la session
