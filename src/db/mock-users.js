@@ -1,5 +1,6 @@
 ﻿const users = [
     {
+        user_id: 1,
         login: "bauer",
         password: "bb1212",
         email: "bbauer02@gmail.com",
@@ -19,6 +20,7 @@
         systemRole_id: 5
     },
     {
+        user_id: 2,
         login: "umebosi1014",
         password: "ume1014",
         email: "umebosi1014@yahoo.co.jp",
@@ -38,6 +40,7 @@
         systemRole_id: 1
     },
     {
+        user_id: 3,
         login: "cLefebre",
         password: "lfvr1234*",
         email: "cLefebre@gmail.com",
@@ -57,6 +60,7 @@
         systemRole_id: 1
     },
     {
+        user_id: 4,
         login: "didierM",
         password: "Didi--51",
         email: "didierMoulard@gmail.com",
