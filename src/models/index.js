@@ -61,6 +61,7 @@ const initDB = async (sequelize) => {
         if(mode === "production") {
             isDev = false;
         }
+        // force: isDev
 
         await sequelize.sync({ force: isDev, alter: true });
         console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");

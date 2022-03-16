@@ -21,7 +21,7 @@ app
 
 
 // Initialisation de la BDD
-models.initDB(sequelize);
+ models.initDB(sequelize);
 
 app.get('/', (req, res) => {
     res.json('Hello, API ! ');
