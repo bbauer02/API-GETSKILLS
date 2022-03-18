@@ -12,10 +12,18 @@ module.exports = {
   // Connect Settings: https://dashboard.stripe.com/account/applications/settings
   //https://dashboard.stripe.com/test/settings/connect
   stripe: {
-    secretKey : 'sk_test_51HtBY6FuTsYUJRGzlVgQPdylwsYZZhA5SPqTAXjrVGeYRNvsj87cMKRuoKEDHSmKtjyhGV9LAO0XvjbY9Qpk2NSp003xNXUlSL',
-    publishableKey: 'pk_test_51HtBY6FuTsYUJRGz7s7Y06bjDspi4sgQ2dQBbiHAAxZ6lw8FYmPYCS5GA8OgGmcjFPj1201lEENzkFrDEW0cr8DN00GNML65kd',
-    whSecretKey : 'whsec_qvCn6ZZ2tEXOlTy7B3mYosHtXAfyF6aw',
-    clientId: 'ca_K7Lz986uooZnu5LEVbNG2p7t90PMYJLA',
+    production : {
+      secretKey : 'sk_test_51HtBY6FuTsYUJRGzlVgQPdylwsYZZhA5SPqTAXjrVGeYRNvsj87cMKRuoKEDHSmKtjyhGV9LAO0XvjbY9Qpk2NSp003xNXUlSL',
+      publishableKey: 'pk_test_51HtBY6FuTsYUJRGz7s7Y06bjDspi4sgQ2dQBbiHAAxZ6lw8FYmPYCS5GA8OgGmcjFPj1201lEENzkFrDEW0cr8DN00GNML65kd',
+      whSecretKey : 'whsec_qvCn6ZZ2tEXOlTy7B3mYosHtXAfyF6aw',
+      clientId: 'ca_K7Lz986uooZnu5LEVbNG2p7t90PMYJLA',
+     },
+     development : {
+      secretKey : 'sk_test_51HtBY6FuTsYUJRGzlVgQPdylwsYZZhA5SPqTAXjrVGeYRNvsj87cMKRuoKEDHSmKtjyhGV9LAO0XvjbY9Qpk2NSp003xNXUlSL',
+      publishableKey: 'pk_test_51HtBY6FuTsYUJRGz7s7Y06bjDspi4sgQ2dQBbiHAAxZ6lw8FYmPYCS5GA8OgGmcjFPj1201lEENzkFrDEW0cr8DN00GNML65kd',
+      whSecretKey : 'whsec_qvCn6ZZ2tEXOlTy7B3mYosHtXAfyF6aw',
+      clientId: 'ca_K7Lz986uooZnu5LEVbNG2p7t90PMYJLA',
+     }
   },
   // Base de données
   db: {

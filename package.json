@@ -17,6 +17,7 @@
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
+    "cross-env": "^7.0.3",
     "crypto": "^1.0.1",
     "del": "^6.0.0",
     "dotenv": "^8.2.0",
@@ -31,10 +32,9 @@
     "moment": "^2.29.1",
     "mysql2": "^2.2.5",
     "pdf-merger-js": "^3.2.1",
-    "sequelize": "^6.6.2",
+    "sequelize": "^6.17.0",
     "stripe": "^8.160.0",
-    "unoconv-promise": "^1.0.8",
-    "cross-env": "^7.0.3"
+    "unoconv-promise": "^1.0.8"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

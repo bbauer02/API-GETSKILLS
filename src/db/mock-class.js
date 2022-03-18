@@ -50,7 +50,7 @@ const itemsCsv = require('../db/mock-items_csv');
     constructor(
                  nbrUsers=100, 
                 nbrSession=50, 
-                nbrSessionUsers = 100, 
+                nbrSessionUsers = 200, 
                 nbrSkills=20, 
                 nbrSubSkills=20, 
                 nbrSubSubSkills=20,
@@ -352,16 +352,16 @@ const itemsCsv = require('../db/mock-items_csv');
             const currentSession = faker.random.arrayElement(this.sessions);
             const {institut_id, placeAvailable, session_id} = currentSession;
             // On récupére aléatoirement un identifiant de USER membre de l'institut
-            const {user_id} = faker.random.arrayElement(this.institutHasRandomUsers.filter(RandomUser => RandomUser.institut_id === institut_id));
+            const ranUser_id = faker.random.arrayElement(this.institutHasRandomUsers.filter(RandomUser => RandomUser.institut_id === institut_id)).user_id;
             // On vérifie que l'utilisateur ne soit pas déjà inscrit dans la session
-            const isSubscribed = this.sessionHasUsers.find(({user_id, session_id}) => user_id === user_id && session_id === session_id);
+            const isSubscribed = this.sessionHasUsers.find(({user_id, session_id}) => user_id === ranUser_id && session_id === session_id);
             // On vérifie que la session est pleine
             const isSessionFull = this.sessionHasUsers.length === currentSession.placeAvailable ? true : false;
-            if(!isSessionFull && !isSubscribed) {
+            if(!isSessionFull && isSubscribed === undefined) {
                 this.sessionHasUsers.push({
                     sessionUser_id : index,
                     session_id,
-                    user_id,
+                    user_id: ranUser_id,
                     paymentMode: 1,
                     numInscrAnt: null,
                     hasPaid: faker.datatype.number({
