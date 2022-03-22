@@ -21,7 +21,6 @@ const initDB = async (sequelize) => {
             const model = require(path.join(__dirname, file))(sequelize, DataTypes);
             models[model.name] = model;
         });
-
     Object.keys(models).forEach(modelName => {
         if (models[modelName].associate) {
             models[modelName].associate(models);

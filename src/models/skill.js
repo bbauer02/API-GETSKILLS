@@ -39,7 +39,12 @@ module.exports = (sequelize, DataTypes) => {
         hooks: true,
     });
 
-    Skill.belongsTo(Skill, {as: "parent", foreignKey: 'parent_id', onDelete: 'CASCADE', hooks: true});
+    Skill.belongsTo(Skill, {as: "parent", foreignKey: 'parent_id', onDelete: 'NO ACTION', hooks: true});
+    //Skill.hasMany(Question, {foreignKey: 'skill_id', sourceKey: 'skill_id'});
+
+    Skill.associate = models => {
+        Skill.hasMany(models.Question, {foreignKey: 'skill_id', targetKey: 'skill_id'});
+    }
 
     return Skill;
 }   
