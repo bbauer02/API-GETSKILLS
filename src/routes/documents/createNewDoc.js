@@ -26,8 +26,8 @@ module.exports = (app) => {
 
         // on récupère le  fichier et on crée le filepath
         const newFile = files.newFile;
-
-        const uploadPath = path.join(STORE_FILES, d.getTime() + '.odt');
+        const filename = d.getTime() + '.docx';
+        const uploadPath = path.join(STORE_FILES,filename );
 
         // déplacement du fichier uploader dans le dossier public
         try {
@@ -43,7 +43,7 @@ module.exports = (app) => {
                     institut_id: institutId,
                     filename: newFile.name,
                     doctype: doctype,
-                    filepath: uploadPath,
+                    filepath: `${filename}`,
                 })
 
             if (!docCreated) {
@@ -55,17 +55,13 @@ module.exports = (app) => {
         } catch (e) {
             throw new Error('Creation impossible -> ' + e.message);
         }
-
     }
-
     /**
      * Upload de documents super admin
      */
     app.post('/api/documents/upload', isAuthenticated, isAuthorized, async (req, res) => {
 
         const doctype = parseInt(req.body.doctype);
-
-
         try {
             const document = await uploadDocument(doctype, req.files, null)
             return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
@@ -81,7 +77,6 @@ module.exports = (app) => {
 
         const institutId = parseInt(req.params.institut_id);
         const doctype = parseInt(req.body.doctype);
-
         try {
             const document = await uploadDocument(doctype, req.files, institutId)
             return res.status(200).json({message: document.filename + " has been uploaded.", data: document})
