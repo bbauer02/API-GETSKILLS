@@ -35,7 +35,7 @@ const initDB = async (sequelize) => {
         }
         // force: isDev
 
-        /*await sequelize.sync({ force: isDev, alter: true });
+        await sequelize.sync({ force: isDev, alter: true });
         console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
         if(isDev) {
             const mock = new MockDatas();
@@ -99,7 +99,7 @@ const initDB = async (sequelize) => {
             // Suppression des Templates
             await destroyFolder('templates');
             createRepositoryWithName('templates');
-        }*/
+        }
         console.log("");
         console.log(_colors.green("API en écoute ..."));
     } catch (error) {
