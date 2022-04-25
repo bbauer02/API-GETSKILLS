@@ -48,9 +48,9 @@ const itemsCsv = require('../db/mock-items_csv');
     sessionUserOption = [];
 
     constructor(
-                 nbrUsers=1000, 
+                 nbrUsers=500, 
                 nbrSession=50, 
-                nbrSessionUsers = 2000, 
+                nbrSessionUsers = 1000, 
                 nbrSkills=20, 
                 nbrSubSkills=20, 
                 nbrSubSubSkills=20,
