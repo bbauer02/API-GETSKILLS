@@ -48,9 +48,9 @@ const itemsCsv = require('../db/mock-items_csv');
     sessionUserOption = [];
 
     constructor(
-                 nbrUsers=100, 
+                 nbrUsers=1000, 
                 nbrSession=50, 
-                nbrSessionUsers = 200, 
+                nbrSessionUsers = 2000, 
                 nbrSkills=20, 
                 nbrSubSkills=20, 
                 nbrSubSubSkills=20,
@@ -356,7 +356,7 @@ const itemsCsv = require('../db/mock-items_csv');
             // On vérifie que l'utilisateur ne soit pas déjà inscrit dans la session
             const isSubscribed = this.sessionHasUsers.find(({user_id, session_id}) => user_id === ranUser_id && session_id === session_id);
             // On vérifie que la session est pleine
-            const isSessionFull = this.sessionHasUsers.length === currentSession.placeAvailable ? true : false;
+            const isSessionFull = this.sessionHasUsers.length === placeAvailable ? true : false;
             if(!isSessionFull && isSubscribed === undefined) {
                 this.sessionHasUsers.push({
                     sessionUser_id : index,
