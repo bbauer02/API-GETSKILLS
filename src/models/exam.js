@@ -52,6 +52,7 @@
         Exam.hasMany(models.sessionUserOption, {foreignKey:'exam_id',sourceKey: 'exam_id'});
         Exam.hasMany(models.InstitutHasPrices, {foreignKey:'exam_id',sourceKey: 'exam_id'});
         Exam.hasMany(models.sessionHasExam,{foreignKey:'exam_id', sourceKey: 'exam_id'});
+        Exam.belongsToMany(models.Question, { through: models.examHasQuestion, foreignKey: 'exam_id' });
     };
   
     return Exam; 

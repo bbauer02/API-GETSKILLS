@@ -1,46 +1,28 @@
-const {mergePdf} = require("../../services/managePDF");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
-const path = require("path");
-const {getDocumentPDF} = require("../../services/managePDF");
-const {reponseHTTPWithPdf} = require("../../services/managePDF");
-const {getAllFieldsForSchoolDocuments} = require("../../services/manageQueryDocs");
-
-
+const fs = require("fs");
+const {getDataForDocuments, getDocumentPDF} = require('../../services/documents');
+const { deleteTempRepository } = require('../../services/documents/fileSystemManager');
 module.exports = (app) => {
 
     /**
      * La génération de PDF est réalisée par les écoles.
      */
     app.get('/api/instituts/:institut_id/sessions/:session_id/documents/:document_id/download', isAuthenticated, isAuthorized, async (req, res) => {
-
-        const institutId = parseInt(req.params.institut_id)
-        const documentId = parseInt(req.params.document_id);
-        const sessionId = parseInt(req.params.session_id);
-        const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
-
         try {
-
-            // création d'un tableau d'objets contenant toutes les infos
-            let datasForPdf = await getAllFieldsForSchoolDocuments(institutId, sessionId, userId);
-
-            const files = await getDocumentPDF(datasForPdf, documentId);
-
-            // pas de fichier PDF trouvés
-            if (files.length === 0) {
-                throw new Error('No PDF files created.')
-            }
-
-            // 1 fichier PDF généré
-            if (files.length === 1) {
-                reponseHTTPWithPdf(path.join(files[0]), res)
-            }
-
-            // plusieurs fichiers PDF à fusionner ensemble
-            if (files.length > 1) {
-                const pdfFileNameMerged = await mergePdf(files);
-                reponseHTTPWithPdf(pdfFileNameMerged, res);
-            }
-
+            // On récupére les informations nécessaire à la collecte des données.
+            const institutId = parseInt(req.params.institut_id)
+            const documentId = parseInt(req.params.document_id);
+            const sessionId = parseInt(req.params.session_id);
+            const userId = req.query.user_id ? parseInt(req.query.user_id) : null;
+            // On collecte les données
+            const datas = await getDataForDocuments(institutId, sessionId, userId);
+            //return res.status(200).json({datas})
+            const pdfStream = await getDocumentPDF(datas,documentId);
+            // On retourne en réponse le fichier PDF généré.
+            res.contentType("application/pdf");
+            pdfStream.pipe(res);
+            await deleteTempRepository(documentId);
+            
         } catch (e) {
             return res.status(400).json({message: e.message, data: null})
         }

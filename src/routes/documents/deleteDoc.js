@@ -14,12 +14,12 @@ module.exports = (app) => {
     async function deleteDocument (documentId) {
 
         const docFound = await models['Document'].findByPk(documentId);
-
         if (!docFound)
             throw new Error('no document found');
 
-        // suppression du document sur le disque
-        fs.unlink(docFound.filepath, function (error) {
+     // suppression du document sur le disque
+     
+        fs.unlink(path.resolve("public/templates", docFound.filepath), function (error) {
             if (error) throw new Error('File deletion failed')
             console.log('File deleted successfully');
         })
@@ -44,7 +44,6 @@ module.exports = (app) => {
 
         try {
             const docDestroyed = await deleteDocument(documentId);
-
             return res.status(200).json({
                 message: `Document ${docDestroyed.filename} has been deleted.`,
                 data: docDestroyed
