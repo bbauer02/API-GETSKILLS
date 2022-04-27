@@ -70,10 +70,12 @@ async function getDataForDocuments(institutId, sessionId, userId = null) {
                                           [
                                               {
                                                   model: models['InstitutHasPrices'],
+                                                  required: false,
                                                   where: {institut_id: institutId},
                                               },
                                               {
                                                   model: models['sessionHasExam'],
+                                                  required: false,
                                                   where: {session_id: sessionId}
                                               }
                                           ]
@@ -146,6 +148,7 @@ async function getDataForDocuments(institutId, sessionId, userId = null) {
         // Formatage date et heure
 
         datas.sessionUsers[i].facture = { produits:[]};
+       
         datas.sessionUsers[i].sessionUserOptions.forEach((sessionUserOption, index) => {
             if(sessionUserOption.DateTime &&  sessionUserOption.DateTime !== "") {
                 datas.sessionUsers[i].sessionUserOptions[index].date = getDate(sessionUserOption.DateTime, 'fr-fr', 'Europe/Paris');
@@ -156,13 +159,17 @@ async function getDataForDocuments(institutId, sessionId, userId = null) {
                 datas.sessionUsers[i].sessionUserOptions[index].heure = getHour(sessionUserOption.Exam.sessionHasExams[0].DateTime, 'fr-fr', 'Europe/Paris');
             }
             // Formatage Facture
+            
            const exam = datas.sessionUsers[i].sessionUserOptions[index].Exam.label;
-           const prix_unitaire_HT = datas.sessionUsers[i].sessionUserOptions[index].user_price ? datas.sessionUsers[i].sessionUserOptions[index].user_price : datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0].price;
+           const prix_unitaire_HT = datas.sessionUsers[i].sessionUserOptions[index].user_price ? datas.sessionUsers[i].sessionUserOptions[index].user_price : datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0]?.price ? datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0].price : datas.sessionUsers[i].sessionUserOptions[index].Exam.price;
            const quantite = 1;
-           const TVA = datas.sessionUsers[i].sessionUserOptions[index].tva ? datas.sessionUsers[i].sessionUserOptions[index].tva : datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0].tva;
-           const prix_unitaire_TTC = prix_unitaire_HT * ( 1 + (TVA / 100));
-           const total_HT = quantite * prix_unitaire_HT;
-           const total_TTC = quantite * prix_unitaire_TTC;
+           const TVA = datas.sessionUsers[i].sessionUserOptions[index].tva ? datas.sessionUsers[i].sessionUserOptions[index].tva : datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0]?.tva? datas.sessionUsers[i].sessionUserOptions[index].Exam.InstitutHasPrices[0]?.tva : 20;
+           let prix_unitaire_TTC = prix_unitaire_HT * ( 1 + (TVA / 100));
+           prix_unitaire_TTC = parseFloat(prix_unitaire_TTC.toFixed(2));
+           let total_HT = quantite * prix_unitaire_HT;
+           total_HT = parseFloat(total_HT.toFixed(2));
+           let total_TTC = quantite * prix_unitaire_TTC;
+           total_TTC = parseFloat(total_TTC.toFixed(2));
 
            const produit = {
             exam,
@@ -180,30 +187,20 @@ async function getDataForDocuments(institutId, sessionId, userId = null) {
         let total_HT = 0;
         let total_TTC = 0;
         datas.sessionUsers[i].facture.produits.forEach((produit, index) => {
+           
             total_HT += produit.total_HT;
             total_TTC += produit.prix_unitaire_TTC;
         })
-        datas.sessionUsers[i].facture.total_TVA = total_HT * (datas.sessionUsers[i].facture.TVA/100);
+        let total_TVA = parseFloat((total_HT * (datas.sessionUsers[i].facture.TVA/100)).toFixed(2));
+        datas.sessionUsers[i].facture.total_TVA = total_TVA;
         datas.sessionUsers[i].facture.total_HT = total_HT;
         datas.sessionUsers[i].facture.total_TTC = total_TTC;
         datas.sessionUsers[i].facture.numero_facture = new Date(datas.sessionUsers[i].inscription).getFullYear().toString() + new Date(datas.sessionUsers[i].inscription).getMonth().toString().padStart(2, "0") + datas.sessionUsers[i].sessionUser_id.toString().padStart(6, "0");
         datas.sessionUsers[i].facture.reference = new Date(datas.sessionUsers[i].inscription).getFullYear().toString() + new Date(datas.sessionUsers[i].inscription).getMonth().toString().padStart(2, "0") + datas.Test.label + '-' + datas.sessionUsers[i].sessionUser_id.toString().padStart(6, "0");
         datas.sessionUsers[i].facture.facture_date = getDate(new Date(),'fr-fr', 'Europe/Paris');
         datas.sessionUsers[i].facture.paymentModeLabel = PAYMENTS[datas.sessionUsers[i].paymentMode].label;
+       
     }
-/*
-    // Formatage facture
-    datas.facture.produits = [ {
-        "exam" : "Epreuve1",
-        "prix_unitaire" : 123,
-        "quantite" : 1,
-        "tva"
-
-    }];
-    datas.facture.tva = 22;
-    datas.refClient = "";
-    datas.numFacture = "";
-     */
     
     return datas;
 }
