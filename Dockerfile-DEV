@@ -6,4 +6,4 @@ COPY package-lock.json ./
 RUN npm install -g npm@latest
 RUN npm install -g nodemon@latest
 RUN npm install
-CMD [ "npm", "dev" ]
+CMD [ "npm", "run", "dev" ]
