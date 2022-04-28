@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 199f5fddc15f460ebd04c370ff36d3c83cf3bffa
 name: Get-teste-server CI/CD
 
 on:
@@ -48,4 +51,7 @@ jobs:
           registry: docker.io
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWD }}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 199f5fddc15f460ebd04c370ff36d3c83cf3bffa
