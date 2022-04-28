@@ -2,6 +2,6 @@
 .vscode
 .env.local
 config.prod.js
-
+.github/workflows/get_tested_api.js.yml
 
 
