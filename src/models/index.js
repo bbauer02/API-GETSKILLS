@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { Op } = require("sequelize");
 const path = require('path');
 const DataTypes = require('sequelize');
 const filebasename = path.basename(__filename);
@@ -34,10 +35,9 @@ const initDB = async (sequelize) => {
             isDev = false;
         }
         // force: isDev
-
+        //isDev = false
         await sequelize.sync({ force: isDev, alter: true });
        
-
         if(isDev) {
             console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
             const mock = new MockDatas();
@@ -101,6 +101,53 @@ const initDB = async (sequelize) => {
             // Suppression des Templates
             await destroyFolder('templates');
             createRepositoryWithName('templates');
+        }
+        else {
+            const users = await models['User'].findAll({
+                where: {
+                    systemRole_id : {
+                        [Op.gte] :5
+                    }
+                }
+            });
+            if(users.length <= 0 ) {
+                // On va remplir la BDD avec des valeurs par default
+                console.log('\x1b[36m%s\x1b[0m',"~ Première installation ..... ~");
+                console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
+
+                const mock = new MockDatas();
+                await mock.initialize();
+                //countries
+                await models['Country'].bulkCreate(mock.countries);
+                console.log('Table `Country` ..................... OK');
+                //languages
+                await models['Language'].bulkCreate(mock.languages);
+                console.log('Table `Language` .................... OK');
+                //roles
+                await models['Role'].bulkCreate(mock.roles);
+                console.log('Table `Role` ........................ OK');
+                //tests
+                await models['Test'].bulkCreate(mock.tests);
+                console.log('Table `Test` ........................ OK');
+                //levels
+                await models['Level'].bulkCreate(mock.levels);
+                console.log('Table `Level` ....................... OK');
+                //itemsCsv
+                await models['csvItem'].bulkCreate(mock.itemsCsv);
+                console.log('Table `csvItem` ..................... OK');
+                await models['User'].create(mock.defaultAdminProd);
+                console.log('Table `User` ........................ OK');
+                console.log("");
+                console.log("");
+                console.log(_colors.red("*****!!! WARNING !!!*******"));
+                console.log(_colors.red("* user default: admin     *"));
+                console.log(_colors.red("* password default: admin *"));
+                console.log(_colors.red("* Don't Forget to Change  *"));
+                console.log(_colors.red("***************************"));
+                console.log("");
+                console.log("");
+            }
+            
         }
         console.log("");
         console.log(_colors.green("API en écoute ..."));

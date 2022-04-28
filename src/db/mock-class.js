@@ -73,6 +73,7 @@ const itemsCsv = require('../db/mock-items_csv');
         this.#fillLevels();
         this.#fillItemsCSV();
         this.#fillInstituts();
+        this.#createDefaultAdminProd();
         await this.#fillDefaultUsers();
         await this.#fillRandomUsers();
         this.#fillInstitutHasDefaultUsers();
