@@ -2,6 +2,7 @@ FROM node:16
 
 WORKDIR /usr/src/app
 COPY * /usr/src/app/
+COPY src /usr/src/app/src
 RUN npm install -g npm@latest
 RUN npm install -g nodemon@latest
 RUN npm install
