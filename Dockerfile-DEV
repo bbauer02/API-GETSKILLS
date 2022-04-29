@@ -5,4 +5,5 @@ COPY * ./
 RUN npm install -g npm@latest
 RUN npm install -g nodemon@latest
 RUN npm install
+ADD node_modules /usr/src/app/node_modules
 CMD [ "npm", "run", "dev" ]
