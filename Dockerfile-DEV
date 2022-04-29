@@ -1,10 +1,16 @@
 FROM node:16
 
 WORKDIR /usr/src/app
-COPY * /usr/src/app/
-COPY src /usr/src/app/src
+COPY package*.json ./
 RUN npm install -g npm@latest
 RUN npm install -g nodemon@latest
 RUN npm install
+COPY public /usr/src/app/public
+COPY src /usr/src/app/src
+COPY .env /usr/src/app/.env
+COPY app.js /usr/src/app/app.js
+COPY config.prod.js /usr/src/app/config.prod.js
+COPY crons.js /usr/src/app/crons.js
+COPY stripe.js /usr/src/app/stripe.js
 COPY node_modules /usr/src/app/node_modules
 CMD [ "npm", "run", "dev" ]
