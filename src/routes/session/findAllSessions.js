@@ -153,7 +153,7 @@ module.exports = (app) => {
             parameters.include.push(addInstitut);
 
             parameters.distinct = true;
-            parameters.group = ['session.session_id'];
+            parameters.group = ['session_id'];
             const Sessions = await models['Session'].findAll(parameters);
             const message = `${Sessions.length} sessions found`;
             res.json({ message, data: Sessions });
