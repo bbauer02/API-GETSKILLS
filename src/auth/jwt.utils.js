@@ -29,10 +29,11 @@ module.exports = {
             });
         const refreshToken = crypto.randomBytes(128).toString('base64');
 
+        const expiresAt = Date.now() + config.jw.refreshToken.expiresIn;
         await models['RefreshToken'].create({
             userId: userData.user_id,
             token: refreshToken,
-            expiresAt: Date.now() + config.jw.refreshToken.expiresIn
+            expiresAt : new Date(expiresAt)
         });
 
 
