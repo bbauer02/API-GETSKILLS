@@ -1,7 +1,7 @@
 ﻿node_modules
 .vscode
-.env
 .env.local
-
 config.prod.js
-package.json
+.github
+
+
