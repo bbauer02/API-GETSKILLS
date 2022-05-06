@@ -1,6 +1,6 @@
 ﻿const {models} = require('../../models');
 const {stripe, publicDomain} =  require("../../../config.prod");
-const Stripe = require('stripe')(config["stripe"][process.env.NODE_ENV].secretKey);
+const Stripe = require('stripe')(stripe[process.env.NODE_ENV].secretKey);
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
