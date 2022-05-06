@@ -2,7 +2,7 @@
 const {models} = require('../../models');
 
 const {stripe} =  require("../../../config.prod");
-const Stripe = require('stripe')(stripe.secretKey);
+const Stripe = require('stripe')(config["stripe"][process.env.NODE_ENV].secretKey);
 const bcrypt = require('bcrypt');
 
 module.exports = (app) => {

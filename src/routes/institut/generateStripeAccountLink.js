@@ -1,6 +1,6 @@
 ﻿const {models} = require('../../models');
 const {stripe, publicDomain} =  require("../../../config.prod");
-const Stripe = require('stripe')(stripe.secretKey);
+const Stripe = require('stripe')(config["stripe"][process.env.NODE_ENV].secretKey);
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
@@ -8,8 +8,7 @@ module.exports = (app) => {
     try {
       // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
       const reqInstitut_id = req.params.institut_id || req.body.institut_id || req.query.institut_id || null;
-      console.log(reqInstitut_id);
-     /* // On récupére l'identifiant STRIPE de l'institut.
+      // On récupére l'identifiant STRIPE de l'institut.
       if(reqInstitut_id) {
         const Institut = await models['Institut'].findByPk(reqInstitut_id);
         const accountLink = await Stripe.accountLinks.create({
@@ -23,7 +22,7 @@ module.exports = (app) => {
       else {
         const message = `Institut ID non valide`;
         return res.status(400).json({message})
-      }*/
+      }
     }
     catch (error) {
         const message = `Service not available. Please retry later.`;
