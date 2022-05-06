@@ -22,28 +22,28 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - name: npm install dependancies
-        run: npm ci
-      - name: build code
-        run: npm run build --if-present
-        env:
-          CI: true
-      - name: Build & push Docker image for PRODUCTION
-        uses: mr-smithers-excellent/docker-build-push@v5
-        with:
-          image: bangsmed/bangs
-          dockerfile: Dockerfile
-          tags: cifle-server-v1
-          registry: docker.io
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWD }}
+    #  - name: npm install dependancies
+    #    run: npm ci
+    #  - name: build code
+    #    run: npm run build --if-present
+    #    env:
+    #      CI: true
+     # - name: Build & push Docker image for PRODUCTION
+     #   uses: mr-smithers-excellent/docker-build-push@v5
+     #   with:
+     #     image: bangsmed/bangs
+     #     dockerfile: Dockerfile
+     #     tags: cifle-server-v1
+     #     registry: docker.io
+     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+     #     password: ${{ secrets.DOCKERHUB_PASSWD }}
 
-      - name: Build & push Docker image for DEVELOPMENET
-        uses: mr-smithers-excellent/docker-build-push@v5
-        with:
-          image: bangsmed/bangs
-          dockerfile: Dockerfile-DEV
-          tags: cifle-server-dev-v1
-          registry: docker.io
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWD }}
+     # - name: Build & push Docker image for DEVELOPMENET
+     #   uses: mr-smithers-excellent/docker-build-push@v5
+     #   with:
+     #     image: bangsmed/bangs
+     #     dockerfile: Dockerfile-DEV
+     #     tags: cifle-server-dev-v1
+     #     registry: docker.io
+     #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+     #     password: ${{ secrets.DOCKERHUB_PASSWD }}
