@@ -43,7 +43,7 @@ async function createCheckoutSession(req, res) {
     // RECUPERATION DE L IDENTIFIANT STRIPE DE L'INSTITUT
     const Institut = await models['Institut'].findByPk(institut_id);
     const StripeAccount = Institut.stripeId;
-/*
+
     session = await stripeAPI.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
@@ -62,9 +62,9 @@ async function createCheckoutSession(req, res) {
       mode: 'payment',
       success_url: `${domainUrl}/auth/register/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${domainUrl}/auth/register/canceled`
-    });*/
-   //res.status(200).json({sessionId: session.id});
-   res.status(200).json({sessionId: 1});
+    });
+   res.status(200).json({sessionId: session.id});
+   // res.status(200).json({sessionId: 1});
   } catch (error) {
     res.status(400).json({error: 'an error occured, unable to create session'});
   }
