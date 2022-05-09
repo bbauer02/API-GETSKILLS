@@ -9,7 +9,7 @@ async function  webhook(req, res) {
     event = stripeAPI.webhooks.constructEvent(
       req['rawBody'],
       sig,
-      config.db[process.env.NODE_ENV].whSecretKey
+      config.stripe[process.env.NODE_ENV].whSecretKey
     )
   } catch(error) {
     return res.status(400).send(`WEBHOOK ERROR ${error.message}`);
