@@ -63,7 +63,7 @@ async function createCheckoutSession(req, res) {
       success_url: `${domainUrl}/auth/register/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${domainUrl}/auth/register/canceled`
     });
-  // res.status(200).json({sessionId: session.id});
+   res.status(200).json({sessionId: session.id});
     //res.status(200).json({sessionId: "1"});
   } catch (error) {
     res.status(400).json({error: 'an error occured, unable to create session'});

@@ -2,6 +2,7 @@
 .vscode
 .env.local
 config.prod.js
+.env
 .github
 
 
