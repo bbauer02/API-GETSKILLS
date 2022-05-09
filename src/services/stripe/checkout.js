@@ -1,10 +1,10 @@
 ﻿const stripeAPI  = require('../../../stripe');
 const { Op } = require('sequelize');
 const {models} = require('../../models');
-
+const {publicDomain} =  require("../../../config.prod");
 async function createCheckoutSession(req, res) {
   try {
-    const domainUrl = process.env.WEB_APP_URL;
+    const domainUrl = conf.publicDomain;
     const { examsId, email, institut_id, session_id, sessionUser_id } = req.body;
     // check req body has line items and email
     if ( examsId.length == 0 || !email ) {
