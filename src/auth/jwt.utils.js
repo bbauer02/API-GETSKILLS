@@ -133,6 +133,9 @@ module.exports = {
             }
             if(moduleName === 'users') {
                 if(httpMethod ==="PUT" && decodedToken.user_id === parseInt(ids[0],10) ) {
+                    if(req.body.systemRole_id) {
+                        delete req.body.systemRole_id;
+                    }  
                     return next();
                 }
             }
