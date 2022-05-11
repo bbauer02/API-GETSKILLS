@@ -131,6 +131,11 @@ module.exports = {
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
                 }
             }
+            if(moduleName === 'users') {
+                if(httpMethod ==="PUT" && decodedToken.user_id === parseInt(ids[0],10) ) {
+                    return next();
+                }
+            }
             if (userPower >= powerNeed) {
                 return next();
             }
