@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
+        avatar : {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         login: {
             type: DataTypes.STRING,
             allowNull:false,

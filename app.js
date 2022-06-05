@@ -18,7 +18,7 @@ app
     .use(cors())
     .use(cookieParser())
     .use(fileUpload())
-
+    .use('/api/avatars', express.static(__dirname + '/public/images/avatars/'))
 
 // Initialisation de la BDD
  models.initDB(sequelize);
