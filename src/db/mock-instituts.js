@@ -10,7 +10,7 @@
         email: "contact@institut-france.com",
         siteweb: 'www.institut-france.fr',
         phone: '+33123456789',
-        socialNetwork: ["facebook","twitter","instagram","linkedin"],
+        socialNetwork: {"facebook":"FbProfil","twitter":"TwitProfil","instagram":"InstaProfil","linkedin":"LinkedProfil"},
         stripeId: 'acct_1KxRS8QxaIfpu4Sw',
         stripeActivated: 1
     },
@@ -21,11 +21,11 @@
         adress2: "Apt 15B - Bât 12",
         zipcode: "75000",
         city: "paris",
-        country_id: 76,
+        country_id: 75,
         email: "contact@tenri.co.jp",
         siteweb: 'www.tenri.co.jp',
         phone: '+9874561230',
-        socialNetwork: ["facebook","twitter","instagram","linkedin"],
+        socialNetwork: {"facebook":"FbProfil","twitter":"TwitProfil","instagram":"InstaProfil","linkedin":"LinkedProfil"},
         stripeId: 'acct_1KxRS8QxaIfpu4Sw',
         stripeActivated: 1
     }

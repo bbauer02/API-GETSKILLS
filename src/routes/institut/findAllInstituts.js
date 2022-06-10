@@ -55,16 +55,16 @@ module.exports =  (app) => {
                 parameters.offset = parseInt(req.query.offset);
             }
             parameters.order = ['label'];
+
             parameters.include = [{
                     model: models['Country'],
                     as:"institutCountry",
-                    attributes : ["label"]
+                    attributes :["label"]
                 }];
-
-            const Instituts = await models['Institut'].findAndCountAll(parameters);
            
+            const Instituts = await models['Institut'].findAndCountAll(parameters);
             const message = `${Instituts.count} instituts found`;
-           res.json({message, data: Instituts.rows});
+           res.json({message, instituts: Instituts.rows});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

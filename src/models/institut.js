@@ -78,14 +78,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
         socialNetwork: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            get() {
-                return this.getDataValue('socialNetwork').split(';')
-            },
-            set(val) {
-                this.setDataValue('socialNetwork', val.join(';'));
-            }
+            type: DataTypes.JSON ,
+            allowNull: true
         },
         stripeId: {
             type: DataTypes.STRING,
@@ -117,6 +111,7 @@ module.exports = (sequelize, DataTypes) => {
         Institut.hasMany(models.Session, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete: 'CASCADE' })
         Institut.hasMany(models.InstitutHasPrices, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete:'CASCADE' })
         Institut.hasMany(models.empowermentTests, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete:'CASCADE' });
+        Institut.hasMany(models.institutHasUser,{as:'users',foreignKey:'institut_id', sourceKey:'institut_id'});
         Institut.hasMany(models['Invoice'], { as: 'invoices', foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete:'CASCADE' });
     }
     return Institut;
