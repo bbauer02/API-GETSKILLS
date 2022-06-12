@@ -10,11 +10,23 @@ module.exports = (app) => {
                 const message = `Institut doesn't exist.Retry with an other institut id.`;
                 return res.status(404).json({message});
             }
-            await Institut.update(req.body,{
+
+            const Institut_updated = await Institut.update(req.body,{
                 where:{institut_id:req.params.id}
             });
-            const message = `Institut id:${Institut.institut_id} has been updated `;
-            res.json({message, data: Institut});
+
+            _Institut = await models['Institut'].findOne({
+                include: [
+                    {
+                        model: models['Country'],
+                        as:"institutCountry",
+                        attributes : ["label"]
+                    }
+                ],
+                where: {institut_id:Institut_updated.institut_id}
+            }) 
+            const message = `Institut id:${_Institut.institut_id} has been updated `;
+            res.json({message, institut: _Institut});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {
