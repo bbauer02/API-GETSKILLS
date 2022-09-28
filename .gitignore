@@ -3,5 +3,5 @@
 .env.local
 config.prod.js
 .github
-
+public/images/avatars
 
