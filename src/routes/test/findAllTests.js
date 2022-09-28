@@ -14,10 +14,20 @@ module.exports =  (app) => {
                parameters.where = {isArchive: false}
            }
 
+
            // Parameter : ORDER
            parameters.order = [['label', 'ASC']]
-
-           parameters.where = {parent_id: {[Op.is]: null}}
+           // Afficher les enfants également
+           if(req.query.child)
+           {
+                if(req.query.child =="false") {
+                    parameters.where = {parent_id: {[Op.is]: null}};
+                }
+           }
+           else {
+            parameters.where = {parent_id: {[Op.is]: null}};
+           }
+           
 
            // Parameter : INCLUDE
            parameters.include = [
@@ -36,7 +46,7 @@ module.exports =  (app) => {
             const Tests = await models['Test'].findAndCountAll(parameters);
 
             const message = `${Tests.count} test(s) found`;
-            res.json({message, data: Tests.rows});
+            res.json({message, tests: Tests.rows});
        }
        catch (error){
          const message = `Service not available. Please retry later.`;

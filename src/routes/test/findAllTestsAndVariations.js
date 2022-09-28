@@ -1,8 +1,13 @@
 ﻿﻿const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
+    /* 
+    DEPRECIATED 
+    */
     app.get('/api/testsAll', async (req,res) => {
        try {
+        // This Route testsAll is now depreciated, prefer use /api/tests?child=true
+        console.log("[WARNING] This Route testsAll is now depreciated, prefer use '/api/tests?child=true'");
             const Tests = await models['Test'].findAndCountAll({
                 order:['label'],
                 include:

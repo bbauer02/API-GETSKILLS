@@ -81,7 +81,7 @@ module.exports = (app) => {
             }
             const Exams = await models['Exam'].findAll(parameters);
             const message = `${Exams.length} exams found`;
-            res.json({ message, data: Exams });
+            res.json({ message, exams: Exams });
         }
         catch (error) {
             const message = `Service not available. Please retry later.`;
