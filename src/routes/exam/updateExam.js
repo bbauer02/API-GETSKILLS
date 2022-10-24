@@ -14,7 +14,7 @@ module.exports = (app) => {
                 where:{exam_id:req.params.id}
             });
             const message = `Exam id:${Exam.exam_id} has been updated `;
-            res.json({message, data: Exam});
+            res.json({message, exam: Exam});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {

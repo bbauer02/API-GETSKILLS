@@ -63,13 +63,13 @@ module.exports = (app) => {
                 }
             ];
 
-            const Session = await models['Session'].findOne(parameters);
-            if (Session === null) {
+            const session = await models['Session'].findOne(parameters);
+            if (session === null) {
                 const message = `Session doesn't exist.Retry with an other Session id.`;
                 return res.status(404).json({ message });
             }
             const message = `Session found`;
-            res.json({ message, data: Session });
+            res.json({ message, session });
         }
         catch (error) {
             const message = `Service not available. Please retry later.`;

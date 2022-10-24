@@ -17,7 +17,7 @@ module.exports = (app) => {
       const SessionDeleted = Session;
       await Session.destroy({where: { session_id: Session.session_id}});
       const message = `Session id:${SessionDeleted.session_id} has been deleted`;
-      res.json({message, data: SessionDeleted});
+      res.json({message, session: SessionDeleted});
     }
     catch(error) {
       const message = `Service not available. Please retry later.`;

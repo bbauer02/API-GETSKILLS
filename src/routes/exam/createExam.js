@@ -5,9 +5,10 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  app => {
     app.post('/api/exams',isAuthenticated, isAuthorized, async (req, res) => {
         try {
+            console.log(req.body)
             const exam = await models['Exam'].create(req.body);
             const message = `The exam '${req.body.label}' has been created.`;
-            res.json({message,data:exam})
+            res.json({message,exam})
         }
         catch(error) {
             if(error instanceof ValidationError) {
@@ -16,7 +17,7 @@ module.exports =  app => {
             if(error instanceof UniqueConstraintError) {
                 return res.status(400).json({message: error.message, data:error})
             }
-            const message = `Level cannot be created. Retry later. `;
+            const message = `Exam cannot be created. Retry later. `;
             res.status(500).json({message, data:error});
         }
     });

@@ -154,9 +154,9 @@ module.exports = (app) => {
 
             parameters.distinct = true;
             parameters.group = ['session_id'];
-            const Sessions = await models['Session'].findAll(parameters);
-            const message = `${Sessions.length} sessions found`;
-            res.json({ message, data: Sessions });
+            const sessions = await models['Session'].findAll(parameters);
+            const message = `${sessions.length} sessions found`;
+            res.json({ message, sessions });
         }
         catch (error) {
             const message = `Service not available. Please retry later.`;

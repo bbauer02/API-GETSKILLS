@@ -13,7 +13,7 @@ module.exports =  (app) => {
                 return res.status(404).json({message});
             }
             const message = `Exam found`;
-            res.json({message, data: Exam})
+            res.json({message, exam: Exam})
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

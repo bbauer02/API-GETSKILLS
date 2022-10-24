@@ -12,7 +12,7 @@ module.exports = (app) => {
       const examDeleted = Exam;
       await Exam.destroy({where: { exam_id: Exam.exam_id}});
       const message = `Institut id:${examDeleted.exam_id} has been deleted`;
-      res.json({message, data: examDeleted});
+      res.json({message, exam: examDeleted});
     }
     catch(error) {
       const message = `Service not available. Please retry later.`;
