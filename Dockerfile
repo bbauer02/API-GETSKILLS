@@ -1,8 +1,11 @@
-FROM node:16
+FROM node:alpine
 
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install -g npm@latest
-RUN npm install -g nodemon@latest
-RUN npm install
-CMD [ "npm", "start" ]
+RUN apk update && \
+    mkdir -p /usr/app/API-GETSKILLS && \
+    cd /usr/app/API-GETSKILLS
+
+WORKDIR /usr/app/API-GETSKILLS
+COPY . /usr/app/API-GETSKILLS/
+EXPOSE 3003:3003
+
+CMD ["npm", "run", "dev"]

@@ -4,6 +4,7 @@ const { models } = require('../models');
 const { power } = require('../config');
 const config = require('../../config.prod');
 const crypto = require('crypto');
+const { cp } = require('fs');
 
 
 
@@ -44,6 +45,7 @@ module.exports = {
         return new Promise(async (resolve, reject) => {
 
             try {
+                
                 const { cookies, headers } = req;
                 /* On vérifie que le JWT est présent dans les cookies de la requête */
                 if (!cookies || !cookies.access_token) {
@@ -51,6 +53,7 @@ module.exports = {
                 }
                 const accessToken = cookies.access_token;
                 /* On vérifie que le token CSRF est présent dans les en-têtes de la requête */
+
                 if (!headers || !headers['x-xsrf-token']) {
                     reject(new Error('Missing XSRF token in headers'));
                 }
@@ -76,6 +79,7 @@ module.exports = {
     isAuthenticated: async (req, res, next) => {
         try {
             const decodedToken = await module.exports.getHeaderToken(req);
+            console.log(decodedToken)
             // 4. On vérifie que l'utilisateur existe bien dans notre base de données.
             const userId = decodedToken.sub;
             const user = await models['User'].findOne({ where: { user_id: userId } });
