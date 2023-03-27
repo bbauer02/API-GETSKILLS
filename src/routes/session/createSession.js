@@ -4,28 +4,39 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/sessions', isAuthenticated, isAuthorized, async (req, res) => {
-
-        async function createSession() {
-            try {
-
-                // Ici le req.body contient deux objects, un avec les infos de la session
-                // et un autre contenant toutes les info des sessionHasUser (adresse et heure épreuves)
-                // req.body.session et req.body.examsForSessionCreate
-                const SessionCreated = await models['Session'].create(req.body.session);
-                return SessionCreated;
-
-            } catch (error) {
-                if (error instanceof ValidationError) {
-                    return res.status(400).json({ message: error.message, data: error })
+        try {
+            const { session, sessionHasExam} = req.body;
+            console.log(session);
+            const {dataValues : sessionCreated} = await models['Session'].create(session);
+            const exams = sessionHasExam.filter((exam) => exam.examId !=="").map((exam, index) => {
+                return {
+                    adressExam: exam.adressExam,
+                    room: exam.room,
+                    DateTime: exam.examDateTime,
+                    session_id: sessionCreated.session_id,
+                    exam_id: exam.examId
                 }
-                if (error instanceof UniqueConstraintError) {
-                    return res.status(400).json({ message: error.message, data: error })
-                }
-                const message = `An error has occured creating the Session.`;
-                return res.status(500).json({ message, data: error.message })
+            });
+            console.log(exams);
+            await models['sessionHasExam'].bulkCreate(exams);
+            const message = `Session id : ${sessionCreated.session_id} and all the sessionHasExam have been created.`;
+            res.json({ message, session: sessionCreated })
+        }
+        catch (error) { 
+            if (error instanceof ValidationError) {
+                return res.status(400).json({ message: error.message, data: error })
             }
+            if (error instanceof UniqueConstraintError) {
+                return res.status(400).json({ message: error.message, data: error })
+            }
+            const message = `An error has occured creating the Session.`;
+            return res.status(500).json({ message, data: error.message })
         }
 
+
+
+
+/*
         // unused
         /*
         async function findAllSessionExams() {
@@ -98,7 +109,7 @@ module.exports = (app) => {
             }
         }
         */
-
+/*
         async function postAllSessionHasExam(_sessionCreated) {
             try {
 
@@ -145,6 +156,6 @@ module.exports = (app) => {
         } catch (error) {
             const message = `Service not available. Please retry later.`;
             res.status(500).json({ message, data: error });
-        }
+        }*/
     });
 }

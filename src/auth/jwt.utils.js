@@ -79,7 +79,6 @@ module.exports = {
     isAuthenticated: async (req, res, next) => {
         try {
             const decodedToken = await module.exports.getHeaderToken(req);
-            console.log(decodedToken)
             // 4. On vérifie que l'utilisateur existe bien dans notre base de données.
             const userId = decodedToken.sub;
             const user = await models['User'].findOne({ where: { user_id: userId } });
