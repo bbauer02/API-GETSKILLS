@@ -3,7 +3,6 @@ const {  isAuthenticated,isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
     app.get('/api/account/', isAuthenticated, async (req,res) => {
         try {
-            console.log("her")
             const parameters = {}; 
             parameters.where = {user_id:req.accessToken.sub};
             parameters.order = ['lastname'];
