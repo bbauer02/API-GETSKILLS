@@ -5,7 +5,21 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/sessions', isAuthenticated, isAuthorized, async (req, res) => {
 
-        async function createSession() {
+
+        try {
+            
+            
+            const {session, sessionHasExam} = req.body;
+            // Création de la session
+            const {Session : {dataValues : SessionCreated}} = await models['Session'].create(session);
+            console.log(SessionCreated)
+        }
+        catch(error) {
+            const message = `Service not available. Please retry later.`;
+            res.status(500).json({message, data: error})
+          }
+
+       /* async function createSession() {
             try {
 
                 // Ici le req.body contient deux objects, un avec les infos de la session
@@ -99,7 +113,7 @@ module.exports = (app) => {
         }
         */
 
-        async function postAllSessionHasExam(_sessionCreated) {
+       /* async function postAllSessionHasExam(_sessionCreated) {
             try {
 
                 let sessionHasExamsForCreate = [];
@@ -137,7 +151,7 @@ module.exports = (app) => {
             const sessionCreated = await createSession();
             // const allExamsFromSession = await findAllSessionExams();
             // await checkAllExaminatorForEachExam();
-            await postAllSessionHasExam(sessionCreated);
+           // await postAllSessionHasExam(sessionCreated);
 
             const message = `Session id : ${sessionCreated.dataValues.session_id} and all the sessionHasExam have been created.`;
             res.json({ message, data: sessionCreated })
@@ -145,6 +159,6 @@ module.exports = (app) => {
         } catch (error) {
             const message = `Service not available. Please retry later.`;
             res.status(500).json({ message, data: error });
-        }
+        }*/
     });
 }
