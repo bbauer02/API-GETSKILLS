@@ -125,6 +125,7 @@ module.exports = (app) => {
 
             const addUsers = {
                 model: models['sessionUser'],
+                attributes: ['user_id']
             };
 
             parameters.include.push(addUsers);
@@ -151,9 +152,8 @@ module.exports = (app) => {
                 attributes: ['label']
             };
             parameters.include.push(addInstitut);
-
             parameters.distinct = true;
-            parameters.group = ['session_id'];
+           // parameters.group = ['session_id'];
             const sessions = await models['Session'].findAll(parameters);
             const message = `${sessions.length} sessions found`;
             res.json({ message, sessions });
