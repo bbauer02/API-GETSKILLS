@@ -40,7 +40,12 @@ module.exports =  (app) => {
                },
                {
                    model: models['Level']
-               }
+               },
+               {
+                model: models['Test'],
+                as:'parent', 
+                attributes : ["test_id", "label"]
+            },
            ]
 
             const Tests = await models['Test'].findAndCountAll(parameters);
@@ -52,7 +57,5 @@ module.exports =  (app) => {
          const message = `Service not available. Please retry later.`;
          res.status(500).json({message, data: error})
        }
-
-
     });
 }

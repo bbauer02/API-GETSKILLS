@@ -117,6 +117,7 @@ module.exports = {
             const defaultPowerNeeded = 10;
             // On obtient le pouvoir nécessaire à la lecture de cette route.
             const powerNeed = module.exports.getPowerNeed(powerNeedByHttpMethod, entriesPoints, defaultPowerNeeded);
+            
             // On vérifie les droits de l'utilisateur
             // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
             // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
@@ -148,7 +149,7 @@ module.exports = {
             else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
                 return next();
             }
-            // console.log(userPower, powerNeed);
+             console.log(userPower, powerNeed);
             throw new Error(`You have no power here !`);
         }
         catch (error) {

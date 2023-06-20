@@ -3,7 +3,7 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
     app.get('/api/tests/:id', async (req,res) => {
        try {
-            const Test = await models['Test'].findAll({
+            const test = await models['Test'].findOne({
                 where: {
                     test_id: req.params.id
                 },
@@ -26,12 +26,12 @@ module.exports =  (app) => {
                      }]
                 }]
             });
-            if(Test === null) {
+            if(test === null) {
                 const message = `Test doesn't exist.Retry with an other test id.`;
                 return res.status(404).json({message});
             }
             const message = `Test found`;
-            res.json({message, data: Test})
+            res.json({message, test})
        }
        catch (error){
          const message = `Service not available. Please retry later.`;
