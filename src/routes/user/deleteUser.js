@@ -11,7 +11,7 @@ module.exports = (app) => {
       const UserDeleted = User;
       await User.destroy({where: { user_id: User.user_id}});
       const message = `User id:${UserDeleted.user_id} has been deleted`;
-      res.json({message, data: UserDeleted});
+      res.json({message, user: UserDeleted});
     }
     catch(error) {
       const message = `Service not available. Please retry later.`;
