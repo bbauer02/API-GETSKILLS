@@ -38,6 +38,8 @@ module.exports = (app) => {
                 where:{user_id:user.user_id}
             });
 
+            
+
             const message = `User id:${User.user_id} has been updated `;
             res.json({message, User});
         }

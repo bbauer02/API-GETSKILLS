@@ -80,67 +80,43 @@ module.exports = (app) => {
                 attributes: ["label"]
             }];
 
-            // Options 
+           // Options 
 
             const addUsers = {
                 model: models['sessionUser'],
+                attributes: ['user_id']
             };
 
-            // Add Users
-            if (req.query.users === "true") {
-                const addUsers = {
-                    model: models['sessionUser'],
-                    include: [
-                        {
-                            model: models['User'],
-                            attributes: { exclude: ['password'] },
-                            include: [{
-                                model: models['Country'],
-                                as: "country",
-                                attributes: ["label"]
-                            },
-                            {
-                                model: models['Country'],
-                                as: "nationality",
-                                attributes: ["countryNationality"]
-                            },
-                            {
-                                model: models['Language'],
-                                as: "firstlanguage",
-                                attributes: ["nativeName"]
-                            }]
-                        }]
-                };
-                parameters.include.push(addUsers);
-            }
+            parameters.include.push(addUsers);
 
-
-            // Options 
-            // Add Test & Levels
-
-            if (req.query.levels === "true") {
-                const addTests = {
+            const addTests = {
+                model: models['Test'],
+                attributes: ['test_id', 'label', 'isInternal', 'parent_id'],
+                include: [{
+                    as: "parent",
                     model: models['Test'],
                     attributes: ['test_id', 'label', 'isInternal', 'parent_id'],
-                    include: [{
-                        as: "parent",
-                        model: models['Test'],
-                        attributes: ['test_id', 'label', 'isInternal', 'parent_id'],
-                    }]
-                };
-                parameters.include.push(addTests);
+                }]
+            };
+            parameters.include.push(addTests);
 
-                const addLevels = {
-                    model: models['Level'],
-                    attributes: ['level_id', 'label', 'ref', 'description']
-                };
-                parameters.include.push(addLevels);
-            }
+            const addLevels = {
+                model: models['Level'],
+                attributes: ['level_id', 'label', 'ref', 'description']
+            };
+            parameters.include.push(addLevels);
+
+            const addInstitut = {
+                model: models['Institut'],
+                attributes: ['label']
+            };
+            parameters.include.push(addInstitut);
+            parameters.distinct = true;
 
 
             const Sessions = await models['Session'].findAndCountAll(parameters);
             const message = `${Sessions.count} sessions found`;
-            res.json({ message, data: Sessions.rows });
+            res.json({ message, sessions: Sessions.rows });
         }
         catch (error) {
             const message = `Service not available. Please retry later.`;

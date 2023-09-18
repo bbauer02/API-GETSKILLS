@@ -30,7 +30,7 @@ module.exports = (app) => {
                 where: { session_id: req.params.session_id }
             });
             const message = `Session id:${Session.session_id} has been updated `;
-            res.json({ message, data: Session });
+            res.json({ message, session: Session });
         }
         catch (error) {
             if (error instanceof UniqueConstraintError) {
