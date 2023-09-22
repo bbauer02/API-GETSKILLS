@@ -4,16 +4,19 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports = (app) => {
     app.put('/api/tests/:id', isAuthenticated, isAuthorized,async (req, res) => {
         try {
-            const Test = await models['Test'].findByPk(req.params.id);
-            if(Test === null) {
+            const test = await models['Test'].findByPk(req.params.id);
+            if(test === null) {
                 const message = `Test doesn't exist.Retry with an other Test id.`;
                 return res.status(404).json({message});
             }
-            await Test.update(req.body,{
+            if(req.body.parent_id === -1 || req.body.parent_id === '-1') {
+                req.body.parent_id = null;
+            }
+            await test.update(req.body,{
                 where:{test_id:req.params.id}
             });
-            const message = `Test id:${Test.test_id} has been updated `;
-            res.json({message, data: Test});
+            const message = `Test id:${test.test_id} has been updated `;
+            res.json({message, test});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {

@@ -133,7 +133,7 @@ module.exports =  (app) => {
             }];
             const Users = await models['User'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;
-            res.json({message, data: Users.rows});
+            res.json({message, users : Users.rows});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;

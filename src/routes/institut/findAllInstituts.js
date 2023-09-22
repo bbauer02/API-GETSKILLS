@@ -5,6 +5,7 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  (app) => {
     app.get('/api/instituts',isAuthenticated, isAuthorized, async (req,res) => {
         try {
+
             const parameters = {}; 
             parameters.where = {};
             // Recherche par nom.

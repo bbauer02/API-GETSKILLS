@@ -5,11 +5,17 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 module.exports =  app => {
     app.post('/api/tests',isAuthenticated, isAuthorized, async (req, res) => {
         try {
-            const test = await models['Test'].create(req.body);
+            const newTest = {
+                label: req.body.label,
+                isInternal : req.body.isInternal,
+                isArchive : false,
+                parent_id : req.body.parent_id === -1 || req.body.parent_id === "-1" ? null : req.body.parent_id,
+            };
+            const test = await models['Test'].create(newTest);
             const message = `The test '${req.body.label}' has been created.`;
-            res.json({message,data:test})
+            res.json({message,test})
         }
-        catch(error) {
+        catch(error) { 
             if(error instanceof ValidationError) {
                 return res.status(400).json({message:error.message, data:error})
             }
