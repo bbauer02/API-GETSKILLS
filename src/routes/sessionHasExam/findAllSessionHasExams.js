@@ -80,7 +80,7 @@ module.exports = (app) => {
 
             const SessionshasUsers = await models['sessionHasExam'].findAll(parameters);
             const message = `${SessionshasUsers.length} sessionHasExams found`;
-            res.json({ message, data: SessionshasUsers });
+            res.json({ message, exams: SessionshasUsers });
         }
         catch (error) {
             const message = `Service not available. Please retry later.`;

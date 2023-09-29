@@ -8,7 +8,6 @@ module.exports = (app) => {
     app.put('/api/instituts/:institut_id/sessions/:session_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         const { session, sessionHasExams} = req.body;
-        
         // on vérifie que l'Id de la session et de l'institut dans l'url correspondent à ceux passé dans le body
         if (req.params.session_id != session.session_id) {
             const message = `The session id in the url doesn't match the session id in the body.`;
