@@ -16,12 +16,36 @@ module.exports =  (app) => {
                 where: {},
                 include: [{
                     model: models['Exam']
-                }
-            ]}];
+                }]
+            },
+            {
+                model: models['User'],
+                attributes: { exclude: ['password'] },
+                include: [{
+                    model: models['Country'],
+                    as: 'country',
+                    attributes: ["label"]
+                },
+                {
+                    model: models['Country'],
+                    as: 'nationality',
+                    attributes: [["countryNationality", 'label']]
+                },
+                {
+                    model: models['Language'],
+                    as: 'firstlanguage',
+                    attributes: ['nativeName']
+                },
+                {
+                    model: models['Role'],
+                    as: 'systemRole'
+                }]
+            }
+        ];
 
             const sessionUser = await models['sessionUser'].findOne(parameters);
             const message = 'sessionUser found';
-            res.json({message, data: sessionUser});
+            res.json({message, sessionUser});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
