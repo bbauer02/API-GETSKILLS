@@ -136,6 +136,17 @@ module.exports = {
                 }
             }
             if(moduleName === 'users') {
+                const response = await models['institutHasUser'].findOne({ where: { user_id: ids[0] } });
+                if (!response) {
+                    throw new Error(`User ${ids[0]} not exists.`);
+                }
+                const userToUpdateInstitut =  response.dataValues.institut_id;
+                const currentUserInstitut = decodedToken.instituts[0].institut_id;
+
+                // On verifie si celui qui fait l'update de l'utilisateur est membre de l'institut du user modifié
+                if(httpMethod ==="PUT" && userToUpdateInstitut === currentUserInstitut && decodedToken.instituts[0].Role.power >= power["PUT"]["instituts"]["sessions"]["users"]) {
+                    return next();
+                }
                 if(httpMethod ==="PUT" && decodedToken.user_id === parseInt(ids[0],10) ) {
                     if(req.body.systemRole_id) {
                         delete req.body.systemRole_id;
@@ -149,7 +160,6 @@ module.exports = {
             else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
                 return next();
             }
-             console.log(userPower, powerNeed);
             throw new Error(`You have no power here !`);
         }
         catch (error) {
