@@ -1,51 +1,49 @@
 ﻿const {models} = require('../../models');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports =  (app) => {
     app.get('/api/instituts/:institut_id/sessions/:session_id/users/:user_id', isAuthenticated,isAuthorized, async (req, res) => {
         try {
-            const parameters = {}; 
+            const parameters = {
+                attributes: ['session_id']
+            }; 
             parameters.where = {
                 session_id: req.params.session_id,
-                user_id: req.params.user_id
+
             };
 
-            parameters.include = [{
-                model: models['sessionUserOption'],
-                where: {},
-                include: [{
-                    model: models['Exam']
-                }]
-            },
-            {
-                model: models['User'],
-                attributes: { exclude: ['password'] },
-                include: [{
-                    model: models['Country'],
-                    as: 'country',
-                    attributes: ["label"]
-                },
+            parameters.include = [
                 {
-                    model: models['Country'],
-                    as: 'nationality',
-                    attributes: [["countryNationality", 'label']]
-                },
-                {
-                    model: models['Language'],
-                    as: 'firstlanguage',
-                    attributes: ['nativeName']
-                },
-                {
-                    model: models['Role'],
-                    as: 'systemRole'
-                }]
-            }
-        ];
+                    model: models['sessionUser'],
+                    where: 
+                    {
+                        user_id: req.params.user_id,
+                    },
+                    include: [{
+                        model: models['sessionUserOption'],
+                        include: [{
+                            model: models['Exam'],
+                            where: {isOption: true},
+                            include: [{
+                                model: models['sessionHasExam'],
+                                where: {session_id: req.params.session_id}
+                            }]
 
-            const sessionUser = await models['sessionUser'].findOne(parameters);
+                        }]
+
+                    },
+                    {
+                        model: models['User'],
+                    }]
+                }
+            
+            ];
+ 
+          
+            const session = await models['Session'].findOne(parameters);
             const message = 'sessionUser found';
-            res.json({message, sessionUser});
+            res.json({message, sessionUser: session.sessionUsers[0]});
         }
         catch(error) {
             const message = `Service not available. Please retry later.`;
@@ -53,3 +51,38 @@ module.exports =  (app) => {
         }
     });
 }
+
+
+
+
+/* 
+  const parameters = {
+                attributes: ['session_id']
+            }; 
+            parameters.where = {
+                session_id: req.params.session_id,
+
+            };
+
+            parameters.include = [{
+                model: models['sessionUser'],
+                where: 
+                {
+                    user_id: req.params.user_id,
+                },
+                include: [{
+                    model: models['sessionUserOption'],
+                    include: [{
+                        model: models['Exam'],
+                        where: {isOption: true},
+                        include: [{
+                            model: models['sessionHasExam'],
+                            where: {session_id: req.params.session_id}
+                        }]
+
+                    }]
+
+                }]
+            }];
+
+            */
