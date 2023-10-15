@@ -86,7 +86,7 @@ const itemsCsv = require('../db/mock-items_csv');
         this.#fillEmpowerments();
         this.#fillSessionExamExaminators();
         this.#fillInstitutHasPrices();
-        this.#fillSessionUserOption();
+       // this.#fillSessionUserOption();
     }
 
     #fillCountries() {
