@@ -4,9 +4,7 @@ const moment = require('moment');
 
 module.exports = (app) => {
     app.get('/api/instituts/:institut_id/sessions/:session_id/exams', async (req, res) => {
-
         try {
-
             const parameters = {};
             parameters.where = {
                 session_id: req.params.session_id
@@ -41,7 +39,12 @@ module.exports = (app) => {
                 model: models['sessionExamHasExaminator']
             },
             {
-                model: models['Exam']
+                model: models['Exam'],
+                include: [{
+                    model: models['InstitutHasPrices'],
+                    required: false,
+                    attributes: ['price', 'tva'],
+                }]
             }];
 
             // Add Users
