@@ -4,11 +4,11 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 // Unused
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/options', isAuthorized, isAuthenticated, async (req,res) => {
+    app.post('/api/instituts/:institut_id/options',  isAuthenticated, isAuthorized,  async (req,res) => {
         try{
             const sessionUserOption = await models['sessionUserOption'].create(req.body);
             const message = `Option has been added in the sessionUser id : ${sessionUserOption.sessionUser_id}.`;
-            res.json({message, data:sessionUserOption})
+            res.json({message, sessionUserOption})
         }catch(error) {
             if(error instanceof ValidationError) {
                 return res.status(400).json({message:error.message, data:error})

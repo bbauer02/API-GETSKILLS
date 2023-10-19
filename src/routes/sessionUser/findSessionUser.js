@@ -17,7 +17,7 @@ module.exports =  (app) => {
                 {
                     // les epreuves obligatoires de la session
                     model: models['sessionHasExam'],
-                    attributes: ['adressExam', 'room', 'DateTime'],
+                    attributes: ['sessionHasExam_id', 'adressExam', 'room', 'DateTime'],
                     include: [{
                         model: models['Exam'],
                         attributes: ['exam_id', 'label', 'price', 'isOption'],
@@ -37,9 +37,14 @@ module.exports =  (app) => {
                     where: {
                         user_id: req.params.user_id,
                     },
-                    include: [{
-                        model: models['sessionUserOption'],
-                    }]
+                    include: [
+                        {
+                            model: models['sessionUserOption'],
+                        },
+                        {
+                            model: models['User'],
+                        }
+                    ]
                 }
             ];
 

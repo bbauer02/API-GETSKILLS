@@ -87,6 +87,7 @@ module.exports = (env) => ({
             exams: {
                 price: env.INSTITUTS_EXAMS_PRICE_POST
             },
+            options: env.SESSIONS_USER_OPTION_POST,
             empowermenttests: env.EMPOWERMENT_POST,
             newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
@@ -191,6 +192,11 @@ module.exports = (env) => ({
             },
             documents: {
                 default: env.DOCUMENTS_DELETE
+            },
+            sessionUsers: {
+                exams:{
+                    options: env.SESSIONS_USER_OPTION_DELETE
+                }
             }
         },
         exams: env.EXAMS_DELETE,

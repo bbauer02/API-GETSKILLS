@@ -209,7 +209,7 @@ module.exports = (app) => {
             
 
 
-            await sessionUserOptionFound.update(req.body, {
+           const optionUpdated =  await sessionUserOptionFound.update(req.body, {
                 where: {
                     sessionUser_id: req.params.sessionUser_id,
                     exam_id: req.params.exam_id,
@@ -217,10 +217,10 @@ module.exports = (app) => {
                 }
             });
 
-            const sessionUserUpdated = await findSessionUser();
+           // const sessionUserUpdated = await findSessionUser();
 
             const message = `The sessionUser session has been updated `;
-            res.json({ message, data: sessionUserUpdated });
+            res.json({ message, optionUpdated: optionUpdated });
         }
         catch (error) {
             if (error instanceof UniqueConstraintError) {

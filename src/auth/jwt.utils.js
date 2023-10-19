@@ -117,7 +117,6 @@ module.exports = {
             const defaultPowerNeeded = 10;
             // On obtient le pouvoir nécessaire à la lecture de cette route.
             const powerNeed = module.exports.getPowerNeed(powerNeedByHttpMethod, entriesPoints, defaultPowerNeeded);
-            
             // On vérifie les droits de l'utilisateur
             // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
             // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
@@ -127,10 +126,11 @@ module.exports = {
             if (moduleName === 'instituts') {
                 // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
                 const reqInstitut_id = req.params.institut_id || req.body.institut_id || req.query.institut_id || null;
+              
                 if (reqInstitut_id) {
-                    
                     // on cherche dans le token de connexion l'objet relatif à l'identifiant de l'institut concerné. 
                     userMemberOfInstitut = decodedToken.instituts.find(({ institut_id }) => institut_id === parseInt(reqInstitut_id));
+
                     // on récupére le userPower
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
                 }

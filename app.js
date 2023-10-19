@@ -114,6 +114,7 @@ require('./src/routes/sessionUser/findSessionUser')(app);
 require('./src/routes/sessionUser/findSessionUsers')(app);
 require('./src/routes/sessionUser/updateSessionUser')(app);
 require('./src/routes/sessionUser/updateSessionUserOption')(app);
+require('./src/routes/sessionUser/deleteSessionUserOption')(app);
 
 // SessionHasExams
 require('./src/routes/sessionHasExam/createSessionHasExam')(app);
