@@ -33,7 +33,6 @@ module.exports =  (app) => {
                 {
                     // L'utilisateur de la session
                     model: models['sessionUser'],
-                    attributes: {exclude: ['paymentMode','numInscrAnt', 'inscription', 'hasPaid', 'informations' ]},
                     where: {
                         user_id: req.params.user_id,
                     },
