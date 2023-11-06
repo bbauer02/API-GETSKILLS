@@ -186,6 +186,9 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.RefreshToken, {as: 'refreshTokens', foreignKey: 'user_id',sourceKey:'user_id'});
 
         User.hasMany(models.empowermentTests,{foreignKey:'user_id', sourceKey:'user_id'});
+
+        User.hasMany(models.Invoice,{foreignKey:'user_id',sourceKey: 'user_id'});
+
     }
     return User;
 } 

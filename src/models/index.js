@@ -35,9 +35,9 @@ const initDB = async (sequelize) => {
             isDev = false;
         }
         // force: isDev
-        //isDev = false
-        await sequelize.sync({ force: false, alter: false });
-       /*
+       // isDev = false
+        await sequelize.sync({ force: true, alter: true });
+
         if(isDev) {
             console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
             const mock = new MockDatas();
@@ -98,6 +98,11 @@ const initDB = async (sequelize) => {
             //sessionUserOption
             await models['sessionUserOption'].bulkCreate(mock.sessionUserOption);
             console.log('Table `sessionUserOption` ........... OK');
+            //invoices + invoiceLines
+            console.log('Table `invoices` ........... OK');
+            await models['Invoice'].bulkCreate(mock.invoices);
+            console.log('Table `invoice_lines` ........... OK');
+            await models['InvoiceLines'].bulkCreate(mock.invoice_lines);
             // Suppression des Templates
             await destroyFolder('templates');
             createRepositoryWithName('templates');
@@ -148,7 +153,7 @@ const initDB = async (sequelize) => {
                 console.log("");
             }
             
-        } */
+        } 
         console.log("");
         console.log(_colors.green("API en écoute ..."));
     } catch (error) {

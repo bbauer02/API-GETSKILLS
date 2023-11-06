@@ -9,19 +9,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        num_line: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
         label: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        quantity: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        price_pu_ttc: {
+        price_HT: {
             type: DataTypes.FLOAT,
             allowNull: false,
         },
@@ -35,6 +27,13 @@ module.exports = (sequelize, DataTypes) => {
             timestamps: false
         }
     );
+    InvoiceLines.addScope('price_ttc', {
+        attributes: {
+            include: [
+                [sequelize.literal('price_HT + price_HT * (tva / 100)'), 'price_TTC']
+            ]
+        }
+    });
     InvoiceLines.associate = models => {
         InvoiceLines.belongsTo(models['Invoice'], {as: 'lines', foreignKey: 'invoice_id', sourceKey: 'invoice_id'});
     }

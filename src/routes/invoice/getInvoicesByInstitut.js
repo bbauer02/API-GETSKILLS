@@ -10,12 +10,19 @@ module.exports = (app) => {
      */
     async function getInvoices (where = null) {
 
-        let queryParameter = {include: {as: 'lines', model: models.InvoiceLines}}
+        let queryParameter = {
+            include: [
+                {
+                    as: 'lines', 
+                    model: models.InvoiceLines.scope('price_ttc'), 
+                }
+            ]
+        };
 
         if (where)
             queryParameter = {where, ...queryParameter}
 
-        return await models.Invoice.findAll(queryParameter);
+        return await models.Invoice.scope('amount_ttc').findAll(queryParameter);
 
     }
 
@@ -55,9 +62,9 @@ module.exports = (app) => {
             const invoices = await getInvoices({institut_id: institutId});
 
             if (invoices.length === 0) {
-                return res.status(400).json({message: "error: no invoices found", data: null})
+                return res.status(400).json({message: "error: no invoices found", invoices: null})
             } else {
-                return res.status(200).json({message: `${invoices.length} invoices found.`, data: invoices});
+                return res.status(200).json({message: `${invoices.length} invoices found.`, invoices});
             }
 
         } catch (e) {

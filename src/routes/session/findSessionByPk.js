@@ -11,8 +11,14 @@ module.exports = (app) => {
                 {
                     model: models['sessionHasExam'],
                     include: [{
-                        model: models['Exam']
-                    }]
+                        model: models['Exam'],
+                        include: [{
+                            model: models['InstitutHasPrices'],
+                            required: false,
+                            attributes: ['price', 'tva'],
+                            where: { institut_id: req.params.institut_id }
+                        }]
+                    }],
                 },
                 {
                     model: models['Institut'],

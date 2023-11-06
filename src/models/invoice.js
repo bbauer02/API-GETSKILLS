@@ -9,16 +9,61 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
-            reference: {
+            session_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            user_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            session: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            isPaid: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false,
+           
+            customerFirstname: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerLastname: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerAddress: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerCity: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerZipCode: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerCountry: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerEmail: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            customerPhone: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            status: {
+                type: DataTypes.INTEGER,
+                defaultValue: 0,
                 allowNull: false,
             },
             ref_client: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            ref_invoice: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
@@ -26,11 +71,15 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
-            price_total_TTC: {
-                type: DataTypes.FLOAT,
+            level: {
+                type: DataTypes.STRING,
                 allowNull: false,
             },
-            DateTime: {
+            createDate: {
+                type: DataTypes.DATE,
+                allowNull: true
+            },
+            dueDate: {
                 type: DataTypes.DATE,
                 allowNull: true
             },
@@ -40,9 +89,23 @@ module.exports = (sequelize, DataTypes) => {
             timestamps: true
         }
     );
+    Invoice.addScope('amount_ttc', {
+        attributes: {
+            include: [
+                [
+                  sequelize.literal('(SELECT SUM(price_ht + (price_ht * tva / 100)) FROM `invoice_lines` WHERE `invoice_id` = `invoice`.`invoice_id`)'),
+                  'amount_ttc'
+                ],
+              ],
+        }
+    });
     Invoice.associate = models => {
         Invoice.belongsTo(models.Institut, {foreignKey: 'institut_id', sourceKey: 'institut_id'});
         Invoice.hasMany(models.InvoiceLines, {as: 'lines', foreignKey: 'invoice_id', sourceKey: 'invoice_id'});
+
+
+        Invoice.belongsTo(models.User, {foreignKey: 'user_id', sourceKey: 'user_id'});
+        Invoice.belongsTo(models.Session, {foreignKey: 'session_id', sourceKey: 'session_id'});
     }
     return Invoice;
 }

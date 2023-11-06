@@ -13,6 +13,9 @@ const tests = require('../db/mock-tests');
 const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const itemsCsv = require('../db/mock-items_csv');
+const { fa } = require('faker/lib/locales');
+const { format } = require('date-fns');
+
  class MockDatas {
 
     // Params
@@ -46,6 +49,8 @@ const itemsCsv = require('../db/mock-items_csv');
     sessionExamsExaminators = [];
     institutHasPrices = [];
     sessionUserOption = [];
+    invoices = [];
+    invoice_lines = [];
 
     constructor(
                  nbrUsers=500, 
@@ -55,7 +60,8 @@ const itemsCsv = require('../db/mock-items_csv');
                 nbrSubSkills=20, 
                 nbrSubSubSkills=20,
                 nbrExams=50,
-                nbrInstitutExamPrices = 50) {
+                nbrInstitutExamPrices = 50,
+                nbrInvoices = 50) {
         this.nbrUsers = nbrUsers;
         this.nbrSessions = nbrSession;
         this.nbrSessionUsers = nbrSessionUsers;
@@ -64,6 +70,8 @@ const itemsCsv = require('../db/mock-items_csv');
         this.nbrSubSubSkills = nbrSubSubSkills;
         this.nbrExams = nbrExams;
         this.nbrInstitutExamPrices = nbrInstitutExamPrices;
+        this.nbrInvoices = nbrInvoices;
+
     }
     async initialize() {
         this.#fillCountries();
@@ -86,6 +94,7 @@ const itemsCsv = require('../db/mock-items_csv');
         this.#fillEmpowerments();
         this.#fillSessionExamExaminators();
         this.#fillInstitutHasPrices();
+        this.#fillInvoices();
        // this.#fillSessionUserOption();
     }
 
@@ -578,6 +587,74 @@ const itemsCsv = require('../db/mock-items_csv');
                 }
             }
         }
+    }
+
+    padWithZeros(number) {
+        const numberString = number.toString();
+        const zerosToAdd = 5 - numberString.length;
+        
+        if (zerosToAdd <= 0) {
+          // Si le nombre est déjà de 5 caractères ou plus, retourne tel quel.
+          return numberString;
+        } else {
+          // Ajoute des zéros au début du nombre.
+          const paddedNumber = '0'.repeat(zerosToAdd) + numberString;
+          return paddedNumber;
+        }
+      }
+    #fillInvoices() {
+        for (let index = 1; index <= this.nbrInvoices; index++) {
+            const invoice = {
+                "session" : "Session du " + format(faker.date.future(), 'dd/MM/yyyy') + " au " + format(faker.date.future(), 'dd/MM/yyyy'),
+                "session_id" : faker.random.arrayElement(this.sessions).session_id,
+                "user_id": faker.random.arrayElement(this.defaultUsers).user_id,
+                "institut_id" : faker.random.arrayElement(this.instituts).institut_id,
+                "customerFirstname" : faker.name.firstName(),
+                "customerLastname" : faker.name.lastName(),
+                "customerAddress" : faker.address.streetAddress(),
+                "customerCity" : faker.address.city(),
+                "customerZipCode" : faker.address.zipCode(),
+                "customerCountry" : faker.address.country(),
+                "customerEmail" : faker.internet.email(),
+                "customerPhone" : faker.phone.phoneNumber(),
+                "status" : faker.datatype.number({
+                    'min': 0,
+                    'max': 3
+                }),
+                "ref_client" : faker.random.alphaNumeric(6).toUpperCase(),
+                "ref_invoice": `F${this.padWithZeros(index)}`,
+                "test" : faker.random.arrayElement(this.tests).label,
+                "level" : faker.random.arrayElement(this.levels).label,
+                "createDate" : faker.date.past(),
+                "dueDate" : faker.date.future()
+            }
+            const nbrLines = faker.datatype.number({
+                'min': 1,
+                'max': 5
+            });
+            
+
+            for (let index2 = 1; index2 <= nbrLines; index2++) {
+                this.invoice_lines.push({
+                    "invoice_id" : index,
+                    "label" : "EXAM " + faker.datatype.number({ 'min': 1, 'max': 10 }),
+                    "price_HT" : faker.datatype.number({
+                        'min': 100,
+                        'max': 1000
+                    }),
+                    "tva" : faker.datatype.number({
+                        'min': 10,
+                        'max': 22
+                    })
+                });
+            }
+
+
+            this.invoices.push(invoice);
+
+        }
+        
+    
     }
 }
 
