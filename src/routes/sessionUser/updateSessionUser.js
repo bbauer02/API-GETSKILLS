@@ -25,7 +25,7 @@ module.exports = (app) => {
                 }
             });
             const message = `The user's session has been updated `;
-            res.json({message, data: sessionUser});
+            res.json({message,  sessionUser});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {
