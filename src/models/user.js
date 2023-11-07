@@ -17,10 +17,10 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty:{msg: `User:Login cannot be empty !`},
                 notNull: {msg: `User:Login cannot be NULL!`}
             },
-            unique: {
+          /* unique: {
                 args : true,
                 msg: 'User:Login already exist!'
-            }
+            }*/
         },
         password: {
             type: DataTypes.STRING,
@@ -37,10 +37,10 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty:{msg: `User:Email cannot be empty !`},
                 notNull: {msg: `User:Email cannot be NULL!`}
             },
-            unique: {
+         /* unique: {
                 args : true,
                 msg: 'User:Email already exist!'
-            }
+            }*/
         }, 
         phone: {
             type: DataTypes.STRING,

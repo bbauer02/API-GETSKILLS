@@ -77,7 +77,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             level: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
             createDate: {
                 type: DataTypes.DATE,
@@ -90,7 +90,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         {
             tableName: 'invoice',
-            timestamps: true
+            timestamps: false
         }
     );
     Invoice.addScope('amount_ttc', {
@@ -108,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
         Invoice.hasMany(models.InvoiceLines, {as: 'lines', foreignKey: 'invoice_id', sourceKey: 'invoice_id'});
 
 
-        Invoice.belongsTo(models.User, {foreignKey: 'user_id', sourceKey: 'user_id'});
+        Invoice.belongsTo(models.User, {foreignKey: 'user_id', sourceKey: 'user_id', onDelete: 'NO ACTION'});
         Invoice.belongsTo(models.Session, {foreignKey: 'session_id', sourceKey: 'session_id'});
     }
     return Invoice;
