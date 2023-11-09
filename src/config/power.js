@@ -22,7 +22,8 @@ module.exports = (env) => ({
                 default: env.SESSION_GET,
                 users: {
                     default: env.SESSIONS_USER_GET,
-                    exams: env.SESSIONS_EXAM_GET
+                    exams: env.SESSIONS_EXAM_GET,
+                    invoices: env.INSTITUTS_SESSIONS_USERS_INVOICES_GET
                 },
                 exams: env.SESSIONS_EXAM_GET,
                 orders: env.INVOICES_GET,
@@ -94,7 +95,7 @@ module.exports = (env) => ({
                 default: env.SESSIONS_POST,
                 users: env.INSTITUTS_NEW_USER_POST,
                 exams: env.SESSIONS_EXAM_POST,
-                exports: env.SESSIONS_EXPORT
+                exports: env.SESSIONS_EXPORT,
             },
             invoices: {
                 default: env.INVOICES_POST,

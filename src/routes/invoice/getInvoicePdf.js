@@ -5,104 +5,77 @@ const {models} = require("../../models");
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-
-    async function getInvoice (invoiceId) {
-
-        return await models['Invoice'].findOne({
-            where: {invoice_id: invoiceId},
-            include: [
-                {
-                    model: models['InvoiceLines'],
-                    as: 'lines',
-                    required: false
-                },
-                {
-                    model: models['Institut'],
-                    include:
-                        [
-                            {
-                                attributes: [['label', 'label']],
-                                model: models['Country'],
-                                as: 'institutCountry'
-                            },
-                        ]
-                }
-            ]
-        })
-    }
-
-    async function generateInvoiceInPDF (invoiceId) {
-        // création d'un tableau d'objets contenant toutes les infos
-        const invoice = await getInvoice(invoiceId);
-
-        return [new FieldsForInvoice(invoice)];
-    }
-
-    async function findInvoice () {
-        return await models['Document'].findOne({
-            where: {institut_id: null, doctype: DOC_TYPES.findIndex((item) => item === "Facture") }
-        })
-    }
-
-
+ 
     /**
      * Génération du PDF de la facture des sessions pour les écoles.
      */
-    app.get('/api/instituts/:institut_id/invoices/:invoice_id/download', isAuthenticated, isAuthorized, async (req, res) => {
 
-        const invoiceId = parseInt(req.params.invoice_id);
-
+    async function getInvoice(req, res) {
         try {
 
-            const datasForPdf = await generateInvoiceInPDF(invoiceId);
+            let invoice_id;
+            let institut_id;
+            let session_id;
+            let user_id;
+            let where;
 
-            const document = await findInvoice();
+            if(req.params.invoice_id && req.params.institut_id) {
+                invoice_id = +req.params.invoice_id;
+                institut_id = +req.params.institut_id;
 
-            const files = await getDocumentPDF(datasForPdf, document.document_id);
-
-            // pas de fichier PDF trouvés
-            if (files.length === 0) {
-                throw new Error('No PDF files created.')
+                where = {
+                    invoice_id,
+                    institut_id
+                }
             }
+            else if(req.params.session_id && req.params.user_id && req.params.institut_id) {
+                session_id = +req.params.session_id;
+                user_id = +req.params.user_id;
+                institut_id = +req.params.institut_id;
 
-            // 1 fichier PDF généré
-            if (files.length === 1) {
-                reponseHTTPWithPdf(files[0], res, true)
+                where = {
+                    session_id,
+                    user_id,
+                    institut_id
+                }
             }
+            
+
+
+           const invoice =  await models['Invoice'].findOne({
+                where,
+                include: [
+                    {
+                        model: models['InvoiceLines'],
+                        as: 'lines',
+                        required: false
+                    },
+                    {
+                        model: models['Institut'],
+                        include:
+                            [
+                                {
+                                    attributes: [['label', 'label']],
+                                    model: models['Country'],
+                                    as: 'institutCountry'
+                                },
+                            ]
+                    }
+                ]
+            });
+
+            return res.status(200).json({message: `invoice found.`, invoice});
 
         } catch (e) {
             return res.status(400).json({message: e.message, data: null})
         }
+    }
 
+    app.get('/api/instituts/:institut_id/invoices/:invoice_id', isAuthenticated, isAuthorized, async (req, res) => {
+        await getInvoice(req, res);
     });
 
-    /**
-     * Génération du PDF de al facture des sessions pour Get-skills vers les écoles
-     */
-    app.get('/api/invoices/:invoice_id/download', isAuthenticated, isAuthorized, async (req, res) => {
-
-        const invoiceId = parseInt(req.params.invoice_id);
-
-        try {
-
-            const datasForPdf = await generateInvoiceInPDF(invoiceId);
-
-            const document = await findInvoice();
-
-            const files = await getDocumentPDF(datasForPdf, document.document_id);
-
-            // pas de fichier PDF trouvés
-            if (files.length === 0) {
-                throw new Error('No PDF files created.')
-            }
-
-            // 1 fichier PDF généré
-            if (files.length === 1) {
-                reponseHTTPWithPdf(files[0], res, true)
-            }
-
-        } catch (e) {
-            return res.status(400).json({message: e.message, data: null})
-        }
-    })
+    app.get('/api/instituts/:institut_id/sessions/:session_id/users/:user_id/invoices', isAuthenticated, isAuthorized, async (req, res) => {
+        await getInvoice(req, res);
+    });
 }

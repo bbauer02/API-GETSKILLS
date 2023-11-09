@@ -42,6 +42,24 @@ module.exports =  (app) => {
                         },
                         {
                             model: models['User'],
+                            attributes: { exclude: ['password'] },
+                            include: [
+                                {
+                                    model: models['Country'],
+                                    as: 'country',
+                                    attributes: ["label"]
+                                },
+                                {
+                                    model: models['Country'],
+                                    as: 'nationality',
+                                    attributes: [["countryNationality", 'label']]
+                                },
+                                {
+                                    model: models['Language'],
+                                    as: 'firstlanguage',
+                                    attributes: ['nativeName']
+                                },
+                            ]
                         }
                     ]
                 }

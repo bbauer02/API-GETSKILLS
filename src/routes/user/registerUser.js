@@ -12,7 +12,7 @@ function generateInvoiceID(sessionID, userID, instituteID) {
     const minutes = currentDate.getMinutes().toString().padStart(2, '0'); // Minutes avec 2 chiffres
     const seconds = currentDate.getSeconds().toString().padStart(2, '0'); // Secondes avec 2 chiffres
   
-    const invoiceID = `F${year}${month}${day}-${hours}${minutes}-${userID}`;
+    const invoiceID = `F${year}${month}${day}${hours}${minutes}${userID}`;
     return invoiceID;
   }
 
