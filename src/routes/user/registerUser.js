@@ -3,55 +3,42 @@ const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 const { format } = require('date-fns');
 
-function generateInvoiceID(sessionID, userID, instituteID) {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Mois avec 2 chiffres
-    const day = currentDate.getDate().toString().padStart(2, '0'); // Jour avec 2 chiffres
-    const hours = currentDate.getHours().toString().padStart(2, '0'); // Heure avec 2 chiffres
-    const minutes = currentDate.getMinutes().toString().padStart(2, '0'); // Minutes avec 2 chiffres
-    const seconds = currentDate.getSeconds().toString().padStart(2, '0'); // Secondes avec 2 chiffres
-  
-    const invoiceID = `F${year}${month}${day}${hours}${minutes}${userID}`;
-    return invoiceID;
-  }
+const {Invoice} = require('../invoice/invoice.class');
 
-  function padWithZeros(number) {
-    const numberString = number.toString();
-    const zerosToAdd = 8 - numberString.length;
-    
-    if (zerosToAdd <= 0) {
-      // Si le nombre est déjà de 5 caractères ou plus, retourne tel quel.
-      return numberString;
-    } else {
-      // Ajoute des zéros au début du nombre.
-      const paddedNumber = '0'.repeat(zerosToAdd) + numberString;
-      return paddedNumber;
-    }
-  }
+
 
 module.exports = (app) => {
     app.post('/api/instituts/:institut_id/sessions/:session_id/users',isAuthenticated, isAuthorized,  async (req,res) => {
         try{
+           
             const {user,institutHasUser, sessionUser, sessionUserOptions} = req.body; 
             // Création de l'utilisateur          
             user.systemRole_id = 1;
             const modelUser = await models['User'].create(user);
-            const newUser = await models['User'].findOne(
-                {
+            const newUser = await models['User'].findOne({
                     where: {
                         user_id: modelUser.user_id
                     },
+                    attributes:{exclude:['password']},
+ 
                     include: [
                         {
                             model: models['Country'],
                             as:'country',
                             attributes : ["label"]
-                        }
+                        },
+                        {
+                            model: models['Country'],
+                            as:'nationality',
+                            attributes : [["countryNationality",'label']]
+                        },
+                        {
+                            model: models['Language'],
+                            as:'firstlanguage',
+                            attributes : ['nativeName']
+                        },
                     ]
-                }
-            );
-               
+                });
             // Création de l'association entre l'utilisateur et l'institut 
             institutHasUser.user_id = newUser.user_id;
             institutHasUser.role_id =1 
@@ -66,6 +53,7 @@ module.exports = (app) => {
                     user_id: +newUser.user_id
                 }
             });
+
             // Création des options de l'utilisateur
             if(sessionUserOptions.length > 0) {
                 const NewSessionUserOptions = sessionUserOptions.map(_option => ({
@@ -76,31 +64,18 @@ module.exports = (app) => {
                await models['sessionUserOption'].bulkCreate(NewSessionUserOptions);
             }
 
-            // Infos de la session
-            const Session = await models['Session'].findOne({
-                where: {
-                    institut_id: +req.params.institut_id,
-                    session_id: +req.params.session_id,
-                }
-            });
+
+
+
+            const invoice = new Invoice(req.params.institut_id, req.params.session_id, newUser);
+            await invoice.initialize();
+
+
+           const message = 'user created';
+           res.json(invoice)
+/*
             
-            // Infos Test
-            const includeTest = [];
-            if(Session.level_id) {
-                includeTest.push([
-                    {
-                        model: models['Level'],
-                        where : { level_id: +Session.level_id }
-                    }
-                ])
-            }
-            const Test = await models['Test'].findOne({
-                where: {
-                    test_id: +Session.test_id
-                },
-                include: includeTest
-            })
-           
+          
             // création de la facture
             const createDate = new Date();
             const dueDate = createDate.setDate(createDate.getDate() + 45)
@@ -124,12 +99,11 @@ module.exports = (app) => {
                 ref_client: `REF-${userRef}`,
                 ref_invoice: generateInvoiceID(+req.params.session_id,+newUser.user_id,+req.params.institut_id),
                 test: Test.label,
-                level: Test.Levels ? Test.Levels[0].label : null,
+                level: Level ? Level.label : null,
                 createDate: new Date(),
                 dueDate, 
             }
 
-            
            const newInvoice = await models['Invoice'].create(invoice);
          
           // On doit maintenant ajouter la liste des épreuves obligatoires + les options
@@ -189,7 +163,7 @@ module.exports = (app) => {
 
             const message = 'user created';
             res.json({message})
-
+*/
         }catch(error) {
             if(error instanceof ValidationError) {
                 return res.status(400).json({message:error.message, data:error})
