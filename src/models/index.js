@@ -37,7 +37,7 @@ const initDB = async (sequelize) => {
         // force: isDev
        // isDev = false
         await sequelize.sync({ force: false, alter: false });
-/*
+ /*
         if(isDev) {
             console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
             const mock = new MockDatas();

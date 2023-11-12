@@ -646,7 +646,8 @@ const { format } = require('date-fns');
                     "tva" : faker.datatype.number({
                         'min': 10,
                         'max': 22
-                    })
+                    }),
+                    "exam_id" : faker.datatype.number({ 'min': 1, 'max': 10 }),
                 });
             }
 

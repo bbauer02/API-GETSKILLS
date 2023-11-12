@@ -93,7 +93,10 @@ module.exports = (env) => ({
             newuser: env.INSTITUTS_NEW_USER_POST,
             sessions: {
                 default: env.SESSIONS_POST,
-                users: env.INSTITUTS_NEW_USER_POST,
+                users: {
+                    default: env.INSTITUTS_NEW_USER_POST,
+                    invoices: env.INSTITUTS_SESSIONS_USERS_INVOICES_POST
+                },
                 exams: env.SESSIONS_EXAM_POST,
                 exports: env.SESSIONS_EXPORT,
             },
@@ -184,8 +187,11 @@ module.exports = (env) => ({
             empowermenttests: env.EMPOWERMENT_DELETE,
             sessions: {
                 default: env.SESSIONS_DELETE,
-                users: env.SESSIONS_USER_DELETE,
-                exams: env.SESSIONS_EXAM_DELETE
+                exams: env.SESSIONS_EXAM_DELETE,
+                users: {
+                    default: env.SESSIONS_USER_DELETE,
+                    invoices : env.INSTITUTS_SESSIONS_USERS_INVOICES_GET
+                }
             },
             sessionexams: {
                 default: env.SESSIONS_EXAM_DELETE,
