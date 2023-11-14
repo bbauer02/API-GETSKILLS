@@ -32,6 +32,7 @@ module.exports =  (app) => {
             parameters.include = [
                 {
                     model: models['Role'],
+                    attributes: ["label"],
                     where: {}
                 },
                 {
@@ -52,10 +53,6 @@ module.exports =  (app) => {
                         model: models['Language'],
                         as:'firstlanguage',
                         attributes : ['nativeName']
-                    },
-                    {
-                        model: models['Role'],
-                        as:'systemRole'
                     }]
                 }
             ];
@@ -67,7 +64,7 @@ module.exports =  (app) => {
 
             const Users = await models['institutHasUser'].findAndCountAll(parameters);
             const message = `${Users.count} users found`;
-            res.json({message, data: Users.rows});
+            res.json({message, usersInstitut: Users.rows});
 
         }
         catch(error) {
