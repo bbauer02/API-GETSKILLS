@@ -2,6 +2,11 @@ module.exports = (env) => ({
     GET: {
         instituts: {
             default: env.INSTITUTS_GET,
+            tests : {
+                exams: {
+                    prices: env.INSTITUTS_TESTS_EXAMS_PRICES
+                }
+            },
             users: {
                 default: env.INSTITUTS_USERS_GET,
                 email: {

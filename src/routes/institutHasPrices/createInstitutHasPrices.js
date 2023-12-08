@@ -2,12 +2,13 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.post('/api/instituts/:institut_id/exams/:exam_id/price', isAuthenticated, isAuthorized, async (req, res) => {
 
         // PARAMETERS
-        const institutId = req.body.institut_id;
-        const examId = req.body.exam_id;
+        const institutId = req.params.institut_id;
+        const examId = req.params.exam_id;
 
+       
 
         /**
          * tester si un institut existe en fonction de son ID
@@ -45,12 +46,19 @@ module.exports = (app) => {
             // ETAPE 2 -> on vérifie que l'épreuve demandée existe
             await getExamById();
 
+            const prices = {
+                institut_id: institutId,
+                exam_id: examId,
+                price: +req.body.price,
+                tva: +req.body.tva
+            }
+
             // ETAPE 3 -> on ajoute le prix dans la base de données
-            const priceCreated = await models['InstitutHasPrices'].create(req.body);
+            const priceCreated = await models['InstitutHasPrices'].create(prices);
 
             // FIN -> envoi de la réponse
             const message = `Price for institut ${institutId} and exam ${examId} has been created.`;
-            return res.status(200).json({ message, data: priceCreated });
+            return res.status(200).json({ message, price: priceCreated });
 
         } catch (error) {
             const messageError = `Service not available. Please retry later.`;

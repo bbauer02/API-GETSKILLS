@@ -2,10 +2,46 @@ const { models } = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.get('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.get('/api/instituts/:institut_id/tests/:test_id/exams/prices', isAuthenticated, isAuthorized, async (req, res) => {
+        try {
+            const institutId = parseInt(req.params.institut_id);
+            const testId = parseInt(req.params.test_id);
+            const parameters = {}; 
+            parameters.where = {
+                test_id: testId
+            };
+            parameters.attributes = ["exam_id", "test_id", "level_id", "label"]
+            parameters.include =  [
+                {
+                    model: models['InstitutHasPrices'],
+                    attributes: ["price", "tva"],
+                    where: {
+                        institut_id: institutId
+                    }, 
+                    required:false
+                },
+                
+                {
+                    model: models['Level'],
+                    attributes: ["label"]
 
-        const institutId = parseInt(req.params.institut_id);
+                } 
+               
+            ] 
 
+
+
+            const examPrice = await models['Exam'].findAndCountAll(parameters);
+            const message = `${examPrice.count} exams found`;
+            res.json({message, examPrice: examPrice.rows});
+        }
+        catch(error) {
+            const message = `Service not available. Please retry later.`;
+            res.status(500).json({message, data: error.toString()})
+        }
+
+
+/*
         await models['Test'].findAndCountAll({
             attributes: ['test_id', 'label'],
             required: true,
@@ -15,7 +51,11 @@ module.exports = (app) => {
                 required: true,
                 include: [{
                     model: models['InstitutHasPrices'],
-                    where: { institut_id: institutId },
+                    where: 
+                    { 
+                        institut_id: institutId,
+                        exam_id: examId
+                    },
                     required: true,
                     include: [{
                         model: models['Institut'],
@@ -50,6 +90,6 @@ module.exports = (app) => {
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({ message, data: error.message })
-        })
+        }) */
     });
 }

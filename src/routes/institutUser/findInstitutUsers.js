@@ -53,7 +53,24 @@ module.exports =  (app) => {
                         model: models['Language'],
                         as:'firstlanguage',
                         attributes : ['nativeName']
-                    }]
+                    }, 
+                    {
+                        model: models['sessionUser'],
+                        include: [
+                            {
+                                model: models['Session'],
+                                include: [
+                                    {
+                                        model: models['Test'],
+                                    },
+                                    {
+                                        model: models['Level'],
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                    ]
                 }
             ];
 

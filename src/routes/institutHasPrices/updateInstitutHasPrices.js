@@ -3,14 +3,43 @@ const {Op} = require('sequelize');
 const {isAuthenticated, isAuthorized} = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id/exams/price', isAuthenticated, isAuthorized, async (req, res) => {
+    app.put('/api/instituts/:institut_id/exams/:exam_id/price', isAuthenticated, isAuthorized, async (req, res) => {
+        try {
+            const price = req.body.price;
+            const tva = req.body.tva;
 
-        const priceId = req.body.price_id;
-        const price = req.body.price;
+            const institutId = parseInt(req.params.institut_id);
+            const examId = parseInt(req.params.exam_id);
 
-        // mettre à jour l'épreuve
-        await models['InstitutHasPrices'].findOne({
-            where: {price_id: priceId}
+            // mettre à jour l'épreuve
+            const examPriceFound = await models['InstitutHasPrices'].findOne(
+            {
+                where: {
+                    institut_id: institutId,
+                    exam_id: examId
+                }
+            });
+            if (examPriceFound) {
+                const examPriceCreated = await examPriceFound.update(
+                    {
+                        price: price,
+                        tva: tva
+                    },
+                    {
+                        where: {
+                            institut_id: institutId,
+                            exam_id: examId
+                        }
+                    }
+                );
+                const message = `Price for ${examPriceCreated.price} coin has been updated.`;
+                return res.status(200).json({message, data: examPriceCreated})
+            }
+
+
+
+       /* await models['InstitutHasPrices'].findOne({
+            where: {institut_id: institutId,exam_id: examId}
         }).then(function (examPriceFound) {
             if (examPriceFound) {
                 // le prix existe déjà
@@ -33,10 +62,15 @@ module.exports = (app) => {
                 // le prix n'a pas été défini -> il faut le créer
                 const message = `Update impossible. Price does not exist. Try POST method.`;
                 return res.status(500).json({message, data: null})
-            }
+            } 
         }).catch(function (error) {
             const message = `Service not available. Please retry later.`;
             return res.status(500).json({message, data: error.message})
-        });
+        });*/
+        }
+        catch(error) {
+            const message = `Service not available. Please retry later.`;
+            return res.status(500).json({message, data: error.message})
+        }
     })
 }
