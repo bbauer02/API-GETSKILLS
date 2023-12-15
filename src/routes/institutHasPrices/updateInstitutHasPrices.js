@@ -33,7 +33,7 @@ module.exports = (app) => {
                     }
                 );
                 const message = `Price for ${examPriceCreated.price} coin has been updated.`;
-                return res.status(200).json({message, data: examPriceCreated})
+                return res.status(200).json({message, price: examPriceCreated})
             }
 
 

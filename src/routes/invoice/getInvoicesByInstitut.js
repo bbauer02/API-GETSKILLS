@@ -54,13 +54,12 @@ module.exports = (app) => {
      */
     app.get('/api/instituts/:institut_id/invoices', isAuthenticated, isAuthorized, async (req, res) => {
 
-
         
         try {
             // constantes
             const institutId = parseInt(req.params.institut_id);
             const invoices = await getInvoices({institut_id: institutId});
-
+            
             if (invoices.length === 0) {
                 return res.status(200).json({message: "error: no invoices found", invoices: []})
             } else {

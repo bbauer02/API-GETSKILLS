@@ -86,7 +86,7 @@ module.exports = (sequelize, DataTypes) => {
         Session.belongsTo(models.Test, { foreignKey: 'test_id' });
         Session.belongsTo(models.Level, { foreignKey: 'level_id' });
         Session.hasMany(models.sessionHasExam,{foreignKey:'session_id', sourceKey: 'session_id', onDelete:'CASCADE'});
-        Session.hasMany(models.Invoice,{as: 'invoice',foreignKey:'session_id',sourceKey: 'session_id'});
+        Session.hasMany(models.Invoice,{as: 'invoice',foreignKey:'session_id',sourceKey: 'session_id',  onDelete:'SET NULL'});
 
     };
 

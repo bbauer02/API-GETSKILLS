@@ -1,9 +1,13 @@
 ﻿module.exports = (sequelize, DataTypes) => {
     const SessionHist =  sequelize.define('SessionHist', {
-        session_id: {
+        sessionhist_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
+            allowNull:false
+        },
+        session_id: {
+            type: DataTypes.INTEGER,
             allowNull:false
         },
         institut_id: {

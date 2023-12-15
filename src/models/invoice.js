@@ -7,15 +7,15 @@ module.exports = (sequelize, DataTypes) => {
             },
             institut_id: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
+                allowNull: true,
             },
             session_id: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
+                allowNull: true,
             },
             user_id: {
                 type: DataTypes.INTEGER,
-                allowNull: false,
+                allowNull: true,
             },
             session: {
                 type: DataTypes.STRING,

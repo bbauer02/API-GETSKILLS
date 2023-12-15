@@ -28,7 +28,6 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false,
         hooks: {
             beforeUpdate (instance, options) {
-                console.log(instance.dataValues);
                 models['InstitutHasPricesHist'].create(instance.dataValues);
             }
         }
