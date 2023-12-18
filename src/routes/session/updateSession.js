@@ -8,12 +8,13 @@ module.exports = (app) => {
     app.put('/api/instituts/:institut_id/sessions/:session_id', isAuthenticated, isAuthorized, async (req, res) => {
 
         const { session, sessionHasExams} = req.body;
+
         // on vérifie que l'Id de la session et de l'institut dans l'url correspondent à ceux passé dans le body
-        if (req.params.session_id != session.session_id) {
+        if (+req.params.session_id !== +session.session_id) {
             const message = `The session id in the url doesn't match the session id in the body.`;
             return res.status(400).json({ message });
         }
-        if (req.params.institut_id != session.institut_id) {
+        if (+req.params.institut_id !== +session.institut_id) {
             const message = `The session id in the url doesn't match the session id in the body.`;
             return res.status(400).json({ message });
         }
@@ -24,11 +25,12 @@ module.exports = (app) => {
             const SessionToUpdate =  await models['Session'].findOne({
                 where: { 
                     [Op.and]: [
-                        { session_id: req.params.session_id },
-                        { institut_id: req.params.institut_id }
+                        { session_id: +req.params.session_id },
+                        { institut_id: +req.params.institut_id }
                     ]
                 }
             });
+
             if (SessionToUpdate === null) {
                 const message = `Session doesn't exist.Retry with an other session id.`;
                 return res.status(404).json({ message });
@@ -50,35 +52,43 @@ module.exports = (app) => {
                 }
             });
 
-            
-            let sessionHasExamsUpdated = [];
-
-            sessionHasExams.map((sessionHasExam, index) => { 
-                sessionHasExamsUpdated[index] = {};
-                // sessionHasExam_id
-                sessionHasExamsUpdated[index].sessionHasExam_id = sessionHasExam.sessionHasExam_id;
-                // exam_id
-                sessionHasExamsUpdated[index].exam_id = sessionHasExam.examId;
-                // session_id
-                sessionHasExamsUpdated[index].session_id = session.session_id;
-                // adresse de l'épreuve
-                sessionHasExamsUpdated[index].adressExam = sessionHasExam.adressExam;
-                // salle de l'épreuve
-                sessionHasExamsUpdated[index].room = sessionHasExam.room;
-                // date et heure de l'épreuve
-                sessionHasExamsUpdated[index].DateTime = sessionHasExam.DateTime; 
-            })
-
-            
-            const sessionHasExamsUpdated_ = await models['sessionHasExam'].bulkCreate(sessionHasExamsUpdated, { 
-                updateOnDuplicate: [
-                    "adressExam",
-                    "DateTime",
-                    "room"
-                ] 
-            });
             const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
-            res.json({ message, session: SessionUpdated , sessionHasExams: sessionHasExamsUpdated_}); 
+            res.json({ message, session: SessionUpdated });
+
+            /*
+            let sessionHasExamsUpdated = [];
+            if(sessionHasExam !== null) {
+                console.log("here")
+                sessionHasExams.map((sessionHasExam, index) => { 
+                    sessionHasExamsUpdated[index] = {};
+                    // sessionHasExam_id
+                    sessionHasExamsUpdated[index].sessionHasExam_id = sessionHasExam.sessionHasExam_id;
+                    // exam_id
+                    sessionHasExamsUpdated[index].exam_id = sessionHasExam.examId;
+                    // session_id
+                    sessionHasExamsUpdated[index].session_id = session.session_id;
+                    // adresse de l'épreuve
+                    sessionHasExamsUpdated[index].adressExam = sessionHasExam.adressExam;
+                    // salle de l'épreuve
+                    sessionHasExamsUpdated[index].room = sessionHasExam.room;
+                    // date et heure de l'épreuve
+                    sessionHasExamsUpdated[index].DateTime = sessionHasExam.DateTime; 
+                });
+
+                const sessionHasExamsUpdated_ = await models['sessionHasExam'].bulkCreate(sessionHasExamsUpdated, { 
+                    updateOnDuplicate: [
+                        "adressExam",
+                        "DateTime",
+                        "room"
+                    ] 
+                });
+                const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
+                res.json({ message, session: SessionUpdated , sessionHasExams: sessionHasExamsUpdated_});
+            }
+            
+*/
+            
+             
         }
         catch (error) {
             const message = `An error has occured finding the Session.`;
