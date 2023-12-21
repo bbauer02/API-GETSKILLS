@@ -6,89 +6,90 @@ const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
 
 module.exports = (app) => {
     app.put('/api/instituts/:institut_id/sessions/:session_id', isAuthenticated, isAuthorized, async (req, res) => {
-
-        const { session, sessionHasExams} = req.body;
-
-        // on vérifie que l'Id de la session et de l'institut dans l'url correspondent à ceux passé dans le body
-        if (+req.params.session_id !== +session.session_id) {
-            const message = `The session id in the url doesn't match the session id in the body.`;
-            return res.status(400).json({ message });
-        }
-        if (+req.params.institut_id !== +session.institut_id) {
-            const message = `The session id in the url doesn't match the session id in the body.`;
-            return res.status(400).json({ message });
-        }
-
-
-        // On récupére la session à modifier et on vérifie qu'elle existe
         try {
+
+            // On récupére le body de la requête
+            const { session, sessionHasExams} = req.body;
+            // on vérifie que l'Id de la session et de l'institut dans l'url correspondent à ceux passé dans le body
+            if (+req.params.session_id !== +session.session_id) {
+                const message = `The session id in the url doesn't match the session id in the body.`;
+                return res.status(400).json({ message });
+            }
+            if (+req.params.institut_id !== +session.institut_id) {
+                const message = `The session id in the url doesn't match the session id in the body.`;
+                return res.status(400).json({ message });
+            }
+            // On vérifie que la session existe
             const SessionToUpdate =  await models['Session'].findOne({
                 where: { 
-                    [Op.and]: [
-                        { session_id: +req.params.session_id },
-                        { institut_id: +req.params.institut_id }
-                    ]
+                    session_id: +req.params.session_id,
+                    institut_id: +req.params.institut_id
                 }
             });
-
-            if (SessionToUpdate === null) {
+            // Si la session n'existe pas on retourne une erreur et on arrête le déroulé du script
+            if (!SessionToUpdate) {
                 const message = `Session doesn't exist.Retry with an other session id.`;
                 return res.status(404).json({ message });
             }
-            // On vérifie que la session ne soit pas validée
-            // Si la session est validée, on ne peut changer que les dates
+            // si Validtion du BodyHTML est différent de la valeur actuelle alors
+            // On met à jour avec la nouvelle valeur
             const { validation } = SessionToUpdate.dataValues;
-            if (validation) {
-                delete session.validation;
-                delete session.test_id;
-                delete session.level_id;
+            if(!!session.validation ==! validation) {
+                const ValidationUpdated = await SessionToUpdate.update(session, {
+                    where: { 
+                        session_id: +req.params.session_id,
+                        institut_id: +req.params.institut_id
+                    }
+                });
+                const message = `Validation Changed !!`;
+                res.json({ message, session: ValidationUpdated });
             }
-            const SessionUpdated = await SessionToUpdate.update(session, {
-                where: { 
-                    [Op.and]: [
-                        { session_id: req.params.session_id },
-                        { institut_id: req.params.institut_id }
-                    ]
+            else {
+                // Si session est validée, on ne peux plus changer le test et le level    
+                if (validation) {
+                    delete session.test_id;
+                    delete session.level_id;
                 }
-            });
-
-            const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
-            res.json({ message, session: SessionUpdated });
-
-            /*
-            let sessionHasExamsUpdated = [];
-            if(sessionHasExam !== null) {
-                console.log("here")
-                sessionHasExams.map((sessionHasExam, index) => { 
-                    sessionHasExamsUpdated[index] = {};
-                    // sessionHasExam_id
-                    sessionHasExamsUpdated[index].sessionHasExam_id = sessionHasExam.sessionHasExam_id;
-                    // exam_id
-                    sessionHasExamsUpdated[index].exam_id = sessionHasExam.examId;
-                    // session_id
-                    sessionHasExamsUpdated[index].session_id = session.session_id;
-                    // adresse de l'épreuve
-                    sessionHasExamsUpdated[index].adressExam = sessionHasExam.adressExam;
-                    // salle de l'épreuve
-                    sessionHasExamsUpdated[index].room = sessionHasExam.room;
-                    // date et heure de l'épreuve
-                    sessionHasExamsUpdated[index].DateTime = sessionHasExam.DateTime; 
+                const SessionUpdated = await SessionToUpdate.update(session, {
+                    where: { 
+                        session_id: req.params.session_id,
+                        institut_id: req.params.institut_id
+                    }
                 });
 
-                const sessionHasExamsUpdated_ = await models['sessionHasExam'].bulkCreate(sessionHasExamsUpdated, { 
-                    updateOnDuplicate: [
-                        "adressExam",
-                        "DateTime",
-                        "room"
-                    ] 
-                });
-                const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
-                res.json({ message, session: SessionUpdated , sessionHasExams: sessionHasExamsUpdated_});
+                let sessionHasExamsUpdated = [];
+                if(sessionHasExams !== null) {
+                    sessionHasExams.map((sessionHasExam, index) => { 
+                        sessionHasExamsUpdated[index] = {};
+                        // sessionHasExam_id
+                        sessionHasExamsUpdated[index].sessionHasExam_id = sessionHasExam.sessionHasExam_id;
+                        // exam_id
+                        sessionHasExamsUpdated[index].exam_id = sessionHasExam.examId;
+                        // session_id
+                        sessionHasExamsUpdated[index].session_id = session.session_id;
+                        // adresse de l'épreuve
+                        sessionHasExamsUpdated[index].adressExam = sessionHasExam.adressExam;
+                        // salle de l'épreuve
+                        sessionHasExamsUpdated[index].room = sessionHasExam.room;
+                        // date et heure de l'épreuve
+                        sessionHasExamsUpdated[index].DateTime = sessionHasExam.DateTime; 
+                    });
+    
+                    const sessionHasExamsUpdated_ = await models['sessionHasExam'].bulkCreate(sessionHasExamsUpdated, { 
+                        updateOnDuplicate: [
+                            "adressExam",
+                            "DateTime",
+                            "room"
+                        ] 
+                    });
+                    const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
+                    res.json({ message, session: SessionUpdated , sessionHasExams: sessionHasExamsUpdated_});
+                } 
+                else {
+                    const message = `Session id:${SessionUpdated.session_id} and all linked sessionHAsExam have been updated `;
+                    res.json({ message, session: SessionUpdated });
+                }
             }
-            
-*/
-            
-             
         }
         catch (error) {
             const message = `An error has occured finding the Session.`;
