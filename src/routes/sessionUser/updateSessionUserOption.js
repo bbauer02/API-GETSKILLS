@@ -1,57 +1,53 @@
 ﻿const { models } = require('../../models');
 const { ValidationError, UniqueConstraintError } = require('sequelize');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+const { isAllowedToAddOrEditOptions } = require('../../services/middlewares');
 
 module.exports = (app) => {
-    app.put('/api/instituts/:institut_id/sessionUsers/:sessionUser_id/exams/:exam_id/options/:option_id', isAuthenticated, isAuthorized, async (req, res) => {
-
-        // Check si la session est validée
-        async function checkSession() {
-            try {
-
-                const session = await models['Session'].findOne({
-                    where: { session_id: req.body.session_id }
-                });
-
-                if (session === null) {
-                    const message = `session doesn't exist. Retry with an other session id.`;
-                    return res.status(404).json({ message });
+    app.put('/api/instituts/:institut_id/sessionUsers/:sessionUser_id/exams/:exam_id/options/:option_id', isAuthenticated, isAuthorized,isAllowedToAddOrEditOptions, async (req, res) => { 
+        try {
+            
+            // Donnée provenant du middleware
+            // const { session,sessionUser } = res.locals;
+            // On récupère les options de l'utilisateur
+            const sessionUserOptionFound = await models['sessionUserOption'].findOne({
+                where: {
+                    sessionUser_id: req.params.sessionUser_id,
+                    exam_id: req.params.exam_id,
+                    option_id: req.params.option_id
                 }
-
-                return session;
-
-
-            } catch (error) {
-                const message = `An error has occured checking the session.`;
-                return res.status(500).json({ message, data: error.message })
+            });
+            if(sessionUserOptionFound === null) {
+                throw new error(`The option doesn't exist!`)
             }
+
+            const optionUpdated =  await sessionUserOptionFound.update(req.body, {
+                where: {
+                    sessionUser_id: req.params.sessionUser_id,
+                    exam_id: req.params.exam_id,
+                    option_id: req.params.option_id
+                }
+            });
+            const message = `The options of the user has been updated!`;
+            res.json({ message, optionUpdated: optionUpdated });
+
+        }
+        catch(error) {
+            console.log("error")
+            res.status(500).json({ "error": error });
         }
 
-        // Check si le sessionUserOption existe
-        async function checkSessionUserOption() {
-            try {
+    });
+}
 
-                const sessionUserOption = await models['sessionUserOption'].findOne({
-                    where: {
-                        sessionUser_id: req.params.sessionUser_id,
-                        exam_id: req.params.exam_id,
-                        option_id: req.params.option_id
-                    }
-                });
 
-                if (sessionUserOption === null) {
-                    const message = `The option doesn't exist.`;
-                    return res.status(404).json({ message });
-                }
 
-                return sessionUserOption;
 
-            } catch (error) {
-                const message = `An error has occured finding the sessionUserOption.`;
-                return res.status(500).json({ message, data: error.message })
-            }
-        }
 
+       
+
+        /*
+       
         // Check si l'exam existe
         async function findSessionExam(session) {
             try {
@@ -185,14 +181,16 @@ module.exports = (app) => {
             }
         }
 
-
         try {
+
+           const sessionUser = await checkUserPaid();
+
             const session = await checkSession();
 
-            const sessionUserOptionFound = await checkSessionUserOption();
+          const sessionUserOptionFound = await checkSessionUserOption();
 
             
-                // Si le candidat ne participe plus à une épreuve (isCandidate)
+              /*  // Si le candidat ne participe plus à une épreuve (isCandidate)
                 // On supprime le sessionExamHasExaminator correspondant
                 if (req.body?.isCandidate === false && sessionUserOptionFound?.dataValues.isCandidate === true) {
                     const sessionExamFoundForDelete = await findSessionExam(session);
@@ -226,11 +224,19 @@ module.exports = (app) => {
             if (error instanceof UniqueConstraintError) {
                 return res.status(400).json({ message: error.message, data: error })
             }
-            if (error instanceof ValidationError) {
+            else if (error instanceof ValidationError) {
                 return res.status(400).json({ message: error.message, data: error })
             }
-            const message = `Service not available. Please retry later.`;
-            res.status(500).json({ message, data: error });
+            else if (error.type === "ForbiddenEdit") {
+                res.status(400).json({ message: error.message, data: error });
+            }
+            else {
+                const message = `Service not available. Please retry later.`;
+                res.status(500).json({ message, data: error });
+            }
+            
+            
         }
     });
 }
+*/

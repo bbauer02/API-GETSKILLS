@@ -1,13 +1,18 @@
 const { ValidationError, UniqueConstraintError } = require('sequelize');
 const {models} = require('../../models');
 const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
-
+const { isAllowedToAddOrEditOptions } = require('../../services/middlewares');
 // Unused
 module.exports = (app) => {
-    app.post('/api/instituts/:institut_id/options',  isAuthenticated, isAuthorized,  async (req,res) => {
+    app.post('/api/instituts/:institut_id/options',  isAuthenticated, isAuthorized, isAllowedToAddOrEditOptions,  async (req,res) => {
+
         try{
+
+
             const sessionUserOption = await models['sessionUserOption'].create(req.body);
             const message = `Option has been added in the sessionUser id : ${sessionUserOption.sessionUser_id}.`;
+
+
             res.json({message, sessionUserOption})
         }catch(error) {
             if(error instanceof ValidationError) {
