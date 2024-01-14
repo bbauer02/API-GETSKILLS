@@ -56,7 +56,7 @@ module.exports = {
                 throw new Error(`session doesn't exist. Retry with an other session id.`);
             }
             if(!!session.validation) {
-                throw new Error(`Session is Validated, You cannot change the options !`);
+                throw new Error(`Session is Validated, You cannot add options !`);
             }
 
             // On vérifie si l'Utilisateur a payé son inscription : 
@@ -76,6 +76,8 @@ module.exports = {
 
             res.locals.session = session;
             res.locals.sessionUser = sessionUser;
+
+            
 
             return next();
         }
