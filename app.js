@@ -10,12 +10,18 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const _colors = require('colors');
 
+
+const corsConfig = {
+    origin: true,
+    credentials: true,
+};
+
 app
     .use(express.urlencoded({extended: true}))
     .use(express.json({
         verify: (req, res, buffer) => req['rawBody'] = buffer,
     }))
-    .use(cors())
+    .use(cors(corsConfig))
     .use(cookieParser())
     .use(fileUpload())
     .use('/api/avatars', express.static(__dirname + '/public/images/avatars/'))
