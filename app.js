@@ -1,4 +1,5 @@
 require('./crons');
+const https = require('https');
 const config = require('./config.prod');
 const express = require('express');
 const sequelize = require('./src/db/sequelize');
@@ -10,12 +11,28 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const _colors = require('colors');
 
+
+const { privateKeyPath, certificatePath } = config;
+
+const credentialsHttps = {
+    key: privateKeyPath,
+    cert: certificatePath,
+};
+
+const corsConfig = {
+    origin: true,
+    credentials: true,
+};
+
+
+
+
 app
     .use(express.urlencoded({extended: true}))
     .use(express.json({
         verify: (req, res, buffer) => req['rawBody'] = buffer,
     }))
-    .use(cors())
+    .use(cors(corsConfig))
     .use(cookieParser())
     .use(fileUpload())
     .use('/api/avatars', express.static(__dirname + '/public/images/avatars/'))
@@ -187,16 +204,29 @@ require('./src/routes/csvItem/findCsvItemByTest')(app);
 require('./src/routes/documents/testRequete')(app);
 
 
+if(privateKeyPath !== '' && certificatePath !== '' && 
+privateKeyPath !== null && certificatePath !== null  &&
+privateKeyPath !== undefined && certificatePath !== undefined ) {
 
-// Question
+    const httpsServer = https.createServer(credentialsHttps, app);
+    httpsServer.listen(port, () => {
+        console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+        console.log(_colors.yellow(`~ API GET-TESTED.ONLINE est démarrée sur le port : `) + _colors.green(`${port}`));
+        console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+        console.log(_colors.yellow("HTTPS : ") + _colors.green("ON"));
+        console.log(_colors.yellow("En mode : ") + _colors.green(process.env.NODE_ENV.toUpperCase()));
+    });
 
+}
+else{
+    
+    app.listen(port, () => {
+        console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+        console.log(_colors.yellow(`~ API GET-TESTED.ONLINE est démarrée sur le port : `) + _colors.green(`${port}`));
+        console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
+        console.log(_colors.yellow("HTTPS : ") + _colors.green("OFF"));
+        console.log(_colors.yellow("En mode : ") + _colors.green(process.env.NODE_ENV.toUpperCase()));
+    });
 
-
-
-app.listen(port, () => {
-    console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
-    console.log(_colors.yellow(`~ API GET-TESTED.ONLINE est démarrée sur le port : `) + _colors.green(`${port}`));
-    console.log(_colors.yellow(`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`));
-    console.log(_colors.yellow("En mode : ") + _colors.green(process.env.NODE_ENV.toUpperCase()));
-});   
+}
 
