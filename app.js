@@ -1,4 +1,5 @@
 require('./crons');
+const fs = require('fs');
 const https = require('https');
 const config = require('./config.prod');
 const express = require('express');
@@ -14,10 +15,7 @@ const _colors = require('colors');
 
 const { privateKeyPath, certificatePath } = config;
 
-const credentialsHttps = {
-    key: privateKeyPath,
-    cert: certificatePath,
-};
+
 
 const corsConfig = {
     origin: true,
@@ -207,6 +205,11 @@ require('./src/routes/documents/testRequete')(app);
 if(privateKeyPath !== '' && certificatePath !== '' && 
 privateKeyPath !== null && certificatePath !== null  &&
 privateKeyPath !== undefined && certificatePath !== undefined ) {
+
+    const credentialsHttps = {
+        key: fs.readFileSync(privateKeyPath),
+        cert: fs.readFileSync(certificatePath),
+    };
 
     const httpsServer = https.createServer(credentialsHttps, app);
     httpsServer.listen(port, () => {
