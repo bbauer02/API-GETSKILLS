@@ -46,6 +46,8 @@ app.get('/', (req, res) => {
 // Login
 
 require('./src/routes/login')(app);
+require('./src/routes/auth/sign-in')(app);
+require('./src/routes/auth/me')(app);
 
 // Countries
 require('./src/routes/country/findAllCountries')(app);

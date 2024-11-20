@@ -12,25 +12,43 @@ module.exports = {
     // Generer un Token
     generateTokenForUser: async (userData) => {
         /* On créer le token CSRF */
-        const xsrfToken = crypto.randomBytes(64).toString('hex');
+        const now = Math.floor(Date.now() / 1000);
 
         const accessToken = jwt.sign({
             user_id: userData.user_id,
             instituts: userData.instituts,
             systemRole: userData.systemRole,
-            xsrfToken
+            type: 'access',
         },
-            config.jw.accessToken.secret,
-            {
-                algorithm: config.jw.accessToken.algorithm,
-                audience: config.jw.accessToken.audience,
-                expiresIn: config.jw.accessToken.expiresIn / 1000,
-                issuer: config.jw.accessToken.issuer,
-                subject: userData.user_id.toString()
-            });
-        const refreshToken = crypto.randomBytes(128).toString('base64');
+        config.jw.accessToken.secret,
+        {
+            algorithm: config.jw.accessToken.algorithm,
+            audience: config.jw.accessToken.audience,
+            expiresIn: config.jw.accessToken.expiresIn / 1000,
+            issuer: config.jw.accessToken.issuer,
+            subject: userData.user_id.toString(),
+            jwtid: crypto.randomBytes(16).toString('hex'), // unique JWT ID
+        });
+
+        const refreshToken = jwt.sign({
+            user_id: userData.user_id,
+            instituts: userData.instituts,
+            systemRole: userData.systemRole,
+            type: 'refresh',
+        },
+        config.jw.refreshToken.secret,
+        {
+            algorithm: config.jw.refreshToken.algorithm,
+            audience: config.jw.refreshToken.audience,
+            expiresIn: config.jw.refreshToken.expiresIn / 1000,
+            issuer: config.jw.refreshToken.issuer,
+            subject: userData.user_id.toString(),
+            jwtid: crypto.randomBytes(16).toString('hex'), // unique JWT ID
+        });
+
 
         const expiresAt = Date.now() + config.jw.refreshToken.expiresIn;
+
         await models['RefreshToken'].create({
             userId: userData.user_id,
             token: refreshToken,
@@ -38,35 +56,48 @@ module.exports = {
         });
 
 
-
-        return { accessToken, refreshToken, xsrfToken };
+        return { accessToken, refreshToken };
     },
     getHeaderToken: (req) => {
         return new Promise(async (resolve, reject) => {
 
             try {
-                
-                const { cookies, headers } = req;
-                /* On vérifie que le JWT est présent dans les cookies de la requête */
-                if (!cookies || !cookies.access_token) {
-                    reject(new Error('Missing token in cookie'));
+                // Vérifier présence du header Authorization
+                const authHeader = req.headers['authorization'];
+                if (!authHeader) {
+                    return reject(new Error('Authorization header missing.'));
                 }
-                const accessToken = cookies.access_token;
-                /* On vérifie que le token CSRF est présent dans les en-têtes de la requête */
+                 // Vérifier format Bearer
+                 if (!authHeader.startsWith('Bearer ')) {
+                    return reject(new Error('Invalid token format. Must be Bearer token.'));
+                 }
 
-                if (!headers || !headers['x-xsrf-token']) {
-                    reject(new Error('Missing XSRF token in headers'));
+                const bearerToken = authHeader.substring(7);
+                if (!bearerToken) {
+                    return reject(new Error('Token is empty.'));
                 }
-                const xsrfToken = headers['x-xsrf-token'];
-                // On vérifie et décode le token à l'aide du secret et de l'algorithme utilisé pour le générer
-                const decodedToken = await jwt.verify(accessToken, config.jw.accessToken.secret, {
-                    algorithms: config.jw.accessToken.algorithm
-                });
-                /* On vérifie que le token CSRF correspond à celui présent dans le JWT  */
-                if (xsrfToken !== decodedToken.xsrfToken) {
-                    reject(new Error('Bad xsrf token'));
+                try {
+                    const decodedToken = await jwt.verify(
+                        bearerToken, 
+                        config.jw.accessToken.secret,
+                        {
+                            algorithms: [config.jw.accessToken.algorithm],
+                            issuer: config.jw.accessToken.issuer,
+                            audience: config.jw.accessToken.audience
+                        }
+                    );
+                    // Vérifications supplémentaires du token
+                    if (!decodedToken.sub) {
+                        return reject(new Error('Invalid token structure: missing subject.'));
+                    }
+
+                    return resolve(decodedToken);
+                } catch (error) {
+                    console.log('Erreur détaillée:', error);
+                    throw error;
                 }
-                resolve(decodedToken);
+
+               
             }
             catch (error) {
                 reject(new Error('Invalid Token. Perhaps it was modified or expired.'));
@@ -78,6 +109,7 @@ module.exports = {
     // Fonction qui vérifie si l'utilisateur est identifié, 
     isAuthenticated: async (req, res, next) => {
         try {
+            
             const decodedToken = await module.exports.getHeaderToken(req);
             // 4. On vérifie que l'utilisateur existe bien dans notre base de données.
             const userId = decodedToken.sub;
