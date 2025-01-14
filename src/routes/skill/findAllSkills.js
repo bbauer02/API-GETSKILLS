@@ -31,7 +31,7 @@ module.exports =  (app) => {
                parameters.where = {isArchive: false}
            }
             const message = `${Skills.count} skill(s) found`;
-            res.json({message, data: Skills.rows});
+            res.json({message, skills: Skills.rows});
        }
        catch (error){
          const message = `Service not available. Please retry later.`;

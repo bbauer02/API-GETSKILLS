@@ -36,11 +36,11 @@ const initDB = async (sequelize) => {
         }
         // force: isDev
        // isDev = false
-        await sequelize.sync({ force: false, alter: false });
+        await sequelize.sync({ force: true, alter: true });
  
         if(isDev) {
             console.log('\x1b[36m%s\x1b[0m',"~ La base de données est en cours de création .... ~");
-           /* const mock = new MockDatas();
+            const mock = new MockDatas();
             await mock.initialize();
             //countries
             await models['Country'].bulkCreate(mock.countries);
@@ -52,7 +52,10 @@ const initDB = async (sequelize) => {
             await models['Role'].bulkCreate(mock.roles);
             console.log('Table `Role` ........................ OK');
             //tests
-            await models['Test'].bulkCreate(mock.tests);
+            await models['Test'].bulkCreate(mock.tests).catch(error => {
+                console.log("Erreur détaillée lors de la création des tests:", error);
+                throw error;
+            });
             console.log('Table `Test` ........................ OK');
             //levels
             await models['Level'].bulkCreate(mock.levels);
@@ -105,7 +108,7 @@ const initDB = async (sequelize) => {
             await models['InvoiceLines'].bulkCreate(mock.invoice_lines);
             // Suppression des Templates
             await destroyFolder('templates');
-            createRepositoryWithName('templates');*/
+            createRepositoryWithName('templates');
         }
         else {
             const users = await models['User'].findAll({

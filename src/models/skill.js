@@ -19,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: null,
                 allowNull: true
             },
+            test_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                validate: {
+                    notNull: {msg: `skill:test_id cannot be NULL!`}
+                }
+                // Suppression de defaultValue car incompatible avec allowNull: false
+            }
         },
         {
             tableName: 'skills',
@@ -41,9 +49,10 @@ module.exports = (sequelize, DataTypes) => {
 
     Skill.belongsTo(Skill, {as: "parent", foreignKey: 'parent_id', onDelete: 'NO ACTION', hooks: true});
     //Skill.hasMany(Question, {foreignKey: 'skill_id', sourceKey: 'skill_id'});
-
+   
     Skill.associate = models => {
         Skill.hasMany(models.Question, {foreignKey: 'skill_id', targetKey: 'skill_id'});
+        Skill.belongsTo(models.Test, { foreignKey: 'test_id',targetKey: 'test_id',as: 'test'});
     }
 
     return Skill;

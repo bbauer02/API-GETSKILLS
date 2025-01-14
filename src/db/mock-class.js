@@ -13,6 +13,7 @@ const tests = require('../db/mock-tests');
 const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const itemsCsv = require('../db/mock-items_csv');
+const skills = require('../db/mock-skills');
 const { fa } = require('faker/lib/locales');
 const { format } = require('date-fns');
 
@@ -384,41 +385,14 @@ const { format } = require('date-fns');
         }
     }
     #fillSkills() {
-        let skillId = 1
-        for (skillId; skillId <= this.nbrSkills; skillId++) {   
-            this.skills.push({
-                skill_id: skillId,
-                label: "Compétence " + skillId,
-                parent_id: null,
-                isArchive: false,
-            });
-        }
-        skillId--;
-        let subSkillId = 1;
-        for (subSkillId; subSkillId <= this.nbrSubSkills; subSkillId++) {   
-            this.skills.push({
-                skill_id: skillId + subSkillId,
-                label: "SousCompétence " + subSkillId,
-                parent_id: faker.datatype.number({
-                    'min': 1,
-                    'max': skillId
-                }),
-                isArchive: false,
-            });
-        }
-        subSkillId--;
-        let subSubSkillId = 1
-        for (subSubSkillId; subSubSkillId <= this.nbrSubSubSkills; subSubSkillId++) {   
-            this.skills.push({
-                skill_id: skillId+subSkillId+subSubSkillId,
-                label: "SousSousCompétence " + subSubSkillId,
-                parent_id: faker.datatype.number({
-                    'min': skillId + 1,
-                    'max': subSkillId
-                }),
-                isArchive: false,
-            });
-        }
+            for (const skill of skills) {
+                this.skills.push({
+                    skill_id : skill.skill_id,
+                    label: skill.label,
+                    parent_id: skill.parent_id,
+                    test_id: skill.test_id
+                });
+            }
     }
     #fillExams() {
         for (let examId = 1;examId <= this.nbrExams;examId++) {

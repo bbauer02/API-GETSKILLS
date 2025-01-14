@@ -138,7 +138,13 @@ module.exports = {
             // On détermine maintenant le pouvoir nécéssaire à la lecture de cette route : 
             // On récupére un tableau des différents points d'entrées qui composent l'URL.
             const filteredURL = req.url.split('?')[0];
-            const entriesPoints = filteredURL.split('/').filter(e => e !== 'api' && !parseInt(e) && e !== '');
+            const entriesPoints = filteredURL.split('/').filter(segment => {
+                const isNotApi = segment !== 'api';
+                const isNotEmpty = segment !== '';
+                const isNotNumber = isNaN(segment);               
+                return (isNotApi && isNotEmpty && isNotNumber);
+            });
+              
             // moduleName ici avant qu'il ne devienne un tableau vide ? (voir console.log plus bas avant le moduleName === 'institut')
             const moduleName = entriesPoints[0];
             // On récupére les 'ids' de l'URL si il y en a. 
@@ -226,7 +232,7 @@ module.exports = {
         }, {})[firstEntry];
         if(!entries.length) {
             if(typeof filtered === 'object') {
-                if(filtered.default) {
+                if(filtered.hasOwnProperty('default')) {
                     return filtered.default;
                 }
                 else {
