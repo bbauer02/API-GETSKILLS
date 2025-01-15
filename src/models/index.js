@@ -83,6 +83,12 @@ const initDB = async (sequelize) => {
             //skills
             await models['Skill'].bulkCreate(mock.skills);
             console.log('Table `Skill` ....................... OK');
+            //question
+            await models['Question'].bulkCreate(mock.questions);
+            console.log('Table `Question` ....................... OK');
+            //question Skills
+            await models['QuestionSkills'].bulkCreate(mock.questionSkills);
+            console.log('Table `QuestionSkill` ....................... OK');
             //exams 
             await models['Exam'].bulkCreate(mock.exams);
             console.log('Table `Exam` ........................ OK');

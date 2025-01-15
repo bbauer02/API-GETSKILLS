@@ -18,6 +18,9 @@ sequelize = new Sequelize(
             collate: 'utf8mb4_general_ci',
             dialectOptions: {
                 timezone:'Etc/GMT+2',  
+            },
+            define: {
+                timestamps: false
             }
         }
         ,

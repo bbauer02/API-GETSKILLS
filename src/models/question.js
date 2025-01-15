@@ -5,35 +5,72 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
-        isWritten : {
-            type: DataTypes.BOOLEAN
+        label: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                notEmpty: { msg: 'Label cannot be empty!' },
+                notNull: { msg: 'Label cannot be NULL!' }
+            }
         },
-        isAuto : {
-            type: DataTypes.BOOLEAN
+        test_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        isTraining : {
-            type: DataTypes.BOOLEAN
-        },
-        type: {
-            type: DataTypes.INTEGER
+        level_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true  // Pour permettre null pour TOEIC
         },
         instruction: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
+            allowNull: false,
+            validate: {
+                notEmpty: { msg: 'Instruction cannot be empty!' },
+                notNull: { msg: 'Instruction cannot be NULL!' }
+            }
         },
-        point: {
-            type: DataTypes.INTEGER
+        duration: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: { args: [1], msg: 'Duration must be at least 1 second!' }
+            }
         },
-        timemax: {
-            type: DataTypes.INTEGER
+        points: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: { args: [0], msg: 'Points cannot be negative!' }
+            }
         },
-        skill_id: {
-            type: DataTypes.INTEGER
-        },
-        answer: {
-            type: DataTypes.JSON
-        },
-        medias: {
-            type: DataTypes.JSON
+        question_data: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            validate: {
+                isValidQuestionData(value) {
+                    if (!value.type) {
+                        throw new Error('Question type is required!');
+                    }
+                    if (!value.content) {
+                        throw new Error('Question content is required!');
+                    }
+                    // Validation spécifique selon le type
+                    switch (value.type) {
+                        case 'MCQ':
+                        case 'UCQ':
+                            if (!Array.isArray(value.content.choices)) {
+                                throw new Error('Choices must be an array!');
+                            }
+                            break;
+                        case 'FillInTheBlanks':
+                            if (!Array.isArray(value.content.answers)) {
+                                throw new Error('Answers must be an array!');
+                            }
+                            break;
+                        // ... autres validations selon les types
+                    }
+                }
+            }
         }
     },
      {
@@ -41,10 +78,11 @@ module.exports = (sequelize, DataTypes) => {
          timestamps: false,
      });
 
-     Question.associate = models => {
-        Question.belongsTo(models.Skill, {foreignKey: 'skill_id', targetKey: 'skill_id'});
-        Question.belongsTo(models.Exam, {foreignKey: 'skill_id'});
-        Question.belongsToMany(models.Exam, { through: models.examHasQuestion, foreignKey: 'question_id' });
+    Question.associate = models => {
+        Question.belongsTo(models.Test, { foreignKey: 'test_id',targetKey: 'test_id',as: 'test'});
+        Question.belongsTo(models.Level, { foreignKey: 'level_id',targetKey: 'level_id',as: 'level'});
     }
+
+    
      return Question;
 }

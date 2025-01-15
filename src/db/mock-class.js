@@ -14,6 +14,7 @@ const users = require('../db/mock-users');
 const instituts = require('../db/mock-instituts');
 const itemsCsv = require('../db/mock-items_csv');
 const skills = require('../db/mock-skills');
+const questions = require('../db/mock-questions');
 const { fa } = require('faker/lib/locales');
 const { format } = require('date-fns');
 
@@ -52,6 +53,9 @@ const { format } = require('date-fns');
     sessionUserOption = [];
     invoices = [];
     invoice_lines = [];
+    questions = [];
+    questionSkills = [];
+
 
     constructor(
                  nbrUsers=500, 
@@ -75,28 +79,56 @@ const { format } = require('date-fns');
 
     }
     async initialize() {
-        this.#fillCountries();
-        this.#fillLanguages();
-        this.#fillRoles();
-        this.#fillTests();
-        this.#fillLevels();
-        this.#fillItemsCSV();
-        this.#fillInstituts();
-        this.#createDefaultAdminProd();
-        await this.#fillDefaultUsers();
-        await this.#fillRandomUsers();
-        this.#fillInstitutHasDefaultUsers();
-        this.#fillInstitutHasRandomUsers();
-        this.#fillSessions();
-        this.#fillSessionsHasUsers();
-        this.#fillSkills();
-        this.#fillExams();
-        this.#fillSessionHasExams();
-        this.#fillEmpowerments();
-        this.#fillSessionExamExaminators();
-        this.#fillInstitutHasPrices();
-        this.#fillInvoices();
-       // this.#fillSessionUserOption();
+        try {
+            this.#fillCountries();
+            this.#fillLanguages();
+            this.#fillRoles();
+            this.#fillTests();
+            this.#fillLevels();
+            this.#fillItemsCSV();
+            this.#fillInstituts();
+            this.#createDefaultAdminProd();
+            await this.#fillDefaultUsers();
+            await this.#fillRandomUsers();
+            this.#fillInstitutHasDefaultUsers();
+            this.#fillInstitutHasRandomUsers();
+            this.#fillSessions();
+            this.#fillSessionsHasUsers();
+            this.#fillSkills();
+            this.#fillExams();
+            this.#fillSessionHasExams();
+            this.#fillEmpowerments();
+            this.#fillSessionExamExaminators();
+            this.#fillInstitutHasPrices();
+            this.#fillInvoices();
+            this.#fillQuestions();
+           // this.#fillSessionUserOption();
+        }
+        catch (error) {
+            throw error.message;
+        }
+       
+    }
+
+    #fillQuestions() {
+        for( const question of questions) {
+            this.questions.push({
+                question_id: question.question_id,
+                label: question.label, 
+                test_id:question.test_id,
+                level_id: question.level_id,
+                instruction: question.instruction,
+                duration: question.duration,
+                points: question.points,
+                question_data: question.question_data
+            });
+            
+            for(const skill_id of question.skills)
+            this.questionSkills.push({
+                question_id: question.question_id,
+                skill_id: skill_id
+            });
+        }
     }
 
     #fillCountries() {

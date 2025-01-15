@@ -51,7 +51,6 @@ module.exports = (sequelize, DataTypes) => {
     //Skill.hasMany(Question, {foreignKey: 'skill_id', sourceKey: 'skill_id'});
    
     Skill.associate = models => {
-        Skill.hasMany(models.Question, {foreignKey: 'skill_id', targetKey: 'skill_id'});
         Skill.belongsTo(models.Test, { foreignKey: 'test_id',targetKey: 'test_id',as: 'test'});
     }
 
