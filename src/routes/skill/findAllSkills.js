@@ -5,8 +5,37 @@ module.exports =  (app) => {
     app.get('/api/skills',isAuthenticated, isAuthorized, async (req,res) => {
        try {
 
-           const parameters = {};
+        const parameters = {};
+        parameters.where = {};
 
+        // filtre par test id
+        if (req.query.test) {
+            const test_id = parseInt(req.query.test);
+            if (isNaN(test_id)) {
+                const message = `Level parameter should be an integer.`;
+                return res.status(400).json({ message })
+            }
+            parameters.where.test_id = test_id;
+        }
+
+        // Parameter : LIMIT
+        if (req.query.limit) {
+            const limit = parseInt(req.query.limit);
+            if (isNaN(limit)) {
+                const message = `Limit parameter should be an integer.`;
+                return res.status(400).json({ message })
+            }
+            parameters.limit = limit;
+        }
+        // Parameter : OFFSET
+        if (req.query.offset) {
+            const offset = parseInt(req.query.offset);
+            if (isNaN(offset)) {
+                const message = `Offset parameter should be an integer.`;
+                return res.status(400).json({ message })
+            }
+            parameters.offset = parseInt(req.query.offset);
+        }
            // Parameter : ORDER
            parameters.order = [['label', 'ASC']]
 
@@ -24,12 +53,7 @@ module.exports =  (app) => {
 
             const Skills = await models['Skill'].findAndCountAll(parameters);
 
-            // Parameter : ARCHIVE (?archive=true)
-           if(req.query.archive) {
-               parameters.where = {isArchive: JSON.parse(req.query.archive)}
-           } else {
-               parameters.where = {isArchive: false}
-           }
+           
             const message = `${Skills.count} skill(s) found`;
             res.json({message, skills: Skills.rows});
        }
