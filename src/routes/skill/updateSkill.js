@@ -1,31 +1,44 @@
-﻿const {models} = require('../../models');
-const { ValidationError,UniqueConstraintError } = require('sequelize');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+﻿const { ValidationError, UniqueConstraintError } = require('sequelize');
+const {models} = require('../../models');
+const { isAuthenticated } = require('../../auth/jwt.utils');
+const { authorize } = require('../../auth/permissions');
+
 module.exports = (app) => {
-    app.put('/api/skills/:skill_id', isAuthenticated, isAuthorized, async (req, res) => {
-
-        const skillId = req.params.skill_id;
-
+    app.put('/api/skills/:id', isAuthenticated, authorize, async (req, res) => {
         try {
-            const Skill = await models['Skill'].findByPk(skillId);
-            if(Skill === null) {
-                const message = `Skill doesn't exist. Retry with an other Skill id.`;
+            const skill = await models['Skill'].findByPk(req.params.id);
+            if(skill === null) {
+                const message = `La compétence demandée n'existe pas. Réessayez avec un autre identifiant.`;
                 return res.status(404).json({message});
             }
-            await Skill.update(req.body, {
-                where:{skill_id:skillId}
-            });
-            const message = `Skill id:${Skill.skill_id} has been updated `;
-            res.json({message, data: Skill});
+
+            // Vérification des données obligatoires
+            if (!req.body.label) {
+                const message = `Le libellé de la compétence est obligatoire.`;
+                return res.status(400).json({message});
+            }
+            
+            // Vérification que test_id existe si fourni
+            if (req.body.test_id) {
+                const testExists = await models['Test'].findByPk(req.body.test_id);
+                if (!testExists) {
+                    const message = `Le test avec l'ID ${req.body.test_id} n'existe pas.`;
+                    return res.status(400).json({message});
+                }
+            }
+
+            const updatedSkill = await skill.update(req.body);
+            const message = `La compétence ${updatedSkill.label} a été mise à jour avec succès.`;
+            res.json({message, data: updatedSkill});
         }
-        catch (error) {
-            if(error instanceof UniqueConstraintError) {
-                return res.status(400).json({message: error.message, data:error})
-            }
+        catch(error) {
             if(error instanceof ValidationError) {
-                return res.status(400).json({message: error.message, data:error})
+                return res.status(400).json({message: error.message, data: error});
             }
-            const message = `Service not available. Please retry later.`;
+            if(error instanceof UniqueConstraintError) {
+                return res.status(400).json({message: error.message, data: error});
+            }
+            const message = `La compétence n'a pas pu être mise à jour. Réessayez dans quelques instants.`;
             res.status(500).json({message, data: error});
         }
     });

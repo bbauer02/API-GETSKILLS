@@ -35,6 +35,14 @@
                 notEmpty:{msg: `Test:isArchive cannot be empty!`},
                 notNull: {msg: `Test:isArchive cannot be NULL!`}
             }
+        },
+        owner_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'instituts',
+                key: 'institut_id'
+            }
         }
     },
     {
@@ -55,6 +63,9 @@
         Test.hasMany(models.csvItem,{foreignKey:'test_id', sourceKey:'test_id'});
 
         Test.hasMany(models.Skill, {foreignKey: 'test_id',sourceKey: 'test_id',as: 'skills',scope: {parent_id: null}});
+        
+        // Nouvelle relation avec Institut (owner)
+        Test.belongsTo(models.Institut, {foreignKey: 'owner_id', as: 'owner'});
     }
         return Test;  
 }   

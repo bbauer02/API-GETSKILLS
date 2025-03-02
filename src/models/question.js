@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Question =  sequelize.define('Question', {
+    const Question = sequelize.define('Question', {
         question_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         level_id: {
             type: DataTypes.INTEGER,
-            allowNull: true  // Pour permettre null pour TOEIC
+            allowNull: true  
         },
         instruction: {
             type: DataTypes.TEXT,
@@ -46,43 +46,26 @@ module.exports = (sequelize, DataTypes) => {
         question_data: {
             type: DataTypes.JSON,
             allowNull: false,
-            validate: {
-                isValidQuestionData(value) {
-                    if (!value.type) {
-                        throw new Error('Question type is required!');
-                    }
-                    if (!value.content) {
-                        throw new Error('Question content is required!');
-                    }
-                    // Validation spécifique selon le type
-                    switch (value.type) {
-                        case 'MCQ':
-                        case 'UCQ':
-                            if (!Array.isArray(value.content.choices)) {
-                                throw new Error('Choices must be an array!');
-                            }
-                            break;
-                        case 'FillInTheBlanks':
-                            if (!Array.isArray(value.content.answers)) {
-                                throw new Error('Answers must be an array!');
-                            }
-                            break;
-                        // ... autres validations selon les types
-                    }
-                }
-            }
         }
     },
-     {
-         tableName: 'questions',
-         timestamps: false,
-     });
+    {
+        tableName: 'questions',
+        timestamps: false,
+    });
 
     Question.associate = models => {
-        Question.belongsTo(models.Test, { foreignKey: 'test_id',targetKey: 'test_id',as: 'test'});
-        Question.belongsTo(models.Level, { foreignKey: 'level_id',targetKey: 'level_id',as: 'level'});
-    }
+        Question.belongsTo(models.Test, { foreignKey: 'test_id', targetKey: 'test_id', as: 'test' });
+        Question.belongsTo(models.Level, { foreignKey: 'level_id', targetKey: 'level_id', as: 'level' });
+        Question.hasMany(models.QuestionSkills, { foreignKey: 'question_id', sourceKey: 'question_id', as: 'questionSkills' });
 
-    
-     return Question;
-}
+        // 🔥 Utilisation du modèle pivot
+        Question.belongsToMany(models.Subject, {
+            through: models.SubjectHasQuestion, // 🔥 On passe le modèle Sequelize, pas une string
+            foreignKey: "question_id",
+            otherKey: "subject_id",
+            as: "subjects",
+        });
+    };
+
+    return Question;
+};

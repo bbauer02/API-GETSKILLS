@@ -1,4 +1,6 @@
-﻿const {models} = require("./index");
+﻿// Supprimez cette ligne ou utilisez-la uniquement pour les hooks
+// const {models} = require("./index");
+
 module.exports = (sequelize, DataTypes) => {
     const Skill = sequelize.define('Skill', {
             skill_id: {
@@ -25,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
                 validate: {
                     notNull: {msg: `skill:test_id cannot be NULL!`}
                 }
-                // Suppression de defaultValue car incompatible avec allowNull: false
             }
         },
         {
@@ -33,8 +34,9 @@ module.exports = (sequelize, DataTypes) => {
             timestamps: false,
             hooks: {
                 beforeDestroy (instance, options) {
-                    console.log(instance.dataValues);
-                    models['SkillsHist'].create(instance.dataValues);
+                    // Utilisez le models directement passé à la fonction associate
+                    // au lieu de l'importer en haut du fichier
+                    sequelize.models.SkillsHist.create(instance.dataValues);
                 }
             }
         });
@@ -48,11 +50,18 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Skill.belongsTo(Skill, {as: "parent", foreignKey: 'parent_id', onDelete: 'NO ACTION', hooks: true});
-    //Skill.hasMany(Question, {foreignKey: 'skill_id', sourceKey: 'skill_id'});
-   
+    
     Skill.associate = models => {
-        Skill.belongsTo(models.Test, { foreignKey: 'test_id',targetKey: 'test_id',as: 'test'});
+        Skill.belongsTo(models.Test, { foreignKey: 'test_id', targetKey: 'test_id', as: 'test'});
+        
+        // Ajouter cette nouvelle relation avec Exam
+        Skill.belongsToMany(models.Exam, {
+            through: models.ExamHasSkill,
+            foreignKey: 'skill_id',
+            otherKey: 'exam_id',
+            as: 'exams'
+        });
     }
 
     return Skill;
-}   
+}

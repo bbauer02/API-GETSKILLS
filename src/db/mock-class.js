@@ -15,8 +15,11 @@ const instituts = require('../db/mock-instituts');
 const itemsCsv = require('../db/mock-items_csv');
 const skills = require('../db/mock-skills');
 const questions = require('../db/mock-questions');
+const {subjects,subjectHasQuestions} = require('../db/mock-subjects');
+const examHasSkills = require('../db/mock-exams_has_skill');
 const { fa } = require('faker/lib/locales');
 const { format } = require('date-fns');
+const { title } = require('process');
 
  class MockDatas {
 
@@ -55,6 +58,9 @@ const { format } = require('date-fns');
     invoice_lines = [];
     questions = [];
     questionSkills = [];
+    subjects = [];
+    subjectHasQuestions = [];
+    examHasSkills = [];
 
 
     constructor(
@@ -102,12 +108,42 @@ const { format } = require('date-fns');
             this.#fillInstitutHasPrices();
             this.#fillInvoices();
             this.#fillQuestions();
+            this.#fillSubjects();
            // this.#fillSessionUserOption();
+           this.#fillExamHasSkills();
         }
         catch (error) {
             throw error.message;
         }
        
+    }
+
+    #fillExamHasSkills() {
+        for(const examHasSkill of examHasSkills) {
+            this.examHasSkills.push({
+                exam_id: examHasSkill.exam_id,
+                skill_id: examHasSkill.skill_id
+            });
+        }
+    }
+
+    #fillSubjects() {
+        for(const subject of subjects) {
+            this.subjects.push({
+                subject_id: subject.subject_id,
+                title: subject.title,
+                description: subject.description,
+                test_id: subject.test_id,
+                level_id: subject.level_id,
+            });
+        }
+
+        for(const subjectHasQuestion of subjectHasQuestions) {
+            this.subjectHasQuestions.push({
+                subject_id: subjectHasQuestion.subject_id,
+                question_id: subjectHasQuestion.question_id
+            });
+        }
     }
 
     #fillQuestions() {
@@ -164,7 +200,8 @@ const { format } = require('date-fns');
                     test_id : testid,
                     label: test.label,
                     isInternal: test.isInternal,
-                    parent_id: test.parent_id
+                    parent_id: test.parent_id,
+                    owner_id: test.owner_id
                 });
                 testid++;
             }

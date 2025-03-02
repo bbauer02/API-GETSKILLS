@@ -89,7 +89,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false        
-        },
+        }
     },
         {
             tableName: 'instituts',
@@ -113,6 +113,9 @@ module.exports = (sequelize, DataTypes) => {
         Institut.hasMany(models.empowermentTests, { foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete:'CASCADE' });
         Institut.hasMany(models.institutHasUser,{as:'users',foreignKey:'institut_id', sourceKey:'institut_id'});
         Institut.hasMany(models['Invoice'], { as: 'invoices', foreignKey: 'institut_id', sourceKey: 'institut_id', onDelete:'CASCADE' });
+        
+        // Relation avec Test (en tant que propriétaire)
+        Institut.hasMany(models.Test, { as: 'ownedTests', foreignKey: 'owner_id', sourceKey: 'institut_id' });
     }
     return Institut;
 }

@@ -5,6 +5,7 @@
         isInternal: false,
         parent_id:null,
         isArchive: false,
+        owner_id: 1
     },
     {
         test_id :2,
@@ -12,6 +13,7 @@
         isInternal: false,
         parent_id: 1,
         isArchive: false,
+        owner_id: 1
     },
     {
         test_id :3,
@@ -19,6 +21,7 @@
         isInternal: false,
         parent_id:null,
         isArchive: false,
+        owner_id: 1
     },
     {
         test_id :4,
@@ -26,6 +29,7 @@
         isInternal: false,
         parent_id:null,
         isArchive: false,
+        owner_id: 1
     },
     {
         test_id :5,
@@ -33,6 +37,7 @@
         isInternal: false,
         parent_id: 1,
         isArchive: false,
+        owner_id: 1
     }
 ]
 

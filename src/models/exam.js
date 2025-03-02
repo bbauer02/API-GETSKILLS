@@ -53,6 +53,13 @@
         Exam.hasMany(models.InstitutHasPrices, {foreignKey:'exam_id',sourceKey: 'exam_id'});
         Exam.hasMany(models.sessionHasExam,{foreignKey:'exam_id', sourceKey: 'exam_id'});
         Exam.belongsToMany(models.Question, { through: models.examHasQuestion, foreignKey: 'exam_id' });
+         // Nouvelle relation avec Skill
+         Exam.belongsToMany(models.Skill, {
+            through: models.ExamHasSkill,
+            foreignKey: 'exam_id',
+            otherKey: 'skill_id',
+            as: 'skills'
+        });
     };
   
     return Exam; 

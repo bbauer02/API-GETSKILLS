@@ -51,6 +51,9 @@ const initDB = async (sequelize) => {
             //roles
             await models['Role'].bulkCreate(mock.roles);
             console.log('Table `Role` ........................ OK');
+            //instituts
+            await models['Institut'].bulkCreate(mock.instituts);
+            console.log('Table `Institut` .................... OK');
             //tests
             await models['Test'].bulkCreate(mock.tests).catch(error => {
                 console.log("Erreur détaillée lors de la création des tests:", error);
@@ -63,9 +66,6 @@ const initDB = async (sequelize) => {
             //itemsCsv
             await models['csvItem'].bulkCreate(mock.itemsCsv);
             console.log('Table `csvItem` ..................... OK');
-            //instituts
-            await models['Institut'].bulkCreate(mock.instituts);
-            console.log('Table `Institut` .................... OK');
             //defaultUsers 
             //randomUsers
             await models['User'].bulkCreate([...mock.defaultUsers, ...mock.randomUsers]);
@@ -85,10 +85,16 @@ const initDB = async (sequelize) => {
             console.log('Table `Skill` ....................... OK');
             //question
             await models['Question'].bulkCreate(mock.questions);
-            console.log('Table `Question` ....................... OK');
+            console.log('Table `Question` .................... OK');
             //question Skills
             await models['QuestionSkills'].bulkCreate(mock.questionSkills);
-            console.log('Table `QuestionSkill` ....................... OK');
+            console.log('Table `QuestionSkill` ............... OK');
+            //subject
+            await models['Subject'].bulkCreate(mock.subjects);
+            console.log('Table `Subject` ..................... OK');
+            //subjectHasQuestions
+            await models['SubjectHasQuestion'].bulkCreate(mock.subjectHasQuestions);
+            console.log('Table `SubjectHasQuestion` .......... OK');
             //exams 
             await models['Exam'].bulkCreate(mock.exams);
             console.log('Table `Exam` ........................ OK');
@@ -108,9 +114,14 @@ const initDB = async (sequelize) => {
             await models['sessionUserOption'].bulkCreate(mock.sessionUserOption);
             console.log('Table `sessionUserOption` ........... OK');
             //invoices + invoiceLines
-            console.log('Table `invoices` ........... OK');
+            console.log('Table `invoices` .................... OK');
+            //examHasSkills
+            await models['ExamHasSkill'].bulkCreate(mock.examHasSkills);
+            console.log('Table `examHasSkills` ............... OK');
+
+            
             await models['Invoice'].bulkCreate(mock.invoices);
-            console.log('Table `invoice_lines` ........... OK');
+            console.log('Table `invoice_lines` ............... OK');
             await models['InvoiceLines'].bulkCreate(mock.invoice_lines);
             // Suppression des Templates
             await destroyFolder('templates');

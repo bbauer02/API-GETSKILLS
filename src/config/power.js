@@ -1,5 +1,13 @@
+const { subjects } = require("../db/mock-subjects");
+
 module.exports = (env) => ({
     GET: {
+        questions: {
+            default: env.QUESTION_GET,
+        },
+        subjects: {
+            default: env.SUBJECT_GET,
+        },
         instituts: {
             default: env.INSTITUTS_GET,
             tests : {

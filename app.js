@@ -196,6 +196,14 @@ require('./src/routes/invoice/deleteInvoiceByInstitut')(app);
 require('./src/routes/invoice/newInvoice')(app);
 require('./src/routes/invoice/getInvoicePdf')(app);
 
+
+// QUESTIONS
+require('./src/routes/question/findAllQuestions')(app);
+require('./src/routes/question/findQuestionByPk')(app);
+
+// SUBJECT
+require('./src/routes/subject/findAllSubjects')(app);
+
 // csvItems
 require('./src/routes/csvItem/createCsvItem')(app);
 require('./src/routes/csvItem/deleteCsvItem')(app);

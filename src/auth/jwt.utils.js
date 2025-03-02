@@ -109,102 +109,149 @@ module.exports = {
     // Fonction qui vérifie si l'utilisateur est identifié, 
     isAuthenticated: async (req, res, next) => {
         try {
-            
+            console.log('DEBUG - isAuthenticated - Vérification du token');
             const decodedToken = await module.exports.getHeaderToken(req);
+            console.log('DEBUG - isAuthenticated - Token décodé:', JSON.stringify(decodedToken, null, 2));
+            
             // 4. On vérifie que l'utilisateur existe bien dans notre base de données.
             const userId = decodedToken.sub;
+            console.log('DEBUG - isAuthenticated - userId:', userId);
+            
             const user = await models['User'].findOne({ where: { user_id: userId } });
             if (!user) {
+                console.log('DEBUG - isAuthenticated - Utilisateur non trouvé');
                 throw new Error(`User ${userId} not exists.`);
             }
+            console.log('DEBUG - isAuthenticated - Utilisateur trouvé:', JSON.stringify(user, null, 2));
+            
             // 5. On passe l'utilisateur dans notre requête afin que celui-ci soit disponible pour les prochains middlewares
             req.accessToken = decodedToken;
             return next();
         }
         catch (error) {
+            console.log('DEBUG - isAuthenticated - Erreur:', error);
             res.status(401).json({ "error": error.message });
         }
     },
     // Fonction qui vérifie si l'utilisateur possède le bon rôle pour la ressource. 
     isAuthorized: async (req, res, next) => {
         try {
+            console.log('DEBUG - isAuthorized - Vérification des droits');
+            
             // On obtient la METHODE HTTP utilisé par la requête
             const httpMethod = req.method.toUpperCase();
+            console.log('DEBUG - isAuthorized - Méthode HTTP:', httpMethod);
+            
             // A partit de la method HTTP nous faisons un premier filtre sur l'objet POWER
             // quine retournera que les pouvoir de la méthode HTTP voulue.
             let powerNeedByHttpMethod = power[httpMethod];
+            console.log('DEBUG - isAuthorized - powerNeedByHttpMethod:', JSON.stringify(powerNeedByHttpMethod, null, 2));
+            
             // On récupére également le TOKEN.
             const decodedToken = req.accessToken;
+            console.log('DEBUG - isAuthorized - decodedToken:', JSON.stringify(decodedToken, null, 2));
+            
             // On détermine maintenant le pouvoir nécéssaire à la lecture de cette route : 
             // On récupére un tableau des différents points d'entrées qui composent l'URL.
             const filteredURL = req.url.split('?')[0];
+            console.log('DEBUG - isAuthorized - filteredURL:', filteredURL);
+            
             const entriesPoints = filteredURL.split('/').filter(segment => {
                 const isNotApi = segment !== 'api';
                 const isNotEmpty = segment !== '';
                 const isNotNumber = isNaN(segment);               
                 return (isNotApi && isNotEmpty && isNotNumber);
             });
+            console.log('DEBUG - isAuthorized - entriesPoints:', entriesPoints);
               
             // moduleName ici avant qu'il ne devienne un tableau vide ? (voir console.log plus bas avant le moduleName === 'institut')
             const moduleName = entriesPoints[0];
+            console.log('DEBUG - isAuthorized - moduleName:', moduleName);
+            
             // On récupére les 'ids' de l'URL si il y en a. 
             const ids = req.url.split('/').filter(e => e !== 'api' && parseInt(e) && e !== '');
+            console.log('DEBUG - isAuthorized - ids:', ids);
+            
             // on fixe un pouvoir par default à 0 en cas d'oublie de définition des pouvoirs d'une route. 
             // en fixant à 10 , la route est protégée. 
             // Toutefois, la valeur 'default' d'un noeud parent écrasera toujours 'defaultPowerNeeded'
             const defaultPowerNeeded = 10;
+            
             // On obtient le pouvoir nécessaire à la lecture de cette route.
             const powerNeed = module.exports.getPowerNeed(powerNeedByHttpMethod, entriesPoints, defaultPowerNeeded);
+            console.log('DEBUG - isAuthorized - powerNeed:', powerNeed);
+            
             // On vérifie les droits de l'utilisateur
             // Si le premier point d'entrée de l'API est INSTITUTS, il faut s'assurer que l'utilisateur qui a l'accès à cette route : 
             // 1 = soit membre de l'institut et possède les droits pour cette route dans cette institut.
             let userMemberOfInstitut = null;
             let userPower = 0;
+            
             // console.log("\n\nentriesPoints==", entriesPoints,"\n\n");
             if (moduleName === 'instituts') {
                 // On récupére l'identifiant de l'institut concerné : dans l'uRL, ou dans le body .
                 const reqInstitut_id = req.params.institut_id || req.body.institut_id || req.query.institut_id || null;
+                console.log('DEBUG - isAuthorized - reqInstitut_id:', reqInstitut_id);
               
                 if (reqInstitut_id) {
                     // on cherche dans le token de connexion l'objet relatif à l'identifiant de l'institut concerné. 
                     userMemberOfInstitut = decodedToken.instituts.find(({ institut_id }) => institut_id === parseInt(reqInstitut_id));
+                    console.log('DEBUG - isAuthorized - userMemberOfInstitut:', JSON.stringify(userMemberOfInstitut, null, 2));
 
                     // on récupére le userPower
                     userMemberOfInstitut !== undefined && userMemberOfInstitut !== null ? userPower = userMemberOfInstitut.Role.power : -1;
+                    console.log('DEBUG - isAuthorized - userPower:', userPower);
                 }
             }
             if(moduleName === 'users') {
                 const response = await models['institutHasUser'].findOne({ where: { user_id: ids[0] } });
+                console.log('DEBUG - isAuthorized - response users:', JSON.stringify(response, null, 2));
+                
                 if (!response) {
                     throw new Error(`User ${ids[0]} not exists.`);
                 }
                 const userToUpdateInstitut =  response.dataValues.institut_id;
                 const currentUserInstitut = decodedToken.instituts[0].institut_id;
+                console.log('DEBUG - isAuthorized - userToUpdateInstitut:', userToUpdateInstitut);
+                console.log('DEBUG - isAuthorized - currentUserInstitut:', currentUserInstitut);
 
                 // On verifie si celui qui fait l'update de l'utilisateur est membre de l'institut du user modifié
                 if(httpMethod ==="PUT" && userToUpdateInstitut === currentUserInstitut && decodedToken.instituts[0].Role.power >= power["PUT"]["instituts"]["sessions"]["users"]) {
+                    console.log('DEBUG - isAuthorized - Utilisateur autorisé (PUT users)');
                     return next();
                 }
                 if(httpMethod ==="PUT" && decodedToken.user_id === parseInt(ids[0],10) ) {
+                    console.log('DEBUG - isAuthorized - Utilisateur autorisé (PUT self)');
                     if(req.body.systemRole_id) {
                         delete req.body.systemRole_id;
                     }  
                     return next();
                 }
             }
+            
+            // Cas spécial pour les examens, skills, levels et tests
+            // Ces ressources sont gérées par le middleware checkTestOwnerPermission
+            if (['exams', 'skills', 'levels', 'tests'].includes(moduleName)) {
+                console.log('DEBUG - isAuthorized - Ressource gérée par checkTestOwnerPermission, autorisation accordée');
+                return next();
+            }
+            
             if (userPower >= powerNeed) {
+                console.log('DEBUG - isAuthorized - Utilisateur autorisé (userPower >= powerNeed)');
                 return next();
             }
             else if (decodedToken.systemRole.power && decodedToken.systemRole.power >= powerNeed) {
+                console.log('DEBUG - isAuthorized - Utilisateur autorisé (systemRole.power >= powerNeed)');
                 return next();
             }
+            
+            console.log('DEBUG - isAuthorized - Utilisateur non autorisé');
             throw new Error(`You have no power here !`);
         }
         catch (error) {
+            console.log('DEBUG - isAuthorized - Erreur:', error);
             res.status(401).json({ "error": error.message });
         }
-
-
     },
     hasPowerEnough: (systemRole, powerNeeded) => {
         if (systemRole && systemRole.power >= powerNeeded) {

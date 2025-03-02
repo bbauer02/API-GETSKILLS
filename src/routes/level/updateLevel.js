@@ -1,31 +1,32 @@
 ﻿const {models} = require('../../models');
-const { ValidationError,UniqueConstraintError } = require('sequelize');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+const { ValidationError, UniqueConstraintError } = require('sequelize');
+const { isAuthenticated } = require('../../auth/jwt.utils');
+const { authorize } = require('../../auth/permissions');
 
 module.exports = (app) => {
-    app.put('/api/levels/:level_id', isAuthenticated, isAuthorized,async (req, res) => {
+    app.put('/api/levels/:id', isAuthenticated, authorize, async (req, res) => {
         try {
-            const Level = await models['Level'].findByPk(req.params.level_id);
-            if(Level === null) {
-                const message = `Level doesn't exist.Retry with an other level id.`;
+            const level = await models['Level'].findByPk(req.params.id);
+            if(level === null) {
+                const message = `Le niveau n'existe pas. Veuillez réessayer avec un autre identifiant de niveau.`;
                 return res.status(404).json({message});
             }
-            await Level.update(req.body,{
-                where:{id:req.params.level_id}
-            });
-            const message = `Level id:${Level.level_id} has been updated `;
-            res.json({message, data: Level});
+            
+            await level.update(req.body);
+            
+            const message = `Le niveau avec l'ID ${level.level_id} a été mis à jour avec succès.`;
+            res.json({message, level});
         }
         catch (error) {
             if(error instanceof UniqueConstraintError) {
-                return res.status(400).json({message: error.message, data:error})
+                return res.status(400).json({message: error.message, data: error});
             }
             if(error instanceof ValidationError) {
-                return res.status(400).json({message: error.message, data:error})
+                return res.status(400).json({message: error.message, data: error});
             }
-            const message = `Service not available. Please retry later.`;
+            console.error('Erreur lors de la mise à jour du niveau:', error);
+            const message = `Service non disponible. Veuillez réessayer plus tard.`;
             res.status(500).json({message, data: error});
         }
-
     });
 }

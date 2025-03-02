@@ -1,91 +1,98 @@
 ﻿﻿const { models } = require('../../models');
 const { Op } = require('sequelize');
-const { isAuthenticated, isAuthorized } = require('../../auth/jwt.utils');
+const { isAuthenticated } = require('../../auth/jwt.utils');
+const { authorize } = require('../../auth/permissions');
 
 module.exports = (app) => {
-    app.get('/api/exams', async (req, res) => {
+    app.get('/api/exams', isAuthenticated, authorize, async (req, res) => {
         try {
+            console.log('DEBUG - findAllExams - Requête reçue avec paramètres:', req.query);
+            
             const parameters = {};
             parameters.where = {};
-            parameters.include = [{
-                attributes: ['exam_id','price', 'tva'],
-                model: models['InstitutHasPrices'],
-                as: 'InstitutHasPrices'
-            },
-            {
-                model: models['Test']
-            },
-            {
-                model: models['Level']
-            }];
+            parameters.include = [
+                {
+                    model: models['Test'],
+                    include: [
+                        {
+                            model: models['Institut'],
+                            as: 'owner',
+                            attributes: ['institut_id', 'label']
+                        }
+                    ]
+                },
+                {
+                    model: models['Level']
+                },
+                {
+                    model: models['Skill'],
+                    as: 'skills',
+                    through: { attributes: [] }
+                }
+            ];
             
-            
-            // Parameter : TEST
+            // Paramètre : TEST
             if (req.query.test) {
                 const test = parseInt(req.query.test);
                 if (isNaN(test)) {
-                    const message = `Test parameter should be an integer.`;
-                    return res.status(400).json({ message })
+                    const message = `Le paramètre test doit être un entier.`;
+                    return res.status(400).json({ message });
                 }
                 parameters.where.test_id = test;
             }
-            // Parameter : LEVEL
+            
+            // Paramètre : LEVEL
             if (req.query.level) {
                 if (req.query.level !== "null") {
                     const level = parseInt(req.query.level);
                     if (isNaN(level)) {
-                        const message = `Level parameter should be an integer.`;
-                        return res.status(400).json({ message })
+                        const message = `Le paramètre level doit être un entier.`;
+                        return res.status(400).json({ message });
                     }
                     parameters.where.level_id = level;
                 }
-
             }
-            // Parameter : PRICE
-            if (req.query.price) {
-                const price = parseInt(req.query.price);
-                if (isNaN(price)) {
-                    const message = `price parameter should be an integer.`;
-                    return res.status(400).json({ message })
-                }
-                parameters.where.price = price;
-            }
-            // Parameter : LIMIT
-            if (req.query.limit) {
-                const limit = parseInt(req.query.limit);
-                if (isNaN(limit)) {
-                    const message = `Limit parameter should be an integer.`;
-                    return res.status(400).json({ message })
-                }
-                parameters.limit = limit;
-            }
-            // Parameter : OFFSET
-            if (req.query.offset) {
-                const offset = parseInt(req.query.offset);
-                if (isNaN(offset)) {
-                    const message = `Offset parameter should be an integer.`;
-                    return res.status(400).json({ message })
-                }
-                parameters.offset = parseInt(req.query.offset);
-            }
-
+            
+            // Paramètre : INSTITUT (propriétaire du test)
             if (req.query.institut) {
                 const institut = parseInt(req.query.institut);
                 if (isNaN(institut)) {
-                    const message = `institut parameter should be an integer.`;
-                    return res.status(400).json({ message })
+                    const message = `Le paramètre institut doit être un entier.`;
+                    return res.status(400).json({ message });
                 }
-                parameters.where['$InstitutHasPrices.institut_id$'] = {
-                    [Op.or]: [institut, null]
-                }
+                parameters.include[0].where = { owner_id: institut };
             }
-            const Exams = await models['Exam'].findAll(parameters);
-            const message = `${Exams.length} exams found`;
-            res.json({ message, exams: Exams });
+            
+            // Paramètre : LIMIT
+            if (req.query.limit) {
+                const limit = parseInt(req.query.limit);
+                if (isNaN(limit)) {
+                    const message = `Le paramètre limit doit être un entier.`;
+                    return res.status(400).json({ message });
+                }
+                parameters.limit = limit;
+            }
+            
+            // Paramètre : OFFSET
+            if (req.query.offset) {
+                const offset = parseInt(req.query.offset);
+                if (isNaN(offset)) {
+                    const message = `Le paramètre offset doit être un entier.`;
+                    return res.status(400).json({ message });
+                }
+                parameters.offset = offset;
+            }
+
+            const exams = await models['Exam'].findAll(parameters);
+            console.log(`DEBUG - findAllExams - ${exams.length} examens trouvés`);
+            
+            const message = `${exams.length} examens trouvés`;
+            res.json({ message, exams: exams });
         }
         catch (error) {
-            const message = `Service not available. Please retry later.`;
-            res.status(500).json({ message, data: error.toString() })
+            console.error('Erreur lors de la récupération des examens:', error);
+            const message = `Service non disponible. Veuillez réessayer plus tard.`;
+            res.status(500).json({ message, data: error.toString() });
         }
     });
 }
