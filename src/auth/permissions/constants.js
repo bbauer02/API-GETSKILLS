@@ -14,7 +14,8 @@ const RESOURCES = {
   INVOICE: 'invoice',
   COUNTRY: 'country',
   ROLE: 'role',
-  LANGUAGE: 'language'
+  LANGUAGE: 'language',
+  SUBJECT: 'subject'
 };
 
 /**

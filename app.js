@@ -200,9 +200,13 @@ require('./src/routes/invoice/getInvoicePdf')(app);
 // QUESTIONS
 require('./src/routes/question/findAllQuestions')(app);
 require('./src/routes/question/findQuestionByPk')(app);
+require('./src/routes/question/createQuestion')(app);
+require('./src/routes/question/updateQuestion')(app);
+require('./src/routes/question/deleteQuestion')(app);
 
 // SUBJECT
 require('./src/routes/subject/findAllSubjects')(app);
+require('./src/routes/subject/generateSubject')(app);
 
 // csvItems
 require('./src/routes/csvItem/createCsvItem')(app);

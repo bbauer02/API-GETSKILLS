@@ -38,7 +38,8 @@ const URL_SEGMENT_TO_RESOURCE = {
 const SPECIAL_ROUTES = {
   'GET:/api/tests/variations': { resource: RESOURCES.TEST, action: ACTIONS.READ },
   'POST:/api/tests/archive': { resource: RESOURCES.TEST, action: ACTIONS.ARCHIVE },
-  'GET:/api/csvItem/export': { resource: RESOURCES.TEST, action: ACTIONS.EXPORT }
+  'GET:/api/csvItem/export': { resource: RESOURCES.TEST, action: ACTIONS.EXPORT },
+  'POST:/api/subject/generate': { resource: RESOURCES.SUBJECT, action: ACTIONS.CREATE }
   // Ajoutez d'autres cas spéciaux selon vos besoins
 };
 

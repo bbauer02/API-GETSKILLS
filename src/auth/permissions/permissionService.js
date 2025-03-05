@@ -31,13 +31,88 @@ class PermissionService {
         return false;
       }
       
+      // Récupérer les instituts auxquels appartient l'utilisateur et leurs rôles
+      const userInstituts = await models['institutHasUser'].findAll({
+        where: { user_id: userId },
+        include: [{ model: models['Role'] }, { model: models['Institut'] }]
+      });
+      
+      console.log(`DEBUG - PermissionService - Utilisateur appartient à ${userInstituts.length} institut(s)`);
+      userInstituts.forEach(institut => {
+        console.log(`DEBUG - PermissionService - Institut: ${institut.Institut.label} (ID=${institut.institut_id}), Rôle: ${institut.Role.label} (power=${institut.Role.power})`);
+      });
+      
       // Vérifier les permissions du rôle système
       const systemRolePower = user.systemRole ? user.systemRole.power : 0;
       console.log(`DEBUG - PermissionService - Rôle système: power=${systemRolePower}`);
       
-      if (this.hasSystemPermission(systemRolePower, resource, action)) {
+      // Vérifier si l'utilisateur a la permission via son rôle système
+      const hasSystemPermission = this.hasSystemPermission(systemRolePower, resource, action);
+      console.log(`DEBUG - PermissionService - Permission système: ${hasSystemPermission ? 'OUI' : 'NON'}`);
+      
+      if (hasSystemPermission) {
         console.log(`DEBUG - PermissionService - Permission accordée par le rôle système`);
         return true;
+      }
+      
+      // Vérifier chaque institut de l'utilisateur
+      console.log(`DEBUG - PermissionService - Vérification des permissions dans les instituts de l'utilisateur...`);
+      
+      // Cas spécial: création d'une nouvelle ressource (pas d'ID de ressource)
+      if (!resourceId && action === 'create') {
+        console.log(`DEBUG - PermissionService - Création d'une nouvelle ressource ${resource}`);
+        
+        // Pour les tests, examens, niveaux et compétences, il faut vérifier les permissions générales
+        if (['exam', 'level', 'skill'].includes(resource)) {
+          try {
+            console.log(`DEBUG - PermissionService - Vérification des permissions générales pour créer ${resource}`);
+            
+            // Vérifier si l'utilisateur a les permissions nécessaires dans au moins un institut
+            for (const institut of userInstituts) {
+              const institutRolePower = institut.Role.power;
+              const permissions = INSTITUT_ROLE_PERMISSIONS[institutRolePower] || [];
+              
+              console.log(`DEBUG - PermissionService - Vérification institut ${institut.institut_id} avec power=${institutRolePower}`);
+              console.log(`DEBUG - PermissionService - Permissions disponibles: ${JSON.stringify(permissions)}`);
+              
+              const hasPermission = permissions.some(permission => 
+                permission === '*' || 
+                permission === `${action}:*` || 
+                permission === `*:${resource}` || 
+                permission === `${action}:${resource}`
+              );
+              
+              console.log(`DEBUG - PermissionService - Institut ${institut.institut_id} a la permission? ${hasPermission}`);
+              
+              if (hasPermission) {
+                console.log(`DEBUG - PermissionService - Permission accordée par le rôle dans l'institut ${institut.institut_id} (power=${institutRolePower})`);
+                return true;
+              }
+            }
+            
+            console.log(`DEBUG - PermissionService - Aucune permission trouvée pour créer ${resource} dans les instituts de l'utilisateur`);
+            return false;
+          } catch (error) {
+            console.error(`Erreur lors de la vérification des permissions pour créer ${resource}:`, error);
+            return false;
+          }
+        }
+        
+        // Si aucun institut spécifique n'est requis, vérifier si l'utilisateur a le droit dans l'un de ses instituts
+        for (const institut of userInstituts) {
+          const institutRolePower = institut.Role.power;
+          const permissions = INSTITUT_ROLE_PERMISSIONS[institutRolePower] || [];
+          
+          if (permissions.some(permission => 
+            permission === '*' || 
+            permission === `${action}:*` || 
+            permission === `*:${resource}` || 
+            permission === `${action}:${resource}`
+          )) {
+            console.log(`DEBUG - PermissionService - Permission accordée par le rôle dans l'institut ${institut.institut_id}`);
+            return true;
+          }
+        }
       }
       
       // Si la ressource a un propriétaire (institut), vérifier les permissions d'institut
@@ -161,6 +236,37 @@ class PermissionService {
     } catch (error) {
       console.error('Erreur lors de la détermination du propriétaire de la ressource:', error);
       return null;
+    }
+  }
+
+  /**
+   * Vérifie si un utilisateur peut créer une ressource liée à un test
+   * @param {number} userId - L'ID de l'utilisateur
+   * @param {number} testId - L'ID du test associé
+   * @param {string} resource - Le type de ressource à créer
+   * @returns {Promise<boolean>} True si l'utilisateur peut créer la ressource, false sinon
+   */
+  static async canCreateResourceForTest(userId, testId, resource) {
+    try {
+      console.log(`DEBUG - PermissionService - Vérification si l'utilisateur ${userId} peut créer ${resource} pour le test ${testId}`);
+      
+      // Récupérer le test pour identifier son propriétaire
+      const test = await models['Test'].findByPk(testId);
+      if (!test || !test.owner_id) {
+        console.log(`DEBUG - PermissionService - Test ${testId} introuvable ou sans propriétaire`);
+        return false;
+      }
+      
+      console.log(`DEBUG - PermissionService - Test ${testId} appartient à l'institut ${test.owner_id}`);
+      
+      // Vérifier si l'utilisateur a les permissions dans cet institut
+      const hasInstitutPerm = await this.hasInstitutPermission(userId, test.owner_id, resource, 'create');
+      console.log(`DEBUG - PermissionService - Permission institut pour créer ${resource}: ${hasInstitutPerm}`);
+      
+      return hasInstitutPerm;
+    } catch (error) {
+      console.error(`Erreur lors de la vérification des permissions pour créer ${resource}:`, error);
+      return false;
     }
   }
 }

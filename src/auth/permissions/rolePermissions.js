@@ -56,6 +56,7 @@ const INSTITUT_ROLE_PERMISSIONS = {
     ...allPermissionsFor(RESOURCES.SKILL),
     ...allPermissionsFor(RESOURCES.DOCUMENT),
     ...allPermissionsFor(RESOURCES.INVOICE),
+    ...allPermissionsFor(RESOURCES.SUBJECT),
     `${ACTIONS.ARCHIVE}:${RESOURCES.TEST}`,
     `${ACTIONS.EXPORT}:${RESOURCES.TEST}`
   ],
@@ -66,6 +67,7 @@ const INSTITUT_ROLE_PERMISSIONS = {
     ...allPermissionsFor(RESOURCES.EXAM),
     ...allPermissionsFor(RESOURCES.LEVEL),
     ...allPermissionsFor(RESOURCES.SKILL),
+    ...allPermissionsFor(RESOURCES.SUBJECT),
     ...readPermissionFor(RESOURCES.USER),
     ...readPermissionFor(RESOURCES.SESSION),
     ...readPermissionFor(RESOURCES.DOCUMENT),

@@ -56,11 +56,28 @@ module.exports = (sequelize, DataTypes) => {
     Question.associate = models => {
         Question.belongsTo(models.Test, { foreignKey: 'test_id', targetKey: 'test_id', as: 'test' });
         Question.belongsTo(models.Level, { foreignKey: 'level_id', targetKey: 'level_id', as: 'level' });
-        Question.hasMany(models.QuestionSkills, { foreignKey: 'question_id', sourceKey: 'question_id', as: 'questionSkills' });
+        
+        // Relation avec QuestionSkills
+        Question.hasMany(models.QuestionSkills, { 
+            foreignKey: 'question_id', 
+            sourceKey: 'question_id', 
+            as: 'questionSkills'
+        });
 
-        // 🔥 Utilisation du modèle pivot
+        // Association de Question à Skill via la table de jointure - version corrigée
+        Question.belongsToMany(models.Skill, {
+            through: {
+                model: models.QuestionSkills,
+                unique: false
+            },
+            foreignKey: "question_id",
+            otherKey: "skill_id",
+            as: "skills"
+        });
+
+        // Utilisation du modèle pivot pour Subject
         Question.belongsToMany(models.Subject, {
-            through: models.SubjectHasQuestion, // 🔥 On passe le modèle Sequelize, pas une string
+            through: models.SubjectHasQuestion,
             foreignKey: "question_id",
             otherKey: "subject_id",
             as: "subjects",

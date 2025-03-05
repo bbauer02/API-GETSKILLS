@@ -54,6 +54,24 @@ module.exports = (sequelize, DataTypes) => {
     Skill.associate = models => {
         Skill.belongsTo(models.Test, { foreignKey: 'test_id', targetKey: 'test_id', as: 'test'});
         
+        // Relation avec QuestionSkills
+        Skill.hasMany(models.QuestionSkills, {
+            foreignKey: 'skill_id',
+            sourceKey: 'skill_id',
+            as: 'skillQuestions'
+        });
+        
+        // Association à Question via la table de jointure - version corrigée
+        Skill.belongsToMany(models.Question, {
+            through: {
+                model: models.QuestionSkills,
+                unique: false
+            },
+            foreignKey: 'skill_id',
+            otherKey: 'question_id',
+            as: 'questions'
+        });
+        
         // Ajouter cette nouvelle relation avec Exam
         Skill.belongsToMany(models.Exam, {
             through: models.ExamHasSkill,
