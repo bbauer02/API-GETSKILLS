@@ -11,11 +11,11 @@ const sequelize = require('../../db/sequelize');
 
 module.exports = (app) => {
     /**
-     * @route POST /api/subject/generate
+     * @route POST /api/subjects/generate
      * @description Génère un nouveau sujet d'examen en équilibrant les compétences et types de questions
      * @access Privé (requiert authentification et rôle approprié)
      */
-    app.post('/api/subject/generate', isAuthenticated, authorize, async (req, res) => {
+    app.post('/api/subjects/generate', isAuthenticated, authorize, async (req, res) => {
         // Initialiser la transaction au niveau supérieur pour pouvoir y accéder en cas d'erreur
         let transaction;
         
@@ -38,7 +38,7 @@ module.exports = (app) => {
             const description = String(req.body.description || '').trim();
             const test_id = parseInt(req.body.test_id, 10);
             const level_id = req.body.level_id ? parseInt(req.body.level_id, 10) : null;
-            const totalDuration = parseInt(req.body.totalDuration, 10);
+            const totalDuration = parseInt(req.body.totalDuration, 10) * 60; // Convertir en secondes
             const totalPoints = parseInt(req.body.totalPoints, 10);
             const requiredPoints = parseInt(req.body.requiredPoints, 10);
             
@@ -50,10 +50,17 @@ module.exports = (app) => {
                 });
             }
             
+            if (level_id !== null && (isNaN(level_id) || level_id <= 0)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "L'ID du niveau doit être un nombre positif ou null"
+                });
+            }
+            
             if (isNaN(totalDuration) || totalDuration <= 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "La durée totale doit être un nombre positif (en minutes)"
+                    message: "La durée totale doit être un nombre positif"
                 });
             }
             
@@ -98,6 +105,44 @@ module.exports = (app) => {
                 }
             }
 
+            // Vérifier que le test a des compétences définies
+            const testSkills = await models.Skill.findAll({
+                where: { test_id },
+                attributes: ['skill_id'],
+                limit: 1
+            });
+            
+            if (!testSkills || testSkills.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Impossible de générer un sujet pour le test_id=${test_id} car aucune compétence n'est définie pour ce test. Veuillez définir des compétences avant de générer un sujet.`
+                });
+            }
+            
+            // Vérifier qu'il existe des questions avec des compétences pour ce test et ce niveau
+            const whereClause = { test_id };
+            if (level_id) {
+                whereClause.level_id = level_id;
+            }
+            
+            const questionsCount = await models.Question.count({
+                where: whereClause,
+                include: [{
+                    model: models.Skill,
+                    attributes: [],
+                    as: 'skills',
+                    through: { attributes: [] },
+                    where: { test_id }
+                }]
+            });
+            
+            if (questionsCount === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Aucune question avec des compétences n'a été trouvée pour le test_id=${test_id}${level_id ? ` et level_id=${level_id}` : ''}. Veuillez ajouter des questions avec des compétences avant de générer un sujet.`
+                });
+            }
+
             // Préparation des données pour la génération
             const examData = {
                 title,
@@ -129,7 +174,7 @@ module.exports = (app) => {
                 const subjectStats = {
                     questionCount: (generatedSubject.questions || []).length,
                     totalPoints: (generatedSubject.questions || []).reduce((sum, q) => sum + (parseInt(q.points || 0, 10)), 0),
-                    totalDuration: (generatedSubject.questions || []).reduce((sum, q) => sum + (parseInt(q.duration || 0, 10)), 0) / 60, // Convertir en minutes
+                    totalDuration: (generatedSubject.questions || []).reduce((sum, q) => sum + (parseInt(q.duration || 0, 10)), 0), // Durée en secondes
                 };
                 
                 try {

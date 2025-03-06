@@ -17,71 +17,275 @@ const sequelize = require('../db/sequelize');
  * @returns {Object} - Le sujet généré avec ses questions
  */
 async function generateExamSubject(examData, options = {}) {
-    // Valider les données d'entrée
-    try {
-        console.log('Données reçues pour la génération:', JSON.stringify(examData));
-        validateExamData(examData);
-    } catch (error) {
-        console.error('Erreur de validation des données:', error);
-        throw error;
+    if (!examData || !examData.test_id) {
+        throw new Error('test_id est requis pour générer un sujet');
     }
+
+    // Extraction des données de l'examen
+    const { 
+        test_id, 
+        level_id, 
+        totalPoints = 1200, 
+        totalDuration = 21600,  // 6 heures en secondes
+        title,
+        description,
+        minQuestionCount = 10   // Nombre minimum de questions requis
+    } = examData;
+
+    console.log(`
+======================================================
+GÉNÉRATION DE SUJET
+------------------------------------------------------
+Test ID: ${test_id}
+Niveau: ${level_id || 'Tous'}
+Points attendus: ${totalPoints}
+Durée attendue: ${totalDuration} secondes
+Nombre minimum de questions: ${minQuestionCount}
+======================================================
+`);
 
     // Utiliser la transaction fournie ou en créer une nouvelle
     const transaction = options.transaction || await sequelize.transaction();
-    const shouldCommitTransaction = !options.transaction; // Commit seulement si on a créé la transaction ici
+    let createdSubject = null;
 
     try {
-        // Récupérer les questions disponibles pour ce test et niveau
-        console.log(`Récupération des questions pour test_id=${examData.test_id}, level_id=${examData.level_id || 'tous niveaux'}`);
-        const availableQuestions = await fetchAvailableQuestions(examData.test_id, examData.level_id);
+        // Vérifier que le test a des compétences définies
+        const testSkills = await models.Skill.findAll({
+            where: { test_id },
+            attributes: ['skill_id'],
+            limit: 1
+        });
         
-        console.log(`Nombre de questions disponibles: ${availableQuestions.length}`);
-        if (availableQuestions.length === 0) {
-            if (shouldCommitTransaction) await transaction.rollback();
-            throw new Error('Aucune question disponible pour ce test et ce niveau');
+        if (!testSkills || testSkills.length === 0) {
+            throw new Error(`Impossible de générer un sujet pour le test_id=${test_id} car aucune compétence n'est définie pour ce test. Veuillez définir des compétences avant de générer un sujet.`);
+        }
+        
+        // Vérifier qu'il existe des questions avec des compétences pour ce test et ce niveau
+        const whereClause = { test_id };
+        if (level_id) {
+            whereClause.level_id = level_id;
+        }
+        
+        const questionsCount = await models.Question.count({
+            where: whereClause,
+            include: [{
+                model: models.Skill,
+                attributes: [],
+                as: 'skills',
+                through: { attributes: [] },
+                where: { test_id }
+            }]
+        });
+        
+        if (questionsCount === 0) {
+            throw new Error(`Aucune question avec des compétences n'a été trouvée pour le test_id=${test_id}${level_id ? ` et level_id=${level_id}` : ''}. Veuillez ajouter des questions avec des compétences avant de générer un sujet.`);
+        }
+        
+        // Récupérer les questions disponibles avec les statistiques requises
+        let questions = await fetchAvailableQuestions(test_id, level_id, { 
+            totalPoints, 
+            totalDuration,
+            ...examData
+        });
+
+        if (!questions || questions.length === 0) {
+            throw new Error(`Aucune question disponible pour test_id=${test_id} et level_id=${level_id}`);
         }
 
-        // Récupérer les compétences associées au test
-        console.log(`Récupération des compétences pour test_id=${examData.test_id}`);
-        const testSkills = await fetchTestSkills(examData.test_id);
-        console.log(`Nombre de compétences trouvées: ${testSkills.length}`);
-        
+        // Si nous n'avons pas assez de questions, chercher des questions dans d'autres tests
+        // UNIQUEMENT si aucun level_id n'est spécifié (pour éviter de mélanger des niveaux différents)
+        if (questions.length < minQuestionCount && !level_id) {
+            console.log(`
+ATTENTION : Seulement ${questions.length} questions disponibles, ce qui est inférieur 
+au minimum requis de ${minQuestionCount}. Recherche de questions supplémentaires...`);
+            
+            // Récupérer les IDs de questions déjà trouvées
+            const foundQuestionIds = questions.map(q => q.question_id);
+            
+            // Chercher des questions dans d'autres tests, de préférence avec des compétences similaires
+            const otherTestQuestions = await models.Question.findAll({
+                where: {
+                    test_id: { [Op.ne]: test_id },
+                    question_id: { [Op.notIn]: foundQuestionIds }
+                },
+                include: [
+                    {
+                        model: models.Skill,
+                        attributes: ['skill_id', 'label', 'parent_id', 'test_id'],
+                        through: { attributes: [] },
+                        as: 'skills'
+                    }
+                ],
+                limit: 50 // Limiter pour ne pas récupérer trop de questions inappropriées
+            });
+            
+            console.log(`${otherTestQuestions.length} questions supplémentaires trouvées dans d'autres tests`);
+            
+            // Ajouter les nouvelles questions à notre sélection
+            questions = [...questions, ...otherTestQuestions];
+            
+            console.log(`Nombre total de questions disponibles après recherche étendue: ${questions.length}`);
+        } else if (questions.length < minQuestionCount && level_id) {
+            console.log(`
+ATTENTION : Seulement ${questions.length} questions disponibles pour le test_id=${test_id} et level_id=${level_id}, 
+ce qui est inférieur au minimum requis de ${minQuestionCount}. 
+La recherche de questions dans d'autres tests est désactivée car un level_id spécifique a été demandé.`);
+        }
+
+        // Récupérer les compétences pour le test sélectionné
+        const skills = await fetchTestSkills(test_id);
+
+        console.log(`${skills.length} compétences disponibles pour le test_id=${test_id}`);
+
         // Analyser les types de questions disponibles
-        console.log('Analyse des types de questions disponibles');
-        const questionTypes = analyzeQuestionTypes(availableQuestions);
-        console.log('Types de questions identifiés:', Object.keys(questionTypes || {}));
+        const questionTypes = analyzeQuestionTypes(questions);
         
-        // Générer une sélection équilibrée de questions
-        console.log('Sélection des questions avec équilibrage');
-        const selectedQuestions = selectBalancedQuestions(
-            availableQuestions, 
-            testSkills, 
-            questionTypes || {},
-            examData.totalPoints,
-            examData.totalDuration
+        // Créer une distribution par défaut basée sur les questions disponibles
+        const questionTypeDistribution = {};
+        const totalQuestions = questions.length;
+        
+        Object.keys(questionTypes).forEach(type => {
+            const typePercentage = Math.round((questionTypes[type].count / totalQuestions) * 100);
+            questionTypeDistribution[type] = typePercentage;
+        });
+        
+        console.log('Distribution des types de questions:', 
+            Object.entries(questionTypeDistribution).map(([type, percent]) => `${type}: ${percent}%`).join(', ')
         );
-        console.log(`Nombre de questions sélectionnées: ${selectedQuestions ? selectedQuestions.length : 0}`);
 
-        // Créer le sujet d'examen dans la base de données
-        console.log('Création du sujet dans la base de données');
-        const subject = await createSubject(examData, selectedQuestions || [], { transaction });
+        // Sélectionner les questions de manière équilibrée
+        const selectedQuestions = selectBalancedQuestions(
+            questions, 
+            skills, 
+            questionTypes,
+            totalPoints,
+            totalDuration
+        );
+
+        if (!selectedQuestions || selectedQuestions.length === 0) {
+            throw new Error('Aucune question n\'a pu être sélectionnée pour le sujet');
+        }
+
+        console.log(`
+RÉSUMÉ DE LA SÉLECTION
+----------------------
+Nombre de questions sélectionnées: ${selectedQuestions.length}
+Nombre de questions disponibles initialement: ${questions.length}
+`);
         
-        // Si nous avons créé notre propre transaction, nous la validons ici
-        if (shouldCommitTransaction) {
+        // Calculer les statistiques finales du sujet
+        let finalPoints = selectedQuestions.reduce((sum, q) => sum + (parseInt(q.points, 10) || 0), 0);
+        let finalDuration = selectedQuestions.reduce((sum, q) => sum + (parseInt(q.duration, 10) || 0), 0);
+        
+        // Calculer le pourcentage d'atteinte des objectifs
+        let pointsPercentage = Math.round((finalPoints / totalPoints) * 100);
+        let durationPercentage = Math.round((finalDuration / totalDuration) * 100);
+        
+        // Vérifier si le sujet respecte les contraintes de durée et de points
+        if (finalDuration > totalDuration) {
+            console.warn(`
+ATTENTION: La durée totale du sujet (${finalDuration} secondes) dépasse la durée maximale autorisée (${totalDuration} secondes).
+Cela peut être dû à la difficulté de trouver des questions qui respectent exactement les contraintes.
+`);
+            
+            // Si la durée dépasse de plus de 5%, essayer de retirer des questions pour se rapprocher de la limite
+            if (finalDuration > totalDuration * 1.05) {
+                console.log('Tentative d\'optimisation du sujet pour respecter la contrainte de durée...');
+                
+                // Trier les questions par rapport points/durée (efficacité) décroissant
+                // pour retirer en priorité les questions les moins efficaces
+                selectedQuestions.sort((a, b) => {
+                    const efficiencyA = (a.points || 0) / Math.max(1, a.duration || 1);
+                    const efficiencyB = (b.points || 0) / Math.max(1, b.duration || 1);
+                    return efficiencyA - efficiencyB; // Ordre croissant pour retirer les moins efficaces en premier
+                });
+                
+                // Retirer des questions jusqu'à respecter la contrainte de durée
+                while (selectedQuestions.length > 0 && 
+                       selectedQuestions.reduce((sum, q) => sum + (parseInt(q.duration, 10) || 0), 0) > totalDuration) {
+                    const removedQuestion = selectedQuestions.shift(); // Retirer la question la moins efficace
+                    console.log(`Question ${removedQuestion.question_id} retirée pour optimiser la durée (${removedQuestion.duration} secondes)`);
+                }
+                
+                // Recalculer les statistiques après optimisation
+                finalPoints = selectedQuestions.reduce((sum, q) => sum + (parseInt(q.points, 10) || 0), 0);
+                finalDuration = selectedQuestions.reduce((sum, q) => sum + (parseInt(q.duration, 10) || 0), 0);
+                
+                console.log(`
+APRÈS OPTIMISATION:
+Points: ${finalPoints}/${totalPoints} (${Math.round((finalPoints / totalPoints) * 100)}%)
+Durée: ${finalDuration}/${totalDuration} secondes (${Math.round((finalDuration / totalDuration) * 100)}%)
+Nombre de questions: ${selectedQuestions.length}
+`);
+                
+                // Mettre à jour les statistiques finales
+                pointsPercentage = Math.round((finalPoints / totalPoints) * 100);
+                durationPercentage = Math.round((finalDuration / totalDuration) * 100);
+            }
+        }
+        
+        console.log(`
+STATISTIQUES FINALES DU SUJET
+-----------------------------
+Points: ${finalPoints}/${totalPoints} (${pointsPercentage}%)
+Durée: ${finalDuration}/${totalDuration} secondes (${durationPercentage}%)
+Nombre de questions: ${selectedQuestions.length}${selectedQuestions.length < minQuestionCount ? ' (INFÉRIEUR AU MINIMUM REQUIS)' : ''}
+`);
+
+        // Analyser la couverture des compétences
+        const coveredSkills = new Set();
+        selectedQuestions.forEach(q => {
+            (q.skills || []).forEach(s => coveredSkills.add(s.skill_id));
+        });
+        
+        // Éviter la division par zéro et afficher un message approprié
+        if (skills.length === 0) {
+            console.log(`Couverture des compétences: ${coveredSkills.size}/0 (Aucune compétence définie pour ce test)`);
+        } else {
+            const coveragePercentage = Math.round((coveredSkills.size / skills.length) * 100);
+            console.log(`Couverture des compétences: ${coveredSkills.size}/${skills.length} (${coveragePercentage}%)`);
+        }
+        
+        // Créer le sujet dans la base de données
+        createdSubject = await createSubject(
+            {
+                title: title || `Sujet test_id=${test_id} level_id=${level_id || 'tous'}`,
+                test_id,
+                level_id: level_id || null,
+                description: description || `Sujet généré automatiquement avec ${selectedQuestions.length} questions`
+            },
+            selectedQuestions,
+            { transaction, ...options }
+        );
+
+        // Si la transaction a été créée ici, la valider
+        if (!options.transaction) {
             await transaction.commit();
-            console.log(`Transaction validée avec succès pour le sujet ${subject.subject_id}`);
+            console.log('Transaction validée avec succès');
         }
-        
-        // Comme le subject retourné par createSubject contient déjà les questions,
-        // nous n'avons pas besoin de le récupérer à nouveau
-        return subject;
+
+        return {
+            subject_id: createdSubject.subject_id,
+            name: createdSubject.name,
+            test_id: createdSubject.test_id,
+            level_id: createdSubject.level_id,
+            questions: selectedQuestions,
+            totalPoints: finalPoints,
+            totalDuration: finalDuration,
+            questionCount: selectedQuestions.length,
+            coverageStats: {
+                pointsPercentage,
+                durationPercentage,
+                skillsCovered: coveredSkills.size,
+                skillsTotal: skills.length
+            }
+        };
     } catch (error) {
-        // Si nous avons créé notre propre transaction, nous l'annulons en cas d'erreur
-        if (shouldCommitTransaction) {
+        // Si la transaction a été créée ici, l'annuler en cas d'erreur
+        if (!options.transaction) {
             await transaction.rollback();
-            console.log('Transaction annulée suite à une erreur');
+            console.error('Transaction annulée suite à une erreur:', error);
         }
-        console.error('Erreur détaillée lors de la génération du sujet:', error);
         throw error;
     }
 }
@@ -118,63 +322,286 @@ function validateExamData(examData) {
  * Récupère les questions disponibles pour un test et niveau donnés
  * @param {Number} testId - L'identifiant du test
  * @param {Number} levelId - L'identifiant du niveau (optionnel)
+ * @param {Object} examData - Les données du sujet à générer
  * @returns {Array} - Les questions disponibles
  */
-async function fetchAvailableQuestions(testId, levelId) {
-    const whereClause = { test_id: testId };
+async function fetchAvailableQuestions(testId, levelId, examData) {
+    console.log(`Recherche de questions disponibles pour test_id=${testId}${levelId ? ` et level_id=${levelId}` : ' (sans niveau)'}`);
     
-    // Ajouter le niveau à la clause where s'il est spécifié
-    if (levelId) {
-        whereClause.level_id = levelId;
+    if (!testId) {
+        console.error('test_id est requis pour la recherche de questions');
+        return [];
     }
+
+    const totalPoints = examData?.totalPoints || 0;
+    const totalDuration = examData?.totalDuration || 0;
+    const minQuestionCount = examData?.minQuestionCount || 10;
     
+    console.log(`Objectifs: ${totalPoints} points, ${totalDuration} secondes, minimum ${minQuestionCount} questions`);
+
     try {
-        console.log(`Recherche de questions avec test_id=${testId}${levelId ? ` et level_id=${levelId}` : ''}`);
+        // Construire la clause where en fonction de la présence ou non d'un niveau
+        const whereClause = {
+            test_id: testId
+        };
         
-        // Utiliser l'association définie dans les modèles
-        const questions = await models.Question.findAll({
+        // Si un level_id est fourni, l'ajouter à la clause where
+        if (levelId) {
+            whereClause.level_id = levelId;
+        }
+        
+        // ÉTAPE 1: Récupérer les questions disponibles qui n'ont jamais été utilisées dans un sujet
+        const freshQuestions = await models.Question.findAll({
             where: whereClause,
-            include: [
-                {
-                    model: models.Skill,
-                    as: 'skills',
-                    through: { attributes: [] } // Ne pas inclure les attributs de la table de jointure
-                }
-            ]
+            include: [{
+                model: models.Skill,
+                attributes: ['skill_id', 'label', 'parent_id', 'test_id'],  // Inclure les attributs pour vérification
+                as: 'skills',
+                through: { attributes: [] },
+                where: { test_id: testId }  // S'assurer que les compétences correspondent au test_id
+            }]
+        });
+
+        console.log(`Étape 1: ${freshQuestions.length} questions fraîches trouvées (jamais utilisées)`);
+        
+        // Vérifier que chaque question a au moins une compétence du test demandé
+        const validFreshQuestions = freshQuestions.filter(question => {
+            const hasValidSkills = question.skills && 
+                                  question.skills.length > 0 && 
+                                  question.skills.some(skill => skill.test_id === testId);
+            
+            if (!hasValidSkills) {
+                console.warn(`Question ${question.question_id} ignorée: aucune compétence valide pour test_id=${testId}`);
+            }
+            
+            return hasValidSkills;
         });
         
-        console.log(`${questions.length} questions trouvées avec leurs compétences associées`);
-        return questions;
+        if (validFreshQuestions.length < freshQuestions.length) {
+            console.warn(`${freshQuestions.length - validFreshQuestions.length} questions ignorées car elles n'ont pas de compétences valides pour test_id=${testId}`);
+        }
+        
+        // Calculer les points et la durée disponibles avec ces questions fraîches valides
+        let availablePoints = 0;
+        let availableDuration = 0;
+        
+        validFreshQuestions.forEach(question => {
+            availablePoints += (question.points || 0);
+            availableDuration += (question.duration || 0);
+        });
+        
+        console.log(`Points disponibles avec questions fraîches: ${availablePoints}/${totalPoints} (${Math.round(availablePoints/totalPoints*100)}%)`);
+        console.log(`Durée disponible avec questions fraîches: ${availableDuration}/${totalDuration} (${Math.round(availableDuration/totalDuration*100)}%)`);
+        
+        // Si nous avons suffisamment de questions fraîches, les utiliser
+        if (validFreshQuestions.length >= minQuestionCount && 
+            availablePoints >= totalPoints && 
+            availableDuration >= totalDuration) {
+            console.log('Suffisamment de questions fraîches disponibles. Utilisation exclusive de ces questions.');
+            return validFreshQuestions;
+        }
+        
+        // ÉTAPE 2: Si pas assez de questions fraîches, chercher dans les sujets précédents
+        const freshQuestionIds = validFreshQuestions.map(q => q.question_id);
+        
+        console.log('Pas assez de questions fraîches. Recherche de questions dans les sujets précédents...');
+        
+        // Ajouter à la clause where la condition pour exclure les questions fraîches
+        const previousWhereClause = {
+            ...whereClause,
+            question_id: {
+                [Op.notIn]: freshQuestionIds
+            }
+        };
+        
+        const previouslyUsedQuestions = await models.Question.findAll({
+            where: previousWhereClause,
+            include: [{
+                model: models.Skill,
+                attributes: ['skill_id', 'label', 'parent_id', 'test_id'],
+                as: 'skills',
+                through: { attributes: [] },
+                where: { test_id: testId }  // S'assurer que les compétences correspondent au test_id
+            },
+            {
+                model: models.Subject,
+                attributes: [],
+                as: 'subjects',
+                through: { attributes: [] }
+            }
+            ],
+            // Ordonner par fréquence d'utilisation (privilégier les moins utilisées)
+            order: [
+                [sequelize.fn('COUNT', sequelize.col('subjects.subject_id')), 'ASC']
+            ],
+            group: ['Question.question_id']
+        });
+        
+        console.log(`Étape 2: ${previouslyUsedQuestions.length} questions supplémentaires trouvées dans des sujets précédents`);
+        
+        // Vérifier que chaque question a au moins une compétence du test demandé
+        const validPreviouslyUsedQuestions = previouslyUsedQuestions.filter(question => {
+            const hasValidSkills = question.skills && 
+                                  question.skills.length > 0 && 
+                                  question.skills.some(skill => skill.test_id === testId);
+            
+            if (!hasValidSkills) {
+                console.warn(`Question ${question.question_id} ignorée: aucune compétence valide pour test_id=${testId}`);
+            }
+            
+            return hasValidSkills;
+        });
+        
+        if (validPreviouslyUsedQuestions.length < previouslyUsedQuestions.length) {
+            console.warn(`${previouslyUsedQuestions.length - validPreviouslyUsedQuestions.length} questions précédemment utilisées ignorées car elles n'ont pas de compétences valides pour test_id=${testId}`);
+        }
+        
+        // Combiner les questions fraîches et celles des sujets précédents
+        let combinedQuestions = [...validFreshQuestions, ...validPreviouslyUsedQuestions];
+        
+        // Recalculer les statistiques avec toutes les questions
+        availablePoints = 0;
+        availableDuration = 0;
+        
+        combinedQuestions.forEach(question => {
+            availablePoints += (question.points || 0);
+            availableDuration += (question.duration || 0);
+        });
+        
+        console.log(`Points disponibles après étape 2: ${availablePoints}/${totalPoints} (${Math.round(availablePoints/totalPoints*100)}%)`);
+        console.log(`Durée disponible après étape 2: ${availableDuration}/${totalDuration} (${Math.round(availableDuration/totalDuration*100)}%)`);
+        
+        // Vérifier si nous avons suffisamment de questions pour générer un sujet
+        if (combinedQuestions.length < minQuestionCount || 
+            availablePoints < totalPoints || 
+            availableDuration < totalDuration) {
+            console.log(`ATTENTION: Seulement ${combinedQuestions.length} questions disponibles totalisant ${availablePoints} points et ${availableDuration} secondes.`);
+            console.log(`Cela peut être insuffisant pour générer un sujet de ${totalPoints} points et ${totalDuration} secondes.`);
+            console.log("Aucune question supplémentaire ne sera ajoutée depuis d'autres tests ou niveaux conformément aux exigences.");
+        }
+        
+        // Statistiques finales
+        console.log(`Nombre total de questions disponibles: ${combinedQuestions.length}`);
+        
+        // Ordonner les questions pour privilégier les questions fraîches
+        combinedQuestions.sort((a, b) => {
+            // Si un niveau est spécifié, privilégier les questions du bon niveau
+            if (levelId) {
+                if (a.level_id === levelId && b.level_id !== levelId) return -1;
+                if (a.level_id !== levelId && b.level_id === levelId) return 1;
+            }
+            
+            // Ensuite, privilégier les questions jamais utilisées
+            const aUsageCount = a.subjects?.length || 0;
+            const bUsageCount = b.subjects?.length || 0;
+            return aUsageCount - bUsageCount;
+        });
+        
+        return combinedQuestions;
     } catch (error) {
         console.error('Erreur lors de la récupération des questions:', error);
-        
-        // En cas d'erreur, utiliser une méthode de secours
-        try {
-            console.log('Tentative de récupération alternative des questions...');
-            const basicQuestions = await models.Question.findAll({
-                where: whereClause
-            });
-            
-            console.log(`Récupération alternative: ${basicQuestions.length} questions trouvées (sans compétences)`);
-            return basicQuestions;
-        } catch (fallbackError) {
-            console.error('Échec de la récupération alternative des questions:', fallbackError);
-            return [];
-        }
+        return [];
     }
 }
 
 /**
  * Récupère les compétences associées à un test
- * @param {Number} testId - L'identifiant du test
- * @returns {Array} - Les compétences du test
+ * @param {number} testId - L'ID du test
+ * @returns {Array} - Les compétences avec leurs poids
  */
 async function fetchTestSkills(testId) {
-    const skills = await models.Skill.findAll({
-        where: { test_id: testId }
-    });
-    
-    return skills;
+    if (!testId) {
+        console.error('ID de test invalide pour la récupération des compétences');
+        return [];
+    }
+
+    try {
+        console.log(`Récupération des compétences pour le test_id=${testId}`);
+        
+        // Récupérer les compétences avec leurs poids
+        const skills = await models.Skill.findAll({
+            where: { test_id: testId },
+            attributes: ['skill_id', 'label', 'parent_id', 'test_id'],
+            order: [['skill_id', 'ASC']] // Trier par ID de compétence
+        });
+        
+        if (!skills || skills.length === 0) {
+            console.warn(`Aucune compétence trouvée pour le test_id=${testId}`);
+            return [];
+        }
+        
+        // Ajouter un poids par défaut à chaque compétence (puisque ce champ n'existe pas dans le modèle)
+        const skillsWithWeight = skills.map(skill => {
+            const skillData = skill.get({ plain: true });
+            skillData.weight = 1.0; // Poids par défaut
+            return skillData;
+        });
+        
+        // Afficher des statistiques sur les compétences trouvées
+        const skillCount = skillsWithWeight.length;
+        const weightStats = { total: skillCount, min: 1.0, max: 1.0 };
+        const avgWeight = 1.0;
+        
+        console.log(`
+COMPÉTENCES DU TEST
+-------------------
+Nombre de compétences: ${skillCount}
+Poids moyen: ${avgWeight.toFixed(2)}
+Poids minimum: ${weightStats.min.toFixed(2)}
+Poids maximum: ${weightStats.max.toFixed(2)}
+`);
+        
+        // Récupérer les questions associées à chaque compétence pour analyse
+        const questionsPerSkill = await models.Skill.findAll({
+            attributes: [
+                'skill_id',
+                [sequelize.fn('COUNT', sequelize.col('questions.question_id')), 'question_count']
+            ],
+            include: [{
+                model: models.Question,
+                attributes: [],
+                as: 'questions',
+                through: { attributes: [] }
+            }],
+            where: { test_id: testId },
+            group: ['Skill.skill_id'],
+            raw: true
+        });
+        
+        // Mapper les statistiques sur les compétences
+        const skillMap = {};
+        questionsPerSkill.forEach(stat => {
+            skillMap[stat.skill_id] = parseInt(stat.question_count, 10);
+        });
+        
+        // Ajouter les statistiques aux compétences
+        const enhancedSkills = skillsWithWeight.map(skill => {
+            const skillData = skill;
+            skillData.questionCount = skillMap[skill.skill_id] || 0;
+            return skillData;
+        });
+        
+        // Trier en fonction du nombre de questions (pour donner la priorité aux compétences avec moins de questions)
+        enhancedSkills.sort((a, b) => {
+            // D'abord par poids (décroissant)
+            if (b.weight !== a.weight) {
+                return b.weight - a.weight;
+            }
+            // Ensuite par nombre de questions (croissant)
+            return a.questionCount - b.questionCount;
+        });
+        
+        // Afficher les 5 premières compétences triées
+        console.log('Top 5 des compétences prioritaires:');
+        enhancedSkills.slice(0, 5).forEach((skill, index) => {
+            console.log(`${index + 1}. ${skill.label} (poids: ${skill.weight}, questions: ${skill.questionCount})`);
+        });
+        
+        return enhancedSkills;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des compétences:', error);
+        return [];
+    }
 }
 
 /**
@@ -212,14 +639,45 @@ function analyzeQuestionTypes(questions) {
  * @param {Array} skills - Les compétences du test
  * @param {Object} questionTypes - Les types de questions disponibles
  * @param {Number} maxPoints - Le nombre maximum de points
- * @param {Number} maxDuration - La durée maximale en minutes
+ * @param {Number} maxDuration - La durée maximale en secondes
  * @returns {Array} - Les questions sélectionnées
  */
 function selectBalancedQuestions(questions, skills, questionTypes, maxPoints, maxDuration) {
     console.log(`Démarrage de la sélection avec ${questions.length} questions, ${skills.length} compétences, maxPoints=${maxPoints}, maxDuration=${maxDuration}`);
     
-    // Convertir la durée en secondes pour correspondre au format de la base de données
-    const maxDurationSeconds = maxDuration * 60;
+    // Vérifier que nous avons des questions avec des compétences
+    if (!questions || questions.length === 0) {
+        console.error("Aucune question disponible pour la sélection.");
+        return [];
+    }
+    
+    // Vérifier que les questions ont des compétences
+    const questionsWithSkills = questions.filter(q => q.skills && q.skills.length > 0);
+    if (questionsWithSkills.length === 0) {
+        console.error("Aucune question avec des compétences n'est disponible pour la sélection.");
+        return [];
+    }
+    
+    // Si aucune compétence n'est fournie, extraire les compétences des questions
+    if (!skills || skills.length === 0) {
+        console.warn("Aucune compétence n'a été fournie. Extraction des compétences à partir des questions...");
+        const extractedSkills = new Set();
+        questionsWithSkills.forEach(q => {
+            (q.skills || []).forEach(s => {
+                if (s && s.skill_id) {
+                    extractedSkills.add(s);
+                }
+            });
+        });
+        skills = Array.from(extractedSkills);
+        console.log(`${skills.length} compétences extraites des questions.`);
+    }
+    
+    // La durée est déjà en secondes, correspondant au format de la base de données
+    const maxDurationSeconds = maxDuration;
+    
+    // Récupérer le test_id des compétences pour vérification
+    const testId = skills.length > 0 ? skills[0].test_id : null;
     
     // Initialiser les statistiques pour le suivi de la sélection
     const stats = {
@@ -228,9 +686,8 @@ function selectBalancedQuestions(questions, skills, questionTypes, maxPoints, ma
         currentDuration: 0,
         skillCoverage: {},
         typeCoverage: {},
-        // Stocker ces valeurs pour y faire référence plus tard
-        maxPoints: maxPoints,
-        maxDurationSeconds: maxDurationSeconds
+        // Ajouter un suivi des compétences déjà couvertes
+        coveredSkills: new Set()
     };
     
     // Initialiser le suivi des compétences
@@ -284,88 +741,87 @@ function selectBalancedQuestions(questions, skills, questionTypes, maxPoints, ma
     
     // Processus de sélection itératif
     let remainingQuestions = [...questionsWithWeight];
-    let canAddMore = true;
-    let iterationCount = 0;
-    const MAX_ITERATIONS = 100; // Limiter le nombre d'itérations pour éviter une boucle infinie
+    let iteration = 0;
+    const maxIterations = questions.length * 2; // Éviter les boucles infinies
     
     console.log('Démarrage du processus de sélection itératif');
-    while (canAddMore && remainingQuestions.length > 0 && iterationCount < MAX_ITERATIONS) {
-        iterationCount++;
-        console.log(`Itération ${iterationCount}, ${remainingQuestions.length} questions restantes`);
+    
+    // Continuer tant qu'il y a des questions disponibles et que les objectifs ne sont pas atteints
+    while (remainingQuestions.length > 0 && 
+           iteration < maxIterations && 
+           stats.currentPoints < maxPoints && 
+           stats.currentDuration < maxDurationSeconds) {
         
-        // Recalculer les poids pour les questions restantes
-        try {
-            remainingQuestions.forEach(item => {
-                if (item && item.question) {
-                    item.weight = calculateQuestionWeight(item.question, stats, skills, questionTypes);
-                }
-            });
-        } catch (error) {
-            console.error(`Erreur lors du recalcul des poids à l'itération ${iterationCount}:`, error);
-            break;
-        }
+        iteration++;
+        console.log(`Itération ${iteration}, ${remainingQuestions.length} questions restantes`);
         
-        // Trier par poids décroissant
-        remainingQuestions.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+        // Recalculer les poids des questions restantes en fonction de la sélection actuelle
+        remainingQuestions.forEach(item => {
+            try {
+                item.weight = calculateQuestionWeight(item.question, stats, skills, questionTypes);
+            } catch (error) {
+                console.error(`Erreur lors du recalcul du poids pour la question ${item.question.question_id}:`, error);
+                // Garder le poids précédent en cas d'erreur
+            }
+        });
         
-        // Vérifier qu'il reste des questions
-        if (remainingQuestions.length === 0 || !remainingQuestions[0]) {
-            console.log('Plus de questions disponibles');
-            canAddMore = false;
-            continue;
-        }
+        // Trier les questions par poids décroissant
+        remainingQuestions.sort((a, b) => b.weight - a.weight);
         
         // Sélectionner la question avec le poids le plus élevé
-        const topCandidate = remainingQuestions[0];
+        const selectedItem = remainingQuestions.shift();
+        const selectedQuestion = selectedItem.question;
         
-        if (!topCandidate || !topCandidate.question) {
-            console.error('Candidat invalide sélectionné');
-            remainingQuestions.shift(); // Retirer le candidat invalide
-            continue;
-        }
+        // Vérifier si l'ajout de cette question ne ferait pas dépasser les limites
+        const newPoints = stats.currentPoints + (selectedQuestion.points || 0);
+        const newDuration = stats.currentDuration + (selectedQuestion.duration || 0);
         
-        // Vérifier si l'ajout de cette question respecte les contraintes
-        if (stats.currentPoints + topCandidate.question.points <= maxPoints && 
-            stats.currentDuration + topCandidate.question.duration <= maxDurationSeconds) {
+        if (newPoints <= maxPoints && newDuration <= maxDurationSeconds) {
+            // Mettre à jour les statistiques
+            stats.selectedQuestions.push(selectedQuestion);
+            stats.currentPoints = newPoints;
+            stats.currentDuration = newDuration;
             
-            // Ajouter la question sélectionnée
-            stats.selectedQuestions.push(topCandidate.question);
-            stats.currentPoints += topCandidate.question.points;
-            stats.currentDuration += topCandidate.question.duration;
-            
-            console.log(`Question ${topCandidate.question.question_id} ajoutée. Total: ${stats.selectedQuestions.length} questions, ${stats.currentPoints}/${maxPoints} points, ${stats.currentDuration}/${maxDurationSeconds} sec`);
-            
-            // Mettre à jour les statistiques de couverture
-            try {
-                updateCoverageStats(topCandidate.question, stats);
-            } catch (error) {
-                console.error(`Erreur lors de la mise à jour des statistiques pour la question ${topCandidate.question.question_id}:`, error);
-            }
-            
-            // Retirer la question des candidats
-            remainingQuestions = remainingQuestions.filter(item => 
-                item && item.question && topCandidate.question && 
-                item.question.question_id !== topCandidate.question.question_id
-            );
+            // Mettre à jour la couverture des compétences et des types
+            updateCoverageStats(selectedQuestion, stats);
         } else {
-            console.log(`Question ${topCandidate.question.question_id} rejetée: dépasse les limites`);
-            // Retirer cette question des candidats puisqu'elle dépasse les limites
-            remainingQuestions.shift();
+            // Si cette question ferait dépasser les limites, la remettre dans la liste pour une éventuelle sélection ultérieure
+            // mais avec un poids réduit pour diminuer ses chances d'être sélectionnée à nouveau
+            selectedItem.weight = selectedItem.weight * 0.5;
+            remainingQuestions.push(selectedItem);
+            // Trier à nouveau pour maintenir l'ordre par poids
+            remainingQuestions.sort((a, b) => b.weight - a.weight);
             
-            // Vérifier si d'autres questions peuvent être ajoutées
-            if (remainingQuestions.length === 0 || 
-                remainingQuestions.every(item => 
-                    !item || !item.question || 
-                    stats.currentPoints + item.question.points > maxPoints || 
-                    stats.currentDuration + item.question.duration > maxDurationSeconds
-                )) {
-                console.log('Plus aucune question ne peut être ajoutée sans dépasser les limites');
-                canAddMore = false;
+            console.log(`Question ${selectedQuestion.question_id} rejetée: dépasserait les limites (points: ${newPoints}/${maxPoints}, durée: ${newDuration}/${maxDurationSeconds})`);
+        }
+        
+        // Vérifier si la sélection a atteint 95% des objectifs de points ET de durée
+        // Si oui, prioritiser les questions complémentaires pour les compétences non couvertes
+        if (stats.currentPoints >= maxPoints * 0.95 && stats.currentDuration >= maxDurationSeconds * 0.95) {
+            console.log(`Les objectifs principaux sont presque atteints. Priorité aux compétences non couvertes.`);
+            
+            // Identifier les compétences non couvertes
+            const uncoveredSkillIds = Object.keys(stats.skillCoverage)
+                .filter(skillId => stats.skillCoverage[skillId] === 0)
+                .map(skillId => parseInt(skillId, 10));
+            
+            if (uncoveredSkillIds.length > 0) {
+                // Filtrer pour ne garder que les questions qui couvrent des compétences non couvertes
+                remainingQuestions = remainingQuestions.filter(item => {
+                    const questionSkills = item.question.skills || [];
+                    return questionSkills.some(skill => uncoveredSkillIds.includes(skill.skill_id));
+                });
+                
+                console.log(`Recentrage sur ${remainingQuestions.length} questions couvrant des compétences manquantes`);
             }
         }
+        
+        console.log(`Question ${selectedQuestion.question_id} ajoutée. Total: ${stats.selectedQuestions.length} questions, ${stats.currentPoints}/${maxPoints} points, ${stats.currentDuration}/${maxDurationSeconds} sec`);
     }
     
     console.log(`Sélection terminée: ${stats.selectedQuestions.length} questions, ${stats.currentPoints}/${maxPoints} points, ${stats.currentDuration}/${maxDurationSeconds} sec`);
+    
+    // Retourner les objets Question directement, pas les objets {question, weight}
     return stats.selectedQuestions;
 }
 
@@ -459,11 +915,26 @@ function calculateQuestionWeight(question, stats, skills, questionTypes) {
         const points = Number(question.points) || 0;
         const duration = Number(question.duration) || 0;
         
-        const pointsLimit = (currentPoints + points) >= maxPoints * 0.95;
-        const durationLimit = (currentDuration + duration) >= maxDurationSeconds * 0.95;
+        // Vérifier si l'ajout de cette question dépasserait les limites
+        const wouldExceedPoints = (currentPoints + points) > maxPoints;
+        const wouldExceedDuration = (currentDuration + duration) > maxDurationSeconds;
         
-        if (pointsLimit || durationLimit) {
-            weight *= 0.5; // Réduire le poids si on s'approche des limites
+        // Si la question ferait dépasser l'une des limites, la pénaliser fortement
+        if (wouldExceedPoints || wouldExceedDuration) {
+            weight *= 0.1; // Pénalité forte pour les questions qui dépasseraient les limites
+        } else {
+            // Sinon, appliquer une pénalité progressive à mesure qu'on s'approche des limites
+            const pointsRatio = (currentPoints + points) / maxPoints;
+            const durationRatio = (currentDuration + duration) / maxDurationSeconds;
+            
+            // Plus on s'approche des limites, plus la pénalité est forte
+            if (pointsRatio > 0.9 || durationRatio > 0.9) {
+                weight *= 0.5;
+            } else if (pointsRatio > 0.8 || durationRatio > 0.8) {
+                weight *= 0.7;
+            } else if (pointsRatio > 0.7 || durationRatio > 0.7) {
+                weight *= 0.9;
+            }
         }
     } catch (error) {
         console.error('Erreur lors du calcul de la pénalité de proximité des limites:', error);

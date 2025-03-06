@@ -127,6 +127,34 @@ class PermissionService {
         }
       }
       
+      // Cas spécial pour les ressources qui n'ont pas d'ID spécifique (comme la liste des sujets)
+      if (!resourceId && ['subject'].includes(resource)) {
+        console.log(`DEBUG - PermissionService - Vérification des permissions générales pour ${action} ${resource}`);
+        
+        // Vérifier si l'utilisateur a les permissions nécessaires dans au moins un institut
+        for (const institut of userInstituts) {
+          const institutRolePower = institut.Role.power;
+          const permissions = INSTITUT_ROLE_PERMISSIONS[institutRolePower] || [];
+          
+          console.log(`DEBUG - PermissionService - Vérification institut ${institut.institut_id} avec power=${institutRolePower}`);
+          console.log(`DEBUG - PermissionService - Permissions disponibles: ${JSON.stringify(permissions)}`);
+          
+          const hasPermission = permissions.some(permission => 
+            permission === '*' || 
+            permission === `${action}:*` || 
+            permission === `*:${resource}` || 
+            permission === `${action}:${resource}`
+          );
+          
+          console.log(`DEBUG - PermissionService - Institut ${institut.institut_id} a la permission? ${hasPermission}`);
+          
+          if (hasPermission) {
+            console.log(`DEBUG - PermissionService - Permission accordée par le rôle dans l'institut ${institut.institut_id} (power=${institutRolePower})`);
+            return true;
+          }
+        }
+      }
+      
       console.log(`DEBUG - PermissionService - Permission refusée`);
       return false;
     } catch (error) {

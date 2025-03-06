@@ -37,7 +37,7 @@ const SYSTEM_ROLE_PERMISSIONS = {
     ...readPermissionFor(RESOURCES.SKILL),
     ...readPermissionFor(RESOURCES.COUNTRY),
     ...readPermissionFor(RESOURCES.LANGUAGE),
-    ...readPermissionFor(RESOURCES.ROLE)
+    ...readPermissionFor(RESOURCES.ROLE),
   ]
 };
 
